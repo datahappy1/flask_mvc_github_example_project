@@ -9,10 +9,11 @@ class GitHubClass:
         #g = Github("yourAccount", "yourPassword")
 
         # or using an access token
-        g = Github("")
+        g = Github("accesstoken")
         # https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
-        self.repo = g.get_repo("datahappy1/flask_github_integrator")
+        #self.repo = g.get_repo("datahappy1/flask_github_integrator")
+        self.repo = g.get_repo("konciergeMD/falkon-configs")
         self.branch_name = "dev"
         self.fpath = os.getcwd().rstrip('lib') + os.path.join('files', 'temp', 'test_' + self.branch_name + '.json')
 
