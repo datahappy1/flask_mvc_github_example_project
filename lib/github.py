@@ -6,10 +6,10 @@ import os
 class GitHubClass:
     def __init__(self):
         # using username and password
-        g = Github("yourAccount", "yourPassword")
+        #g = Github("yourAccount", "yourPassword")
 
         # or using an access token
-        # g = Github("access_token")
+        g = Github("")
         # https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
         self.repo = g.get_repo("datahappy1/flask_github_integrator")
@@ -40,3 +40,9 @@ class GitHubClass:
 
     def put_file(self):
         pass
+
+
+
+obj = GitHubClass()
+lb = GitHubClass.list_branches(obj)
+print(lb)

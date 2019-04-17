@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def returner():
+    os.chdir("..")
     path = os.path.abspath(os.curdir) + os.path.join(os.sep, 'files', 'temp', 'test_dev.json')
 
     with open(path, "r") as f:
