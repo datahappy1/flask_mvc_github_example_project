@@ -54,16 +54,3 @@ class GitHubClass:
         contents = self.repo.get_contents("test.txt", ref="test")
         self.repo.update_file(contents.path, "more tests", "more tests", contents.sha, branch=self.branch_name)
         return 0
-
-
-#token = "978ea3d99448d749df792b9bf3487c43fc753756"
-#repo = "datahappy1/flask_github_integrator"
-#branch_name = "dev"
-#local_file_path = os.getcwd().rstrip('lib') + os.path.join('\\files', 'temp', 'test_' + branch_name + '.json')
-
-
-#obj = GitHubClass(init_token=token, init_repo=repo, init_branch_name=branch_name, init_local_file_path=local_file_path)
-#x = GitHubClass.list_all_branches(obj)
-#x = GitHubClass.list_all_files(obj)
-#x = GitHubClass.get_session_id(obj)
-#print(x)
