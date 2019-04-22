@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="home">
+    <h1>Config Manager</h1>
+    <p>This website was built with Python via the Flask framework.</p>
+
+      <ul>
+          <li>Github session object ID: {{ gh_session_id }}</li>
+          <li>Branches list: {{ b_list }}</li>
+          <li>Files list in the branch: {{ curr_branch }} : {{ f_list }}</li>
+          <li>Upload a new file:</li>
+    </ul>
+
+  </div>
+{% endblock %}

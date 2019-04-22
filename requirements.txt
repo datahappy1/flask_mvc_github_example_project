@@ -1,0 +1,5 @@
+flask
+flask-WTF
+pandas
+github
+requests
