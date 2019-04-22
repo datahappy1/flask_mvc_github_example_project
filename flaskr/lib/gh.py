@@ -11,7 +11,7 @@ class GitHubClass:
     """
     def __init__(self, init_token, init_repo, init_branch_name, init_local_file_path):
         # using username and password
-        #g = Github("", "")
+        # g = Github("", "")
         # or using an access token
         self.token = init_token
         self.g = Github(self.token)

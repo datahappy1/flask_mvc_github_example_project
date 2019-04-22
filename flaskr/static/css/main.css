@@ -2,20 +2,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-  /*gradient CSS 3 start*/
-  background: rgb(216,215,231);
-  background: -moz-linear-gradient(140deg, rgba(216,215,231,1) 0%, rgba(18,150,184,1) 100%);
-  background: -webkit-linear-gradient(140deg, rgba(216,215,231,1) 0%, rgba(18,150,184,1) 100%);
-  background: linear-gradient(140deg, rgba(216,215,231,1) 0%, rgba(18,150,184,1) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#d8d7e7",endColorstr="#1296b8",GradientType=1);
-  /*gradient CSS 3 end*/
-
-}
-
-a {
-    color: #fff;
-    text-decoration: none;
 }
 
 /*
@@ -28,6 +14,12 @@ header {
   opacity: .9;
   margin-bottom: 10px;
 }
+
+header a {
+    color: #fff;
+    text-decoration: none;
+}
+
 header h1.logo {
   margin: 0;
   font-size: 1.7em;
@@ -44,19 +36,18 @@ header h1.logo:hover {
  */
 .container {
   width: 1200px;
-  height: 100vh;
   margin: 0 auto;
 }
 div.config {
   padding: 10px 0 30px 0;
-  background-color: #E6E6FA;
+  /*background-color: #E6E6FA;*/
   -webkit-border-radius: 3px;
      -moz-border-radius: 3px;
           border-radius: 3px;
 }
 div.workflow {
   padding: 10px 0 30px 0;
-  background-color: #E6E6FA;
+  /*background-color: #E6E6FA;*/
   -webkit-border-radius: 3px;
      -moz-border-radius: 3px;
           border-radius: 3px;
