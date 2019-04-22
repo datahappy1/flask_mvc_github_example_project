@@ -6,6 +6,9 @@ import requests
 
 
 class GitHubClass:
+    """
+    project github class
+    """
     def __init__(self, init_token, init_repo, init_branch_name, init_local_file_path):
         # using username and password
         #g = Github("", "")
@@ -17,9 +20,17 @@ class GitHubClass:
         self.local_file_path = init_local_file_path
 
     def get_session_id(self):
+        """
+        get session id for testing
+        :return:
+        """
         return self.g
 
     def list_all_branches(self):
+        """
+        list all github repo branches
+        :return:
+        """
         branches = self.repo.get_branches()
         branches_list = []
         for branch in branches:
@@ -27,6 +38,10 @@ class GitHubClass:
         return branches_list
 
     def list_all_files(self):
+        """
+        list all files in a github repo branch
+        :return:
+        """
         files = self.repo.get_contents("files", ref=self.branch_name)
         files_list = []
         for file in files:
@@ -34,6 +49,10 @@ class GitHubClass:
         return files_list
 
     def get_file(self):
+        """
+        get contents of a file in a github repo
+        :return:
+        """
         contents = self.repo.get_contents("files/test.json", ref=self.branch_name)
         url = contents.download_url
         r = requests.get(url)
@@ -47,10 +66,18 @@ class GitHubClass:
         return r.status_code, f_path
 
     def create_file(self):
+        """
+        create a file in a github repo
+        :return:
+        """
         self.repo.create_file("test.txt", "test", "test", branch=self.branch_name)
         return 0
 
     def update_file(self):
+        """
+        update a file in a github repo
+        :return:
+        """
         contents = self.repo.get_contents("test.txt", ref="test")
         self.repo.update_file(contents.path, "more tests", "more tests", contents.sha, branch=self.branch_name)
         return 0
