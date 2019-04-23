@@ -1,9 +1,15 @@
-<html>
-   <body>
+{% extends "layout.html" %}
+{% block content %}
+  <div class="config">
+    <h1>Config Manager</h1>
+    <p>This website was built with Python via the Flask framework.</p>
+
+
       <form action = "/uploader" method = "POST"
          enctype = "multipart/form-data">
          <input type = "file" name = "file" />
          <input type = "submit"/>
       </form>
-   </body>
-</html>
+
+  </div>
+{% endblock %}

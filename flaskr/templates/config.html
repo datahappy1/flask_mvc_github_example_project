@@ -26,6 +26,24 @@
 
           </li>
 
+          {% if temp_f_list %}
+          <li>Local temp files list : {{ temp_f_list }}
+
+              <select name= temp_files method="GET" action="/">
+            {% for temp_file in temp_f_list %}
+            <option value= "{{temp_file}}" SELECTED>{{temp_file}}</option>"
+            {% endfor %}
+            </select>
+
+          </li>
+
+            <li>
+
+                <a href="{{ url_for('temp_files_merge') }}">merge</a> {{ temp_f_list }} files to one config
+
+            </li>
+            {% endif %}
+
           <li>Upload a new layout file <a href="{{url_for('upload')}}">here</a></li>
       </ul>
 
