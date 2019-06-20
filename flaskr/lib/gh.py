@@ -1,9 +1,6 @@
 from github import Github
 import requests
 
-# https://pygithub.readthedocs.io/en/latest/examples.html
-# https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
-
 
 class GitHubClass:
     """
@@ -39,10 +36,10 @@ class GitHubClass:
 
     def list_all_files(self):
         """
-        list all files in a github repo branch
+        list all files_playground in a github repo branch
         :return:
         """
-        files = self.repo.get_contents("files", ref=self.branch_name)
+        files = self.repo.get_contents("files_playground", ref=self.branch_name)
         files_list = []
         for file in files:
             files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
@@ -53,16 +50,12 @@ class GitHubClass:
         get contents of a file in a github repo
         :return:
         """
-        contents = self.repo.get_contents("files/test.json", ref=self.branch_name)
+        contents = self.repo.get_contents("files_playground/test.json", ref=self.branch_name)
         url = contents.download_url
         r = requests.get(url)
         f_path = self.local_file_path
         with open(f_path, 'wb') as f:
             f.write(r.content)
-        # Retrieve HTTP meta-data
-        # print(r.status_code)
-        # print(r.headers['content-type'])
-        # print(r.encoding)
         return r.status_code, f_path
 
     def create_file(self):

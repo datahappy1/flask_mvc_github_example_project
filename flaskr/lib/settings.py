@@ -1,1 +1,2 @@
-repo = "datahappy1/flask_github_integrator"
+repo = "datahappy1/flask_mvc_github_example"
+repo_folder = "/files_playground/"

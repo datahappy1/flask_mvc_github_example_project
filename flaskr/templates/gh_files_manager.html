@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="gh_files_manager">
+    <h1>Github files manager</h1>
+    <p>Let's see how we can work with Github files using PyGithub library.</p>
+
+    <ul>
+        <li>Github session object ID: {{ gh_session_id }}</li>
+        <li>Branches list: {{ b_list }}
+
+            <select name=branches method="GET" action="/">
+                {% for branch in b_list %}
+                <option value="{{branch}}" SELECTED>{{branch}}</option>
+                {% endfor %}
+            </select>
+
+        </li>
+
+        <li>Files list in the branch: {{ curr_branch }} : {{ f_list }}
+
+            <select name=files method="GET" action="/">
+                {% for file in f_list %}
+                <option value="{{file}}" SELECTED>{{file}}</option>
+                {% endfor %}
+            </select>
+
+        </li>
+
+        <li>Upload a new layout file <a href="{{url_for('upload')}}">here</a></li>
+    </ul>
+
+</div>
+{% endblock %}
