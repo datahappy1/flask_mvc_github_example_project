@@ -94,3 +94,14 @@ table.unstyledTable thead th {
 table.unstyledTable tfoot {
   font-weight: bold;
 }
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+a.selected {
+  background-color: red;
+  color: white;
+  padding: none;
+}

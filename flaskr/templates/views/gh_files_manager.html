@@ -6,17 +6,15 @@
 
     <ul>
         <li>Github session object ID: {{ gh_session_id }}</li>
-        <li>Branches:
-
-            <select name=branches method="GET" action="/">
-                {% for branch in b_list %}
-                <option value="{{branch}}" SELECTED>{{branch}}</option>
-                {% endfor %}
-            </select>
-
+        <li>Choose a Github branch:
+            {% for branch in template_branch_list %}
+            <a href="/views/gh_files_manager/branch/{{ branch }}"
+               {% if branch== template_current_branch %} class="selected" {% endif %}>{{branch}}</a>
+            {% endfor %}
         </li>
-        <li>Upload a new layout file <a href="{{url_for('upload')}}">here</a></li>
-        <li>Files list in the {{ curr_branch }} branch:</li>
+        <li>Commit a new local file into the {{ template_current_branch }} branch
+            <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/commit">here</a></li>
+        <li>Files list in the {{ template_current_branch }} branch:</li>
 
         <table class="unstyledTable">
             <thead>
@@ -26,11 +24,15 @@
                 <td></td>
             </tr>
             </thead>
-            {% for file in f_list %}
+            {% for file in template_file_list %}
             <tr>
                 <td>{{ file }}</td>
-                <td><a href="gh_file_manager/file/edit/{{ file }}">edit</a></td>
-                <td><a href="gh_file_manager/file/delete/{{ file }}">delete</a></td>
+                <td>
+                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/edit/{{ file }}">edit</a>
+                </td>
+                <td>
+                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/delete/{{ file }}">delete</a>
+                </td>
             </tr>
             {% endfor %}
         </table>
