@@ -4,14 +4,12 @@ from flaskr.lib import gh, settings
 
 # github related variables
 token = os.environ['token']
-# branch_name and local_file_path is temporary for testing
+# branch_name  is temporary for testing
 repo = settings.repo
-branch_name = "dev"
-local_file_path = os.getcwd().rstrip('lib') + os.path.join('files_playground', 'temp', 'test_' + branch_name + '.json')
+branch_name = settings.initial_branch_name
 
 # init the github class
-obj = gh.GitHubClass(init_token=token, init_repo=repo, init_branch_name=branch_name,
-                     init_local_file_path=local_file_path)
+obj = gh.GitHubClass(init_token=token, init_repo=repo, init_branch_name=branch_name)
 
 # flask app starts here
 app = Flask(__name__)
@@ -29,13 +27,13 @@ def gh_files_manager():
     branch_list = gh.GitHubClass.list_all_branches(obj)
     files_list = gh.GitHubClass.list_all_files(obj)
 
-    return render_template('gh_files_manager.html', gh_session_id=gh_session_id,
+    return render_template('/views/gh_files_manager.html', gh_session_id=gh_session_id,
                            b_list=branch_list, curr_branch=branch_name, f_list=files_list)
 
 
 @app.route('/upload')
 def upload():
-    return render_template('upload.html')
+    return render_template('templates/upload.html')
 
 
 @app.route('/uploader', methods=['GET', 'POST'])

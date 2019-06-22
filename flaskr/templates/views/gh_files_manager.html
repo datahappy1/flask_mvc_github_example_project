@@ -6,7 +6,7 @@
 
     <ul>
         <li>Github session object ID: {{ gh_session_id }}</li>
-        <li>Branches list: {{ b_list }}
+        <li>Branches:
 
             <select name=branches method="GET" action="/">
                 {% for branch in b_list %}
@@ -15,18 +15,26 @@
             </select>
 
         </li>
-
-        <li>Files list in the branch: {{ curr_branch }} : {{ f_list }}
-
-            <select name=files method="GET" action="/">
-                {% for file in f_list %}
-                <option value="{{file}}" SELECTED>{{file}}</option>
-                {% endfor %}
-            </select>
-
-        </li>
-
         <li>Upload a new layout file <a href="{{url_for('upload')}}">here</a></li>
+        <li>Files list in the {{ curr_branch }} branch:</li>
+
+        <table class="unstyledTable">
+            <thead>
+            <tr>
+                <td>file name</td>
+                <td></td>
+                <td></td>
+            </tr>
+            </thead>
+            {% for file in f_list %}
+            <tr>
+                <td>{{ file }}</td>
+                <td><a href="gh_file_manager/file/edit/{{ file }}">edit</a></td>
+                <td><a href="gh_file_manager/file/delete/{{ file }}">delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
     </ul>
 
 </div>

@@ -80,3 +80,17 @@ h3 {
   color: #fff;
   text-decoration: none;
 }
+
+table.unstyledTable {
+}
+table.unstyledTable td, table.unstyledTable th {
+}
+table.unstyledTable thead {
+  background: #DDDDDD;
+}
+table.unstyledTable thead th {
+  font-weight: normal;
+}
+table.unstyledTable tfoot {
+  font-weight: bold;
+}

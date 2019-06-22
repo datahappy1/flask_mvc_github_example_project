@@ -6,7 +6,7 @@ class GitHubClass:
     """
     project github class
     """
-    def __init__(self, init_token, init_repo, init_branch_name, init_local_file_path):
+    def __init__(self, init_token, init_repo, init_branch_name):
         # using username and password
         # g = Github("", "")
         # or using an access token
@@ -14,7 +14,6 @@ class GitHubClass:
         self.g = Github(self.token)
         self.repo = self.g.get_repo(init_repo)
         self.branch_name = init_branch_name
-        self.local_file_path = init_local_file_path
 
     def get_session_id(self):
         """
@@ -39,10 +38,11 @@ class GitHubClass:
         list all files_playground in a github repo branch
         :return:
         """
-        files = self.repo.get_contents("files_playground", ref=self.branch_name)
+        # files = self.repo.get_contents("/flaskr/files_playground", ref=self.branch_name)
+        files = self.repo.get_dir_contents("/flaskr/files_playground", ref=self.branch_name)
         files_list = []
         for file in files:
-            files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
+                files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
         return files_list
 
     def get_file(self):
