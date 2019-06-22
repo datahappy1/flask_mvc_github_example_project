@@ -4,8 +4,8 @@ from flaskr.lib import gh, settings
 
 # github related variables
 token = os.environ['token']
-# branch_name  is temporary for testing
 repo = settings.repo
+repo_folder = settings.repo_folder
 init_branch_name = settings.initial_branch_name
 
 # init the github class
