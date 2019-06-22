@@ -9,7 +9,7 @@ body {
  */
 header {
   background-color: #000;
-  height: 35px;
+  height: 20px;
   width: 100%;
   opacity: .9;
   margin-bottom: 10px;
@@ -22,7 +22,7 @@ header a {
 
 header h1.logo {
   margin: 0;
-  font-size: 1.7em;
+  font-size: 1.1em;
   color: #fff;
   text-transform: uppercase;
   float: left;
