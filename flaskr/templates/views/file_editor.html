@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="config">
+    <h1>File uploader</h1>
+    <p>Let's pass the file contents through a commit to the branch {{ template_current_branch }}
+        in the Github repository ( Github repo represents the model in the MVC pattern )</p>
+
+    <form action="/uploader/{{ template_current_branch }}/" method="POST"
+          enctype="multipart/form-data">
+        <p><input type="file" name="file"/></p>
+        <p><textarea name="commit_message" maxlength="70">Commit message</textarea></p>
+        <input type="submit" value="commit">
+    </form>
+
+</div>
+{% endblock %}

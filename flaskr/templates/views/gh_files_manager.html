@@ -28,10 +28,10 @@
             <tr>
                 <td>{{ file }}</td>
                 <td>
-                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/post/{{ file }}">edit</a>
+                    <a href="{{ url_for('edit', branch_name=template_current_branch, file_name=file) }}">edit</a>
                 </td>
                 <td>
-                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/delete/{{ file }}">delete</a>
+                    <a href="{{ url_for('delete', branch_name=template_current_branch, file_name=file) }}">delete</a>
                 </td>
             </tr>
             {% endfor %}

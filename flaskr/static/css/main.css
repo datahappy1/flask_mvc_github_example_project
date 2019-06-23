@@ -109,6 +109,9 @@ a.selected {
 /*styling flash messages by category*/
 .messages {
   border-radius: 3px;
+  padding: 5px;
+  height: 15px;
+  margin-top: 5px;
 }
 .messages.warning {
     background: #ff0000;
