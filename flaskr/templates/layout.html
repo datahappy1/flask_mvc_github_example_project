@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>flask_mvc_github_example</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   </head>
   <body>
@@ -17,13 +18,13 @@
     </header>
     <div class="container">
 
-      {% with messages = get_flashed_messages() %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
+
+        {% for category,message in messages %}
+          <div class="messages {{ category }}">{{ message }}</div>
         {% endfor %}
-        </ul>
+
       {% endif %}
       {% endwith %}
 

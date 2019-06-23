@@ -58,12 +58,15 @@ class GitHubClass:
             f.write(r.content)
         return r.status_code, f_path
 
-    def create_file(self):
+    def create_file(self, path, message, content):
         """
         create a file in a github repo
+        :param path:
+        :param message:
+        :param content:
         :return:
         """
-        self.repo.create_file("test.txt", "test", "test", branch=self.branch_name)
+        self.repo.create_file(path=path, message=message, content=content, branch=self.branch_name)
         return 0
 
     def update_file(self):

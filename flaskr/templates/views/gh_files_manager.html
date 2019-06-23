@@ -12,8 +12,8 @@
                {% if branch== template_current_branch %} class="selected" {% endif %}>{{branch}}</a>
             {% endfor %}
         </li>
-        <li>Commit a new local file into the {{ template_current_branch }} branch
-            <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/commit">here</a></li>
+        <li>Commit a new file to the branch {{ template_current_branch }}
+            <a href="{{ url_for('upload', branch_name=template_current_branch) }}">here</a></li>
         <li>Files list in the {{ template_current_branch }} branch:</li>
 
         <table class="unstyledTable">
@@ -28,7 +28,7 @@
             <tr>
                 <td>{{ file }}</td>
                 <td>
-                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/edit/{{ file }}">edit</a>
+                    <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/post/{{ file }}">edit</a>
                 </td>
                 <td>
                     <a href="/views/gh_file_manager/branch/{{ template_current_branch }}/file/delete/{{ file }}">delete</a>

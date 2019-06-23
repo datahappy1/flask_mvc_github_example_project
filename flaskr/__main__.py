@@ -1,6 +1,10 @@
 import os
-from flask import Flask, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request, redirect, flash
 from flaskr.lib import gh, settings
+from flaskr.controllers import gh_files as controller
+
+# project related variables
+local_temp_files_path = settings.local_temp_files_path
 
 # github related variables
 token = os.environ['token']
@@ -22,6 +26,12 @@ def index():
                            template_current_branch=init_branch_name)
 
 
+@app.route('/error_page')
+def error_page(error_message):
+    return render_template('error_page.html',
+                           template_error_message=error_message)
+
+
 @app.route('/views/gh_files_manager/branch/<branch_name>', methods=['GET', 'POST'])
 def gh_files_manager(branch_name):
     gh_session_id = gh.GitHubClass.get_session_id(obj)
@@ -35,19 +45,31 @@ def gh_files_manager(branch_name):
                            template_file_list=files_list)
 
 
-@app.route('/upload')
-def upload():
-    return render_template('templates/upload.html')
+@app.route('/views/gh_files_manager/branch/<branch_name>/file/put', methods=['GET'])
+def upload(branch_name):
+    return render_template('views/file_uploader.html',
+                           template_current_branch=branch_name)
 
 
-@app.route('/uploader', methods=['GET', 'POST'])
-def uploader():
+@app.route('/uploader/<branch_name>/', methods=['GET', 'POST'])
+def uploader(branch_name):
     if request.method == 'POST':
         f = request.files['file']
-        f.save(temp_file_path + f.filename)
-        flash(f.filename + ' was uploaded!')
-        return redirect('/config')
+        message = request.form['commit_message']
+        f.save(local_temp_files_path + f.filename)
+        flash(f.filename + ' was stored!', category="success")
+
+        with open(local_temp_files_path + f.filename, 'rb') as f:
+            file_contents = f.read()
+
+        gh.GitHubClass.create_file(obj, path="/", message=message, content=file_contents)
+        flash(f.filename + ' was committed!', category="success")
+
+        os.path.isfile(local_temp_files_path + f.filename)
+
+        return redirect('/views/gh_files_manager/branch/'+branch_name)
 
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', threaded=True)
+    #import model and controller as blueprints
