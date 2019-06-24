@@ -44,7 +44,7 @@ class GitHubClass:
                 files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
         return files_list
 
-    def get_file(self, branch_name):
+    def download_file(self, branch_name):
         """
         get contents of a file in a github repo
         :return:
@@ -56,6 +56,16 @@ class GitHubClass:
         with open(f_path, 'wb') as f:
             f.write(r.content)
         return r.status_code, f_path
+
+    def get_file_contents(self, gh_file_path, branch_name):
+        """
+        get contents of a file in a github repo
+        :return:
+        """
+        contents = self.repo.get_contents(gh_file_path, ref=branch_name)
+        url = contents.download_url
+        r = requests.get(url)
+        return r.status_code, r.content
 
     def create_file(self, path, message, content, branch_name):
         """

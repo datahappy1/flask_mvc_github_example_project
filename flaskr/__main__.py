@@ -57,10 +57,17 @@ def upload(branch_name):
 
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/post/<path:file_name>', methods=['GET'])
 def edit(branch_name, file_name):
-    print('kuk')
-    return render_template('views/file_editor.html',
-                           template_current_branch=branch_name,
-                           file_name=file_name)
+    gh_file = github.GitHubClass.get_file_contents(global_variables.obj, file_name, branch_name)
+    file_status_code, file_contents = gh_file[0], gh_file[1]
+
+    if file_status_code == 200:
+        return render_template('views/file_editor.html',
+                               template_current_branch=branch_name,
+                               file_name=file_name,
+                               file_contents=file_contents)
+    else:
+        return render_template('error_page.html', error_message=f'File {file_name} not found, github response status: '
+                                                                f'{str(file_status_code)}')
 
 
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
