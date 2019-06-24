@@ -1,0 +1,2 @@
+sid = None
+obj = None
