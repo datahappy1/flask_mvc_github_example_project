@@ -31,15 +31,6 @@ class GitHubClass:
                 files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
         return files_list
 
-    def download_file(self, branch_name):
-        contents = self.repo.get_contents("files_playground/test.json", ref=branch_name)
-        url = contents.download_url
-        r = requests.get(url)
-        f_path = self.local_file_path
-        with open(f_path, 'wb') as f:
-            f.write(r.content)
-        return r.status_code, f_path
-
     def get_file_status(self, gh_file_path, branch_name):
         contents = self.repo.get_contents(gh_file_path, ref=branch_name)
         url = contents.download_url
@@ -59,7 +50,6 @@ class GitHubClass:
 
     def update_file(self, path, message, content, branch_name):
         resp = self.repo.get_contents(path, ref=branch_name)
-        print(resp.sha)
         sha = resp.sha
         self.repo.update_file(path, message, content, sha)
         return 0

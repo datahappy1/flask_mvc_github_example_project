@@ -46,6 +46,6 @@ def editor(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 
 
-@controller_gh_files.route('/deleter/<branch_name>/<path:file_name>', methods=['GET', 'POST'])
+@controller_gh_files.route('/deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
 def deleter(branch_name, file_name):
     return redirect('index.html')
