@@ -1,13 +1,16 @@
-import os
-import uuid
-from flask import Flask, render_template, redirect
+import os.path
+from flask import Flask, render_template
 from flaskr.lib import github, settings, global_variables
 from flaskr.controllers.controller_gh_files import controller_gh_files
+from flaskr.lib.exceptions.exception_decor import exception
+from flaskr.lib.exceptions.exception_logger import create_logger
 
 # project related variables
-global_variables.sid = str(uuid.uuid4().hex)
-global_variables.local_temp_files_path = settings.local_temp_files_path + global_variables.sid + '/'
-os.mkdir(global_variables.local_temp_files_path)
+
+
+# setup logging
+logger = create_logger()
+
 
 # github related variables
 token = os.environ['github_token']
@@ -36,6 +39,7 @@ def error_page(error_message):
                            template_error_message=error_message)
 
 
+@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>', methods=['GET', 'POST'])
 def gh_files_manager(branch_name):
     gh_session_id = github.GitHubClass.get_session_id(global_variables.obj)
@@ -55,9 +59,15 @@ def upload(branch_name):
                            template_current_branch=branch_name)
 
 
+@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/post/<path:file_name>', methods=['GET'])
 def edit(branch_name, file_name):
-    gh_file = github.GitHubClass.get_file_contents(global_variables.obj, file_name, branch_name)
+    try:
+        gh_file = github.GitHubClass.get_file_contents(global_variables.obj, file_name, branch_name)
+    except Exception as e:
+        return render_template('error_page.html', error_message=f'File {file_name} not found, exception: '
+                                                                f'{str(e)}')
+
     file_status_code, file_contents = gh_file[0], gh_file[1]
 
     if file_status_code == 200:
@@ -70,6 +80,7 @@ def edit(branch_name, file_name):
                                                                 f'{str(file_status_code)}')
 
 
+@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete(branch_name, file_name):
     return render_template('views/file_editor.html',

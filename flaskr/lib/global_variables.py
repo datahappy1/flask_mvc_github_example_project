@@ -1,2 +1,1 @@
-sid = None
 obj = None
