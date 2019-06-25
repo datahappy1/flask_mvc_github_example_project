@@ -6,6 +6,10 @@ from tempfile import NamedTemporaryFile
 controller_gh_files = Blueprint('controller_gh_files', __name__, template_folder='templates')
 
 
+@controller_gh_files.route('/file_lister/<branch_name>/', methods=['GET', 'POST'])
+def file_lister(branch_name):
+    pass
+
 @controller_gh_files.route('/uploader/<branch_name>/', methods=['GET', 'POST'])
 def uploader(branch_name):
     if request.method == 'POST':
