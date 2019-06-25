@@ -7,3 +7,4 @@ c:\dummy_file_generator>python -m cProfile -o output.txt c:\dummy_file_generator
 import pstats
 p = pstats.Stats("c:\dummy_file_generator\output.txt")
 p.strip_dirs().sort_stats(1).print_stats()
+c
