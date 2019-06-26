@@ -26,14 +26,14 @@ def uploader(branch_name):
         with open(temp_file_path, 'rb') as f:
             file_contents = f.read()
 
-        github.GitHubClass.create_file(global_variables.obj, path="flaskr/files_playground/" + file_name, message=message,
-                                       content=file_contents, branch_name=branch_name)
-
-        os.unlink(temp_file_path)
-        assert not os.path.exists(temp_file_path)
+        github.GitHubClass.save_file(global_variables.obj, path="flaskr/files_playground/" + file_name, message=message,
+                                     content=file_contents, branch_name=branch_name)
 
         flash(f'{file_name} was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
+
+        os.unlink(temp_file_path)
+        assert not os.path.exists(temp_file_path)
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 

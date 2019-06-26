@@ -1,10 +1,10 @@
-# flask_github_integrator
+# flask_mvc_github_boilerplate (work in progress)
 ## purpose of this boilerplate Flask project is to demonstrate:
 1) how Flask can be used with the MVC design pattern using api endpoints and the blueprints modular import
 2) how Flask can deal with Github integration using the Github api v3 (used as the model "persistance" layer
 in the mvc pattern)
 3) WIP: how Flask can deal with Celery workers ( used for background long-running asynchronous tasks )
-4) how Flack can be used with the logging decorators
+4) how Flask can be used with the logging decorators
 
 ## how to setup your environment:
 1) git clone this repo
