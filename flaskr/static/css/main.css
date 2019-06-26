@@ -9,7 +9,7 @@ body {
  */
 header {
   background-color: #000;
-  height: 35px;
+  height: 28px;
   width: 100%;
   opacity: .9;
   margin-bottom: 10px;
@@ -22,7 +22,7 @@ header a {
 
 header h1.logo {
   margin: 0;
-  font-size: 1.7em;
+  font-size: 1.5em;
   color: #fff;
   text-transform: uppercase;
   float: left;
@@ -93,4 +93,32 @@ table.unstyledTable thead th {
 }
 table.unstyledTable tfoot {
   font-weight: bold;
+}
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+a.selected {
+  background-color: #ff0000;
+  color: white;
+  padding: none;
+}
+
+/*styling flash messages by category*/
+.messages {
+  border-radius: 3px;
+  padding: 5px;
+  height: 15px;
+  margin-top: 5px;
+}
+.messages.warning {
+    background: #ff0000;
+}
+.messages.success {
+    background: #ccff66;
+}
+.messages.info {
+    background: #ffff66;
 }
