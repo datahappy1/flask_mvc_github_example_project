@@ -1,4 +1,4 @@
-# flask_github_integrator
+# flask_mvc_github_boilerplate
 ## purpose of this boilerplate Flask project is to demonstrate:
 1) how Flask can be used with the MVC design pattern using api endpoints and the blueprints modular import
 2) how Flask can deal with Github integration using the Github api v3 (used as the model "persistance" layer
