@@ -55,7 +55,8 @@ class GitHubClass:
 
     def update_file(self, path, message, content, branch_name):
         sha = GitHubClass.get_file_sha(self, path, branch_name)
-        self.repo.update_file(path, message, content, sha)
+        print(path, message, content, branch_name, sha)
+        self.repo.update_file(path, message, content, sha, branch_name)
         return 0
 
     def save_file(self, path, message, content, gh_file_path, branch_name):

@@ -69,6 +69,8 @@ def edit(branch_name, file_name):
                                error_message=f'File {file_name} not found, exception: {str(e)}')
 
     file_status_code, file_contents = gh_file[0], gh_file[1]
+    print(file_status_code)
+    print('fc'+str(file_contents))
 
     if file_status_code == 200:
         return render_template('views/file_editor.html',

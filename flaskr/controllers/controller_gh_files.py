@@ -29,11 +29,11 @@ def uploader(branch_name):
         github.GitHubClass.save_file(global_variables.obj, path="flaskr/files_playground/" + file_name, message=message,
                                      content=file_contents, branch_name=branch_name)
 
-        flash(f'{file_name} was committed to the repository branch {branch_name} '
-              f'with the message {message}!', category="success")
-
         os.unlink(temp_file_path)
         assert not os.path.exists(temp_file_path)
+
+        flash(f'{file_name} was committed to the repository branch {branch_name} '
+              f'with the message {message}!', category="success")
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 
@@ -42,6 +42,10 @@ def uploader(branch_name):
 def editor(branch_name, file_name):
     if request.method == 'POST':
         file_contents = request.form['file_contents']
+
+        print('fce'+str(file_contents))
+        print(file_name)
+
         message = request.form['commit_message']
         github.GitHubClass.update_file(global_variables.obj, path=file_name,
                                        message=message,
