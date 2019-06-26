@@ -37,6 +37,11 @@ class GitHubClass:
         r = requests.get(url)
         return r.status_code
 
+    def get_file_sha(self, gh_file_path, branch_name):
+        resp = self.repo.get_contents(gh_file_path, ref=branch_name)
+        sha = resp.sha
+        return sha
+
     def get_file_contents(self, gh_file_path, branch_name):
         contents = self.repo.get_contents(gh_file_path, ref=branch_name)
         url = contents.download_url
@@ -45,21 +50,23 @@ class GitHubClass:
         return r.status_code, raw_data
 
     def create_file(self, path, message, content, branch_name):
-        self.repo.create_file(path=path, message=message, content=content, branch=branch_name)
+        self.repo.create_file(path, message, content, branch_name)
         return 0
 
     def update_file(self, path, message, content, branch_name):
-        resp = self.repo.get_contents(path, ref=branch_name)
-        sha = resp.sha
+        sha = GitHubClass.get_file_sha(self, path, branch_name)
         self.repo.update_file(path, message, content, sha)
         return 0
 
-    def save_file(self):
-        pass
-        # TODO
+    def save_file(self, path, message, content, gh_file_path, branch_name):
+        file_status = GitHubClass.get_file_status(self, gh_file_path, branch_name)
+        if file_status == 200:
+            GitHubClass.update_file(self, path, message, content, branch_name)
+        else:
+            GitHubClass.create_file(self, path, message, content, branch_name)
+        return 0
 
-    def delete_file(self):
-        pass
-        # TODO
-        #contents = repo.get_contents("test.txt", ref="test")
-        #self.repo.delete_file(contents.path, "remove test", contents.sha, branch="test")
+    def delete_file(self, path, message, branch_name):
+        sha = GitHubClass.get_file_sha(self, path, branch_name)
+        self.repo.delete_file(path, message, sha, branch=branch_name)
+        return 0

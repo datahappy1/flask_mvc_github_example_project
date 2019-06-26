@@ -10,6 +10,7 @@ controller_gh_files = Blueprint('controller_gh_files', __name__, template_folder
 def file_lister(branch_name):
     pass
 
+
 @controller_gh_files.route('/uploader/<branch_name>/', methods=['GET', 'POST'])
 def uploader(branch_name):
     if request.method == 'POST':
@@ -17,21 +18,22 @@ def uploader(branch_name):
         file_name = file.filename
         message = request.form['commit_message']
 
-        f = NamedTemporaryFile(delete=False)
-        fpath = f.name
-        f.write(bytes(file))
+        temp_file_handler = NamedTemporaryFile(delete=False)
+        temp_file_path = temp_file_handler.name
+        temp_file_handler.write(bytes(file))
 
         flash(file_name + ' was stored!', category="success")
-        with open(fpath, 'rb') as f:
+        with open(temp_file_path, 'rb') as f:
             file_contents = f.read()
 
         github.GitHubClass.create_file(global_variables.obj, path="flaskr/files_playground/" + file_name, message=message,
                                        content=file_contents, branch_name=branch_name)
+
+        os.unlink(temp_file_path)
+        assert not os.path.exists(temp_file_path)
+
         flash(f'{file_name} was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
-
-        os.unlink(fpath)
-        assert not os.path.exists(fpath)
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 
@@ -44,7 +46,7 @@ def editor(branch_name, file_name):
         github.GitHubClass.update_file(global_variables.obj, path=file_name,
                                        message=message,
                                        content=file_contents, branch_name=branch_name)
-        flash(f'{file_name} was committed to the repository branch {branch_name} '
+        flash(f'{file_name} update was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
@@ -52,4 +54,12 @@ def editor(branch_name, file_name):
 
 @controller_gh_files.route('/deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
 def deleter(branch_name, file_name):
-    return redirect('index.html')
+    if request.method == 'POST':
+        message = request.form['commit_message']
+        github.GitHubClass.delete_file(global_variables.obj, path=file_name,
+                                       message=message,
+                                       branch_name=branch_name)
+        flash(f'{file_name} deletion was committed to the repository branch {branch_name} '
+              f'with the message {message}!', category="success")
+
+        return redirect('/views/gh_files_manager/branch/'+branch_name)
