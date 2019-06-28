@@ -1,13 +1,12 @@
 import os.path
-from flask import Flask, render_template
+
+from flask import Flask, render_template, redirect, flash
 from flaskr.lib import github, settings, global_variables
 from flaskr.controllers.controller_gh_files import controller_gh_files
+from flaskr.controllers.controller_gh_files import session_getter, branch_lister, \
+    file_lister, file_exists_checker, file_content_getter
 
 # project related variables
-
-
-# setup logging
-
 
 # github related variables
 token = os.environ['github_token']
@@ -30,17 +29,22 @@ def index():
                            template_current_branch=init_branch_name)
 
 
-@app.route('/error_page')
-def error_page(error_message):
-    return render_template('error_page.html',
-                           template_error_message=error_message)
-
-
 @app.route('/views/gh_files_manager/branch/<branch_name>', methods=['GET', 'POST'])
 def gh_files_manager(branch_name):
-    gh_session_id = github.GitHubClass.get_session_id(global_variables.obj)
-    branch_list = github.GitHubClass.list_all_branches(global_variables.obj)
-    files_list = github.GitHubClass.list_all_files(global_variables.obj, branch_name)
+    gh_session_id = session_getter()[0]
+    if gh_session_id == "Github Exception":
+        flash('{}, {}'.format(gh_session_id[0], (gh_session_id[1])), category="warning")
+        return redirect('/')
+
+    branch_list = branch_lister()
+    if branch_list[0] == "Github Exception":
+        flash('{}, {}'.format(branch_list[0],(branch_list[1])), category="warning")
+        return redirect('/')
+
+    files_list = file_lister(branch_name)
+    if files_list[0] == "Github Exception":
+        flash('{}, {}'.format(files_list[0],(files_list[1])), category="warning")
+        return redirect('/')
 
     return render_template('views/gh_files_manager.html',
                            gh_session_id=gh_session_id,
@@ -57,42 +61,28 @@ def upload(branch_name):
 
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/post/<path:file_name>', methods=['GET'])
 def edit(branch_name, file_name):
-    try:
-        gh_file = github.GitHubClass.get_file_contents(global_variables.obj, file_name, branch_name)
-    except Exception as e:
-        return render_template('error_page.html',
-                               error_message=f'File {file_name} not found, exception: {str(e)}')
-
-    file_status_code, file_contents = gh_file[0], gh_file[1]
-
+    file_status_code = file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
+        file_contents = file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
         return render_template('views/file_editor.html',
                                template_current_branch=branch_name,
                                file_name=file_name,
                                file_contents=file_contents)
-    else:
-        return render_template('error_page.html',
-                               error_message=f'File {file_name} not found, github response status: {str(file_status_code)}')
+    elif file_status_code == "Github Exception":
+        flash('{}, {}'.format(file_status_code[0], (file_status_code[1])), category="warning")
+        return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete(branch_name, file_name):
-    try:
-        gh_file = github.GitHubClass.get_file_contents(global_variables.obj, file_name, branch_name)
-    except Exception as e:
-        return render_template('error_page.html',
-                               error_message=f'File {file_name} not found, exception: {str(e)}')
-
-    file_status_code, file_contents = gh_file[0], gh_file[1]
-
+    file_status_code = file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
-                               file_name=file_name,
-                               file_contents=file_contents)
-    else:
-        return render_template('error_page.html',
-                               error_message=f'File {file_name} not found, github response status: {str(file_status_code)}')
+                               file_name=file_name)
+    elif file_status_code == "Github Exception":
+        flash('{}, {}'.format(file_status_code[0], (file_status_code[1])), category="warning")
+        return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
 if __name__ == '__main__':
