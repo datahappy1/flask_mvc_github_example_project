@@ -22,6 +22,19 @@ class GitHubClass:
         branches_list = []
         for branch in branches:
             branches_list.append(str(branch).replace('Branch(name="', '').replace('")', ''))
+            
+            
+        #page_index = 1
+        #while True:
+        #    r = self.g.get(self.GH_DEFAULT_LINK + 'branches?per_page=100&page={}'.format(page_index))
+        #    if r:
+        #        for b in r:
+        #            branches.append(tuple((b.get('name'), b.get('commit').get('sha'))))
+        #        page_index += 1
+        #    else:
+        #        break
+        #return branches
+    
         return branches_list
 
     def list_all_files(self, branch_name):
