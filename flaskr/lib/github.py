@@ -1,4 +1,4 @@
-from github import Github
+from github import Github, GithubException
 import requests
 
 
@@ -49,25 +49,24 @@ class GitHubClass:
         raw_data = r.content.decode('UTF-8')
         return r.status_code, raw_data
 
-    def create_file(self, path, message, content, branch_name):
-        self.repo.create_file(path, message, content, branch_name)
+    def create_file(self, gh_file_path, message, content, branch_name):
+        self.repo.create_file(gh_file_path, message, content, branch_name)
         return 0
 
-    def update_file(self, path, message, content, branch_name):
-        sha = GitHubClass.get_file_sha(self, path, branch_name)
-        print(path, message, content, branch_name, sha)
-        self.repo.update_file(path, message, content, sha, branch_name)
+    def update_file(self, gh_file_path, message, content, branch_name):
+        sha = GitHubClass.get_file_sha(self, gh_file_path, branch_name)
+        self.repo.update_file(gh_file_path, message, content, sha, branch_name)
         return 0
 
-    def save_file(self, path, message, content, gh_file_path, branch_name):
+    def save_file(self, gh_file_path, message, content, branch_name):
         file_status = GitHubClass.get_file_status(self, gh_file_path, branch_name)
         if file_status == 200:
-            GitHubClass.update_file(self, path, message, content, branch_name)
+            GitHubClass.update_file(self, gh_file_path, message, content, branch_name)
         else:
-            GitHubClass.create_file(self, path, message, content, branch_name)
+            GitHubClass.create_file(self, gh_file_path, message, content, branch_name)
         return 0
 
-    def delete_file(self, path, message, branch_name):
-        sha = GitHubClass.get_file_sha(self, path, branch_name)
-        self.repo.delete_file(path, message, sha, branch=branch_name)
+    def delete_file(self, gh_file_path, message, branch_name):
+        sha = GitHubClass.get_file_sha(self, gh_file_path, branch_name)
+        self.repo.delete_file(gh_file_path, message, sha, branch=branch_name)
         return 0

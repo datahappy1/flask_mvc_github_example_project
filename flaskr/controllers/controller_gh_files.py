@@ -26,8 +26,11 @@ def uploader(branch_name):
         with open(temp_file_path, 'rb') as f:
             file_contents = f.read()
 
-        github.GitHubClass.save_file(global_variables.obj, path="flaskr/files_playground/" + file_name, message=message,
-                                     content=file_contents, branch_name=branch_name)
+        github.GitHubClass.save_file(global_variables.obj,
+                                     gh_file_path="flaskr/files_playground/" + file_name,
+                                     message=message,
+                                     content=file_contents,
+                                     branch_name=branch_name)
 
         os.unlink(temp_file_path)
         assert not os.path.exists(temp_file_path)
@@ -47,9 +50,11 @@ def editor(branch_name, file_name):
         print(file_name)
 
         message = request.form['commit_message']
-        github.GitHubClass.update_file(global_variables.obj, path=file_name,
-                                       message=message,
-                                       content=file_contents, branch_name=branch_name)
+        github.GitHubClass.save_file(global_variables.obj,
+                                     gh_file_path=file_name,
+                                     message=message,
+                                     content=file_contents,
+                                     branch_name=branch_name)
         flash(f'{file_name} update was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
 
@@ -60,7 +65,8 @@ def editor(branch_name, file_name):
 def deleter(branch_name, file_name):
     if request.method == 'POST':
         message = request.form['commit_message']
-        github.GitHubClass.delete_file(global_variables.obj, path=file_name,
+        github.GitHubClass.delete_file(global_variables.obj,
+                                       gh_file_path=file_name,
                                        message=message,
                                        branch_name=branch_name)
         flash(f'{file_name} deletion was committed to the repository branch {branch_name} '

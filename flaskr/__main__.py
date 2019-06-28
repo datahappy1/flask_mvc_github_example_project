@@ -2,14 +2,11 @@ import os.path
 from flask import Flask, render_template
 from flaskr.lib import github, settings, global_variables
 from flaskr.controllers.controller_gh_files import controller_gh_files
-from flaskr.lib.exceptions.exception_decor import exception
-from flaskr.lib.exceptions.exception_logger import create_logger
 
 # project related variables
 
 
 # setup logging
-logger = create_logger()
 
 
 # github related variables
@@ -39,7 +36,6 @@ def error_page(error_message):
                            template_error_message=error_message)
 
 
-@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>', methods=['GET', 'POST'])
 def gh_files_manager(branch_name):
     gh_session_id = github.GitHubClass.get_session_id(global_variables.obj)
@@ -59,7 +55,6 @@ def upload(branch_name):
                            template_current_branch=branch_name)
 
 
-@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/post/<path:file_name>', methods=['GET'])
 def edit(branch_name, file_name):
     try:
@@ -82,7 +77,6 @@ def edit(branch_name, file_name):
                                error_message=f'File {file_name} not found, github response status: {str(file_status_code)}')
 
 
-@exception(logger)
 @app.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete(branch_name, file_name):
     try:

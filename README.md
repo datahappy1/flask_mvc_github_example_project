@@ -4,7 +4,7 @@
 2) how Flask can deal with Github integration using the Github api v3 (used as the model "persistance" layer
 in the mvc pattern)
 3) WIP: how Flask can deal with Celery workers ( used for background long-running asynchronous tasks )
-4) how Flask can be used with the logging decorators
+4) WIP: how Flask can be used with the logging decorators
 
 ## how to setup your environment:
 1) git clone this repo
