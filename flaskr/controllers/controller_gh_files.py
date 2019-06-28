@@ -46,9 +46,6 @@ def editor(branch_name, file_name):
     if request.method == 'POST':
         file_contents = request.form['file_contents']
 
-        print('fce'+str(file_contents))
-        print(file_name)
-
         message = request.form['commit_message']
         github.GitHubClass.save_file(global_variables.obj,
                                      gh_file_path=file_name,
