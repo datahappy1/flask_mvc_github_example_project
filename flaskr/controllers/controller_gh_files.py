@@ -1,14 +1,10 @@
 import os
 from flask import Blueprint, request, flash, redirect
-from flaskr.lib import github, global_variables, settings
+from github import GithubException
+from flaskr.lib import github, global_variables
 from tempfile import NamedTemporaryFile
 
 controller_gh_files = Blueprint('controller_gh_files', __name__, template_folder='templates')
-
-
-@controller_gh_files.route('/file_lister/<branch_name>/', methods=['GET', 'POST'])
-def file_lister(branch_name):
-    pass
 
 
 @controller_gh_files.route('/uploader/<branch_name>/', methods=['GET', 'POST'])
@@ -70,3 +66,50 @@ def deleter(branch_name, file_name):
               f'with the message {message}!', category="success")
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
+
+
+def session_getter() -> list:
+    try:
+        session_id = []
+        github_session_id = github.GitHubClass.get_session_id(global_variables.obj)
+        session_id.append(str(github_session_id))
+    except GithubException as ge:
+        return ['Github Exception', f'raised in function {str(__name__)}.branch_lister, exception: {str(ge)}']
+    return session_id
+
+
+def branch_lister() -> list:
+    try:
+        branch_list = github.GitHubClass.list_all_branches(global_variables.obj)
+    except GithubException as ge:
+        return ['Github Exception', f'raised in function {str(__name__)}.branch_lister, exception: {str(ge)}']
+    return branch_list
+
+
+def file_lister(branch_name) -> list:
+    try:
+        files_list = github.GitHubClass.list_all_files(global_variables.obj, branch_name)
+
+    except GithubException as ge:
+        return ['Github Exception', f'raised in function {str(__name__)}.file_lister, exception: {str(ge)}']
+    return files_list
+
+
+def file_exists_checker(gh_file_path, branch_name) -> list:
+    try:
+        file_status = []
+        github_file_status = github.GitHubClass.get_file_status(global_variables.obj, gh_file_path, branch_name)
+        file_status.append(github_file_status)
+    except GithubException as ge:
+        return ['Github Exception', f'raised in function {str(__name__)}.file_exists_checker, exception: {str(ge)}']
+    return file_status
+
+
+def file_content_getter(gh_file_path, branch_name) -> list:
+    try:
+        file_content = []
+        github_file_content = github.GitHubClass.get_file_contents(global_variables.obj, gh_file_path, branch_name)
+        file_content.append(github_file_content)
+    except GithubException as ge:
+        return ['Github Exception', f'raised in function {str(__name__)}.file_exists_checker, exception: {str(ge)}']
+    return file_content
