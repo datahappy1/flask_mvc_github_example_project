@@ -3,9 +3,9 @@ from flaskr.lib import settings
 import requests
 
 
-class GitHubClass:
+class Model:
     """
-    project github class
+    project parent github class
     """
     def __init__(self, init_token, init_repo):
         # using username and password
@@ -19,6 +19,8 @@ class GitHubClass:
     def get_session_id(self):
         return self.g
 
+
+class Branch(Model):
     def list_all_branches(self):
         branches = self.repo.get_branches()
         branches_list = []
@@ -26,6 +28,8 @@ class GitHubClass:
             branches_list.append(str(branch).replace('Branch(name="', '').replace('")', ''))
         return branches_list
 
+
+class File(Model):
     def list_all_files(self, branch_name):
         files = self.repo.get_dir_contents("/flaskr/" + self.repo_folder, ref=branch_name)
         files_list = []
@@ -56,19 +60,19 @@ class GitHubClass:
         return 0
 
     def update_file(self, gh_file_path, message, content, branch_name):
-        sha = GitHubClass.get_file_sha(self, gh_file_path, branch_name)
+        sha = File.get_file_sha(self, gh_file_path, branch_name)
         self.repo.update_file(gh_file_path, message, content, sha, branch_name)
         return 0
 
     def save_file(self, gh_file_path, message, content, branch_name):
-        file_status = GitHubClass.get_file_status(self, gh_file_path, branch_name)
+        file_status = File.get_file_status(self, gh_file_path, branch_name)
         if file_status == 200:
-            GitHubClass.update_file(self, gh_file_path, message, content, branch_name)
+            File.update_file(self, gh_file_path, message, content, branch_name)
         else:
-            GitHubClass.create_file(self, gh_file_path, message, content, branch_name)
+            File.create_file(self, gh_file_path, message, content, branch_name)
         return 0
 
     def delete_file(self, gh_file_path, message, branch_name):
-        sha = GitHubClass.get_file_sha(self, gh_file_path, branch_name)
+        sha = File.get_file_sha(self, gh_file_path, branch_name)
         self.repo.delete_file(gh_file_path, message, sha, branch=branch_name)
         return 0

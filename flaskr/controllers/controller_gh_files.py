@@ -1,7 +1,8 @@
 import os
 from flask import Blueprint, request, flash, redirect
 from github import GithubException
-from flaskr.lib import github, global_variables
+from flaskr.lib import global_variables, settings
+from flaskr.models import model_gh
 from tempfile import NamedTemporaryFile
 
 controller_gh_files = Blueprint('controller_gh_files', __name__, template_folder='templates')
@@ -22,11 +23,11 @@ def uploader(branch_name):
         with open(temp_file_path, 'rb') as f:
             file_contents = f.read()
 
-        github.GitHubClass.save_file(global_variables.obj,
-                                     gh_file_path="flaskr/files_playground/" + file_name,
-                                     message=message,
-                                     content=file_contents,
-                                     branch_name=branch_name)
+        model_gh.File.save_file(global_variables.obj,
+                                gh_file_path="flaskr/files_playground/" + file_name,
+                                message=message,
+                                content=file_contents,
+                                branch_name=branch_name)
 
         os.unlink(temp_file_path)
         assert not os.path.exists(temp_file_path)
@@ -43,11 +44,11 @@ def editor(branch_name, file_name):
         file_contents = request.form['file_contents']
 
         message = request.form['commit_message']
-        github.GitHubClass.save_file(global_variables.obj,
-                                     gh_file_path=file_name,
-                                     message=message,
-                                     content=file_contents,
-                                     branch_name=branch_name)
+        model_gh.File.save_file(global_variables.obj,
+                                gh_file_path=file_name,
+                                message=message,
+                                content=file_contents,
+                                branch_name=branch_name)
         flash(f'{file_name} update was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
 
@@ -58,10 +59,10 @@ def editor(branch_name, file_name):
 def deleter(branch_name, file_name):
     if request.method == 'POST':
         message = request.form['commit_message']
-        github.GitHubClass.delete_file(global_variables.obj,
-                                       gh_file_path=file_name,
-                                       message=message,
-                                       branch_name=branch_name)
+        model_gh.File.delete_file(global_variables.obj,
+                                  gh_file_path=file_name,
+                                  message=message,
+                                  branch_name=branch_name)
         flash(f'{file_name} deletion was committed to the repository branch {branch_name} '
               f'with the message {message}!', category="success")
 
@@ -71,45 +72,61 @@ def deleter(branch_name, file_name):
 def session_getter() -> list:
     try:
         session_id = []
-        github_session_id = github.GitHubClass.get_session_id(global_variables.obj)
+        github_session_id = model_gh.Model.get_session_id(global_variables.obj)
         session_id.append(str(github_session_id))
     except GithubException as ge:
-        return ['Github Exception', f'raised in function {str(__name__)}.branch_lister, exception: {str(ge)}']
+        return [f'Github Exception raised in function {str(__name__)}.'
+                f'session_getter(), '
+                f'exception: {str(ge)}']
     return session_id
 
 
 def branch_lister() -> list:
     try:
-        branch_list = github.GitHubClass.list_all_branches(global_variables.obj)
+        branch_list = model_gh.Branch.list_all_branches(global_variables.obj)
     except GithubException as ge:
-        return ['Github Exception', f'raised in function {str(__name__)}.branch_lister, exception: {str(ge)}']
+        return [f'Github Exception raised in function {str(__name__)}.'
+                f'branch_lister(), '
+                f'exception: {str(ge)}']
     return branch_list
 
 
 def file_lister(branch_name) -> list:
     try:
-        files_list = github.GitHubClass.list_all_files(global_variables.obj, branch_name)
-
+        _files_list = model_gh.File.list_all_files(global_variables.obj, branch_name)
+        files_list = []
+        for file in _files_list:
+            file_extension = os.path.splitext(str(file))[1]
+            if file_extension in settings.editable_file_extensions_list:
+                files_list.append([file, True])
+            else:
+                files_list.append([file, False])
     except GithubException as ge:
-        return ['Github Exception', f'raised in function {str(__name__)}.file_lister, exception: {str(ge)}']
+        return [f'Github Exception raised in function {str(__name__)}.'
+                f'file_lister({branch_name}), '
+                f'exception: {str(ge)}']
     return files_list
 
 
 def file_exists_checker(gh_file_path, branch_name) -> list:
     try:
         file_status = []
-        github_file_status = github.GitHubClass.get_file_status(global_variables.obj, gh_file_path, branch_name)
+        github_file_status = model_gh.File.get_file_status(global_variables.obj, gh_file_path, branch_name)
         file_status.append(github_file_status)
     except GithubException as ge:
-        return ['Github Exception', f'raised in function {str(__name__)}.file_exists_checker, exception: {str(ge)}']
+        return [f'Github Exception raised in function {str(__name__)}.'
+                f'file_exists_checker({gh_file_path},{branch_name}),'
+                f'exception: {str(ge)}']
     return file_status
 
 
 def file_content_getter(gh_file_path, branch_name) -> list:
     try:
         file_content = []
-        github_file_content = github.GitHubClass.get_file_contents(global_variables.obj, gh_file_path, branch_name)
+        github_file_content = model_gh.File.get_file_contents(global_variables.obj, gh_file_path, branch_name)
         file_content.append(github_file_content)
     except GithubException as ge:
-        return ['Github Exception', f'raised in function {str(__name__)}.file_exists_checker, exception: {str(ge)}']
+        return [f'Github Exception raised in function {str(__name__)}.'
+                f'file_exists_checker({gh_file_path},{branch_name}), '
+                f'exception: {str(ge)}']
     return file_content
