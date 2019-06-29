@@ -28,6 +28,12 @@ class Branch(Model):
             branches_list.append(str(branch).replace('Branch(name="', '').replace('")', ''))
         return branches_list
 
+    def create_branch(self):
+        pass
+
+    def delete_branch(self):
+        pass
+
 
 class File(Model):
     def list_all_files(self, branch_name):

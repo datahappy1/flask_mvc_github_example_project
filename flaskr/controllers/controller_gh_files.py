@@ -24,7 +24,7 @@ def uploader(branch_name):
             file_contents = f.read()
 
         model_gh.File.save_file(global_variables.obj,
-                                gh_file_path="flaskr/files_playground/" + file_name,
+                                gh_file_path="flaskr/" + settings.repo_folder + file_name,
                                 message=message,
                                 content=file_contents,
                                 branch_name=branch_name)
