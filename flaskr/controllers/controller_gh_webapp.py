@@ -100,9 +100,10 @@ def delete_file(branch_name, file_name):
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@controller_gh_webapp.route('/branch_creator/src/<branch_name_src>/', methods=['GET', 'POST'])
-def branch_creator(branch_name_src):
+@controller_gh_webapp.route('/branch_creator/', methods=['GET', 'POST'])
+def branch_creator():
     if request.method == 'POST':
+        branch_name_src = request.form['branch_name_src']
         branch_name_tgt = request.form['branch_name_tgt']
         branch_name_tgt = str(branch_name_tgt).replace(' ','')
         model_gh.Branch.create_branch(global_variables.obj,
