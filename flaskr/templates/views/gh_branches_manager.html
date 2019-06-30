@@ -6,7 +6,7 @@
 
     <ul>
         <li>Github session object ID: {{ gh_session_id }}</li>
-        <li>Branches list in the {{ template_repo }} repo:</li>
+        <li>Branches list in the {{ template_repo_name }} repository:</li>
     </ul>
 
         <table class="customTable">
@@ -20,12 +20,12 @@
             <tr>
                 <td>{{ branch }}</td>
                 <td>
-                    <a href="{{ url_for('create_branch', branch_name=branch) }}">
+                    <a href="{{ url_for('controller_gh.create_branch', branch_name=branch) }}">
                         use as a base for creating a new branch
                     </a>
                 </td>
                 <td>
-                    <a href="{{ url_for('delete_branch', branch_name=branch) }}">
+                    <a href="{{ url_for('controller_gh.delete_branch', branch_name=branch) }}">
                         delete branch
                     </a>
                 </td>

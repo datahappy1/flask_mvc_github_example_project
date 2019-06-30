@@ -1,6 +1,5 @@
 flask
-flask-WTF
+flask_restful
 werkzeug
-pandas
 github
 requests
