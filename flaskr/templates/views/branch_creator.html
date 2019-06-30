@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="config">
+    <h1>Branch creator</h1>
+    <p>Let's create the branch based on the source branch {{ template_current_branch }} in the Github repository
+        ( Github repo represents the model in the MVC pattern )</p>
+
+    <form action="/branch_creator/src/{{ template_current_branch }}/" method="POST"
+          enctype="multipart/form-data">
+        <p><textarea name="branch_name_tgt" maxlength="70">New branch name</textarea></p>
+        <input type="submit" value="create">
+    </form>
+
+</div>
+{% endblock %}

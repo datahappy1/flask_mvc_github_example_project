@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="manager_config">
+    <h1>Github branches manager</h1>
+    <p>Let's see how we can work with Github branches using PyGithub library.</p>
+
+    <ul>
+        <li>Github session object ID: {{ gh_session_id }}</li>
+        <li>Branches list in the {{ template_repo }} repo:</li>
+    </ul>
+
+        <table class="customTable">
+            <thead>
+            <tr>
+                <td>branch name</td>
+                <td colspan="2">available actions</td>
+            </tr>
+            </thead>
+            {% for branch in template_branch_list %}
+            <tr>
+                <td>{{ branch }}</td>
+                <td>
+                    <a href="{{ url_for('create_branch', branch_name=branch) }}">
+                        use as a base for creating a new branch
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ url_for('delete_branch', branch_name=branch) }}">
+                        delete branch
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+</div>
+{% endblock %}

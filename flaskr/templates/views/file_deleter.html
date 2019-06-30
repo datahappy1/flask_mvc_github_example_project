@@ -5,7 +5,7 @@
     <p>Let's delete the file through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="/deleter/{{ template_current_branch }}/file/delete/{{ file_name }}" method="POST"
+    <form action="/file_deleter/{{ template_current_branch }}/file/delete/{{ file_name }}" method="POST"
           enctype="multipart/form-data">
         <p><textarea name="commit_message" maxlength="70">Commit message</textarea></p>
         <input type="submit" value="commit">
