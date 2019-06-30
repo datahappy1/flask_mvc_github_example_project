@@ -5,13 +5,13 @@ from flaskr.models import model_gh
 from flaskr.controllers import utils
 from werkzeug.utils import secure_filename
 
-controller_gh = Blueprint('controller_gh', __name__, template_folder='templates')
+controller_gh_webapp = Blueprint('controller_gh_webapp', __name__, template_folder='templates')
 
 
 # @controller_gh.routes - views functions for ui user interaction
 # optionally validating the inputs and returning redirects or rendering templates
 # with the html forms
-@controller_gh.route('/views/gh_branches_manager/', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
     gh_session_id = utils.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
@@ -29,19 +29,19 @@ def gh_branches_manager():
                            template_repo_name=settings.repo)
 
 
-@controller_gh.route('/views/gh_branches_manager/branch/<branch_name>/post/', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_branches_manager/branch/<branch_name>/post/', methods=['GET'])
 def create_branch(branch_name):
     return render_template('views/branch_creator.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
 def delete_branch(branch_name):
     return render_template('views/branch_deleter.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def gh_files_manager(branch_name):
     gh_session_id = utils.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
@@ -65,13 +65,13 @@ def gh_files_manager(branch_name):
                            template_file_list=files_list)
 
 
-@controller_gh.route('/views/gh_files_manager/branch/<branch_name>/file/post/', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/post/', methods=['GET'])
 def upload_file(branch_name):
     return render_template('views/file_uploader.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh.route('/views/gh_files_manager/branch/<branch_name>/file/put/<path:file_name>', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/put/<path:file_name>', methods=['GET'])
 def edit_file(branch_name, file_name):
     file_status_code = utils.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
@@ -85,7 +85,7 @@ def edit_file(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@controller_gh.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
+@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete_file(branch_name, file_name):
     file_status_code = utils.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
@@ -100,7 +100,7 @@ def delete_file(branch_name, file_name):
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@controller_gh.route('/branch_creator/src/<branch_name_src>/', methods=['GET', 'POST'])
+@controller_gh_webapp.route('/branch_creator/src/<branch_name_src>/', methods=['GET', 'POST'])
 def branch_creator(branch_name_src):
     if request.method == 'POST':
         branch_name_tgt = request.form['branch_name_tgt']
@@ -113,7 +113,7 @@ def branch_creator(branch_name_src):
         return redirect('/views/gh_branches_manager/')
 
 
-@controller_gh.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
+@controller_gh_webapp.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
 def branch_deleter(branch_name):
     if request.method == 'POST':
         model_gh.Branch.delete_branch(global_variables.obj,
@@ -123,7 +123,7 @@ def branch_deleter(branch_name):
         return redirect('/views/gh_branches_manager/')
 
 
-@controller_gh.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
+@controller_gh_webapp.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
 def file_uploader(branch_name):
     if request.method == 'POST':
         if request.files:
@@ -154,7 +154,7 @@ def file_uploader(branch_name):
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 
 
-@controller_gh.route('/file_editor/<branch_name>/file/put/<path:file_name>', methods=['GET', 'POST'])
+@controller_gh_webapp.route('/file_editor/<branch_name>/file/put/<path:file_name>', methods=['GET', 'POST'])
 def file_editor(branch_name, file_name):
     if request.method == 'POST':
         file_contents = request.form['file_contents']
@@ -171,7 +171,7 @@ def file_editor(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/'+branch_name)
 
 
-@controller_gh.route('/file_deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
+@controller_gh_webapp.route('/file_deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
 def file_deleter(branch_name, file_name):
     if request.method == 'POST':
         message = request.form['commit_message']
