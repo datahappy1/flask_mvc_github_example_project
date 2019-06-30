@@ -1,4 +1,4 @@
-from github import Github
+from github import Github, GithubException
 from flaskr.lib import settings
 import requests
 
@@ -28,11 +28,15 @@ class Branch(Model):
             branches_list.append(str(branch).replace('Branch(name="', '').replace('")', ''))
         return branches_list
 
-    def create_branch(self):
-        pass
+    def create_branch(self, source_branch, target_branch):
+        sb = self.repo.get_branch(source_branch)
+        self.repo.create_git_ref(ref='refs/heads/' + target_branch, sha=sb.commit.sha)
+        return 0
 
-    def delete_branch(self):
-        pass
+    def delete_branch(self, branch_name):
+        branch_ref = self.repo.get_git_ref(f"heads/{branch_name}")
+        branch_ref.delete()
+        return 0
 
 
 class File(Model):
@@ -68,14 +72,6 @@ class File(Model):
     def update_file(self, gh_file_path, message, content, branch_name):
         sha = File.get_file_sha(self, gh_file_path, branch_name)
         self.repo.update_file(gh_file_path, message, content, sha, branch_name)
-        return 0
-
-    def save_file(self, gh_file_path, message, content, branch_name):
-        file_status = File.get_file_status(self, gh_file_path, branch_name)
-        if file_status == 200:
-            File.update_file(self, gh_file_path, message, content, branch_name)
-        else:
-            File.create_file(self, gh_file_path, message, content, branch_name)
         return 0
 
     def delete_file(self, gh_file_path, message, branch_name):
