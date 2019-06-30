@@ -1,7 +1,8 @@
 import os.path
 
 from flask import Flask, render_template, redirect, flash
-from flaskr.lib import github, settings, global_variables
+from flaskr.lib import settings, global_variables
+from flaskr.models import model_gh
 from flaskr.controllers.controller_gh_files import controller_gh_files
 from flaskr.controllers.controller_gh_files import session_getter, branch_lister, \
     file_lister, file_exists_checker, file_content_getter
@@ -15,7 +16,7 @@ repo_folder = settings.repo_folder
 init_branch_name = settings.initial_branch_name
 
 # init the github class
-global_variables.obj = github.GitHubClass(init_token=token, init_repo=repo)
+global_variables.obj = model_gh.Model(init_token=token, init_repo=repo)
 
 # flask app starts here
 app = Flask(__name__)
@@ -32,18 +33,18 @@ def index():
 @app.route('/views/gh_files_manager/branch/<branch_name>', methods=['GET', 'POST'])
 def gh_files_manager(branch_name):
     gh_session_id = session_getter()[0]
-    if gh_session_id == "Github Exception":
-        flash('{}, {}'.format(gh_session_id[0], (gh_session_id[1])), category="warning")
+    if str(gh_session_id).startswith("Github Exception"):
+        flash('{}'.format(gh_session_id), category="warning")
         return redirect('/')
 
     branch_list = branch_lister()
-    if branch_list[0] == "Github Exception":
-        flash('{}, {}'.format(branch_list[0],(branch_list[1])), category="warning")
+    if str(branch_list[0]).startswith("Github Exception"):
+        flash('{}'.format(str(branch_list[0])), category="warning")
         return redirect('/')
 
     files_list = file_lister(branch_name)
-    if files_list[0] == "Github Exception":
-        flash('{}, {}'.format(files_list[0],(files_list[1])), category="warning")
+    if str(files_list[0]).startswith("Github Exception"):
+        flash('{}'.format(str(files_list[0])), category="warning")
         return redirect('/')
 
     return render_template('views/gh_files_manager.html',
@@ -68,8 +69,8 @@ def edit(branch_name, file_name):
                                template_current_branch=branch_name,
                                file_name=file_name,
                                file_contents=file_contents)
-    elif file_status_code == "Github Exception":
-        flash('{}, {}'.format(file_status_code[0], (file_status_code[1])), category="warning")
+    elif str(file_status_code).startswith("Github Exception"):
+        flash('{}'.format(file_status_code), category="warning")
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
@@ -80,8 +81,8 @@ def delete(branch_name, file_name):
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
                                file_name=file_name)
-    elif file_status_code == "Github Exception":
-        flash('{}, {}'.format(file_status_code[0], (file_status_code[1])), category="warning")
+    elif str(file_status_code).startswith("Github Exception"):
+        flash('{}'.format(file_status_code), category="warning")
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 

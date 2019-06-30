@@ -113,7 +113,7 @@ a.selected {
   margin-top: 5px;
 }
 .messages.warning {
-    background: #ff0000;
+    background: #ff1a1a;
 }
 .messages.success {
     background: #ccff66;

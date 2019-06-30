@@ -26,12 +26,13 @@
             </thead>
             {% for file in template_file_list %}
             <tr>
-                <td>{{ file }}</td>
-                <td>
-                    <a href="{{ url_for('edit', branch_name=template_current_branch, file_name=file) }}">edit</a>
+                <td>{{ file[0] }}</td>
+                <td>{% if file[1] %} <!-- if editable file extension -->
+                    <a href="{{ url_for('edit', branch_name=template_current_branch, file_name=file[0]) }}">edit</a>
+                    {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('delete', branch_name=template_current_branch, file_name=file) }}">delete</a>
+                    <a href="{{ url_for('delete', branch_name=template_current_branch, file_name=file[0]) }}">delete</a>
                 </td>
             </tr>
             {% endfor %}
