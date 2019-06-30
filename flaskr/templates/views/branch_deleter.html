@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="config">
+    <h1>Branch deleter - {{ template_current_branch }}</h1>
+    <p>Let's delete the branch in the Github repository
+        ( Github repo represents the model in the MVC pattern )</p>
+    <p>Are you sure?</p>
+    <form action="/branch_deleter/{{ template_current_branch }}/" method="POST"
+          enctype="multipart/form-data">
+        <input type="submit" value="yes - delete">
+    </form>
+
+</div>
+{% endblock %}
