@@ -1,24 +1,24 @@
 import os
 from flask import Blueprint, request, flash, redirect, render_template
-from flask_restful import Resource, Api
-from github import GithubException
 from flaskr.lib import global_variables, settings
 from flaskr.models import model_gh
+from flaskr.controllers import utils
 from werkzeug.utils import secure_filename
 
 controller_gh = Blueprint('controller_gh', __name__, template_folder='templates')
 
 
-# @controller_gh.routes for reads from the model - functions returning redirects
-
+# @controller_gh.routes - views functions for ui user interaction
+# optionally validating the inputs and returning redirects or rendering templates
+# with the html forms
 @controller_gh.route('/views/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
-    gh_session_id = session_getter()[0]
+    gh_session_id = utils.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
         flash('{}'.format(gh_session_id), category="warning")
         return redirect('/')
 
-    branch_list = branch_lister()
+    branch_list = utils.branch_lister()
     if str(branch_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(branch_list[0])), category="warning")
         return redirect('/')
@@ -29,7 +29,7 @@ def gh_branches_manager():
                            template_repo_name=settings.repo)
 
 
-@controller_gh.route('/views/gh_branches_manager/branch/post/<branch_name>/', methods=['GET'])
+@controller_gh.route('/views/gh_branches_manager/branch/<branch_name>/post/', methods=['GET'])
 def create_branch(branch_name):
     return render_template('views/branch_creator.html',
                            template_current_branch=branch_name)
@@ -37,28 +37,23 @@ def create_branch(branch_name):
 
 @controller_gh.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
 def delete_branch(branch_name):
-    branch_status_code = 200
-    if branch_status_code == 200:
-        return render_template('views/branch_deleter.html',
-                               template_current_branch=branch_name)
-    elif str(branch_status_code).startswith("Github Exception"):
-        flash('{}'.format(branch_status_code), category="warning")
-        return redirect('/views/gh_branches_manager/')
+    return render_template('views/branch_deleter.html',
+                           template_current_branch=branch_name)
 
 
 @controller_gh.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def gh_files_manager(branch_name):
-    gh_session_id = session_getter()[0]
+    gh_session_id = utils.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
         flash('{}'.format(gh_session_id), category="warning")
         return redirect('/')
 
-    branch_list = branch_lister()
+    branch_list = utils.branch_lister()
     if str(branch_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(branch_list[0])), category="warning")
         return redirect('/')
 
-    files_list = file_lister(branch_name)
+    files_list = utils.file_lister(branch_name)
     if str(files_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(files_list[0])), category="warning")
         return redirect('/')
@@ -78,9 +73,9 @@ def upload_file(branch_name):
 
 @controller_gh.route('/views/gh_files_manager/branch/<branch_name>/file/put/<path:file_name>', methods=['GET'])
 def edit_file(branch_name, file_name):
-    file_status_code = file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
+    file_status_code = utils.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
-        file_contents = file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
+        file_contents = utils.file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
         return render_template('views/file_editor.html',
                                template_current_branch=branch_name,
                                file_name=file_name,
@@ -92,7 +87,7 @@ def edit_file(branch_name, file_name):
 
 @controller_gh.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete_file(branch_name, file_name):
-    file_status_code = file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
+    file_status_code = utils.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
@@ -102,7 +97,9 @@ def delete_file(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-# @controller_gh.routes for writes to the model - functions accepting form requests and returning redirects
+# @controller_gh.routes - worker functions accepting form requests from the html forms,
+# proceeding with the desired actions and returning redirects to lead the
+# ui user back to the branches or files manager
 @controller_gh.route('/branch_creator/src/<branch_name_src>/', methods=['GET', 'POST'])
 def branch_creator(branch_name_src):
     if request.method == 'POST':
@@ -186,68 +183,4 @@ def file_deleter(branch_name, file_name):
               f'with the message {message}!', category="success")
 
         return redirect('/views/gh_files_manager/branch/'+branch_name)
-
-
-# controller helper functions returning values only
-def session_getter() -> list:
-    try:
-        session_id = []
-        github_session_id = model_gh.Model.get_session_id(global_variables.obj)
-        session_id.append(str(github_session_id))
-    except GithubException as ge:
-        return [f'Github Exception raised in function {str(__name__)}.'
-                f'session_getter(), '
-                f'exception: {str(ge)}']
-    return session_id
-
-
-def branch_lister() -> list:
-    try:
-        branch_list = model_gh.Branch.list_all_branches(global_variables.obj)
-    except GithubException as ge:
-        return [f'Github Exception raised in function {str(__name__)}.'
-                f'branch_lister(), '
-                f'exception: {str(ge)}']
-    return branch_list
-
-
-def file_lister(branch_name) -> list:
-    try:
-        _files_list = model_gh.File.list_all_files(global_variables.obj, branch_name)
-        files_list = []
-        for file in _files_list:
-            file_extension = os.path.splitext(str(file))[1]
-            if file_extension in settings.editable_file_extensions_list:
-                files_list.append([file, True])
-            else:
-                files_list.append([file, False])
-    except GithubException as ge:
-        return [f'Github Exception raised in function {str(__name__)}.'
-                f'file_lister({branch_name}), '
-                f'exception: {str(ge)}']
-    return files_list
-
-
-def file_exists_checker(gh_file_path, branch_name) -> list:
-    try:
-        file_status = []
-        github_file_status = model_gh.File.get_file_status(global_variables.obj, gh_file_path, branch_name)
-        file_status.append(github_file_status)
-    except GithubException as ge:
-        return [f'Github Exception raised in function {str(__name__)}.'
-                f'file_exists_checker({gh_file_path},{branch_name}),'
-                f'exception: {str(ge)}']
-    return file_status
-
-
-def file_content_getter(gh_file_path, branch_name) -> list:
-    try:
-        file_content = []
-        github_file_content = model_gh.File.get_file_contents(global_variables.obj, gh_file_path, branch_name)
-        file_content.append(github_file_content)
-    except GithubException as ge:
-        return [f'Github Exception raised in function {str(__name__)}.'
-                f'file_exists_checker({gh_file_path},{branch_name}), '
-                f'exception: {str(ge)}']
-    return file_content
 
