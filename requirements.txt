@@ -1,5 +1,5 @@
 flask
-flask_restful
 werkzeug
-github
+PyGithub
 requests
+pytest
