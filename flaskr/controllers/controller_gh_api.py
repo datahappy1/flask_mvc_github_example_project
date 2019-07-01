@@ -1,5 +1,4 @@
 import os
-#import httplib
 from flask import Blueprint, jsonify, request
 from flaskr.lib import global_variables, settings
 from flaskr.models import model_gh
@@ -9,8 +8,6 @@ from werkzeug.utils import secure_filename
 
 controller_gh_api = Blueprint('controller_gh_api', __name__)
 
-
-#https://opensource.com/article/17/3/python-flask-exceptions
 
 # curl http://127.0.0.1:5000/api/gh_branches_manager/
 @controller_gh_api.route('/api/gh_branches_manager/', methods=['GET'])
@@ -31,7 +28,7 @@ def api_gh_branches_manager():
 
 # curl -X POST http://127.0.0.1:5000/api/branch/test2?branch_name_src=test
 # curl -X DELETE http://127.0.0.1:5000/api/branch/test/
-@controller_gh_api.route('/api/branch/<branch_name>', methods=['GET', 'POST', 'DELETE'])
+@controller_gh_api.route('/api/branch/<branch_name>', methods=['POST', 'DELETE'])
 def api_branch(branch_name):
     if request.method == 'POST':
         args = request.args
@@ -51,6 +48,7 @@ def api_branch(branch_name):
         })
         response.status_code = 201
         return response
+
     if request.method == 'DELETE':
         gh_session_id = utils.session_getter()[0]
         model_gh.Branch.delete_branch(global_variables.obj,
@@ -84,15 +82,20 @@ def api_gh_files_manager(branch_name):
         return response
 
 
+# curl -d "data=@path/to/my-file.txt" POST http://127.0.0.1:5000/api/branch/master/my-file.txt?commit_message="curl commit"
+# curl -d "data=@path/to/my-file.txt" PUT http://127.0.0.1:5000/api/branch/master/my-file.txt?commit_message="curl commit"
+# curl -d "data=@path/to/my-file.txt" DELETE http://127.0.0.1:5000/api/branch/master/my-file.txt?commit_message="curl commit"
 @controller_gh_api.route('/api/branch/<branch_name>/file/<file_name>/', methods=['POST', 'PUT', 'DELETE'])
 def api_file(branch_name, file_name):
     if request.method == 'POST':
+        args = request.args
+        message = args['commit_message']
+        gh_session_id = utils.session_getter()[0]
         file_name = secure_filename(file_name.filename)
-        temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
-        file_name.save(temp_file_path)
 
-        with open(temp_file_path, 'rb') as temp_file_handler:
-            file_contents = temp_file_handler.read()
+        temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+        with open(temp_file_path, "wb") as temp_file_handler:
+            file_contents = temp_file_handler.read(request.data)
 
         model_gh.File.create_file(global_variables.obj,
                                   gh_file_path="flaskr/" + settings.repo_folder + file_name,
@@ -103,20 +106,55 @@ def api_file(branch_name, file_name):
         os.unlink(temp_file_path)
         assert not os.path.exists(temp_file_path)
 
-    if request.method == 'PUT':
-        file_contents = request.form['file_contents']
+        response = jsonify({
+            'gh_session_id': gh_session_id,
+            'repository': settings.repo,
+            'current_branch': branch_name,
+            'file': file_name,
+            'method': request.method
+        })
+        response.status_code = 201
+        return response
 
-        message = request.form['commit_message']
+    if request.method == 'PUT':
+        args = request.args
+        message = args['commit_message']
+        gh_session_id = utils.session_getter()[0]
+
+        temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+        with open(temp_file_path, "wb") as temp_file_handler:
+            file_contents = temp_file_handler.read(request.data)
+
         model_gh.File.update_file(global_variables.obj,
                                   gh_file_path=file_name,
                                   message=message,
                                   content=file_contents,
                                   branch_name=branch_name)
 
+        response = jsonify({
+            'gh_session_id': gh_session_id,
+            'repository': settings.repo,
+            'current_branch': branch_name,
+            'file': file_name,
+            'method': request.method
+        })
+        response.status_code = 201
+        return response
+
     if request.method == 'DELETE':
-        if request.method == 'POST':
-            message = request.form['commit_message']
-            model_gh.File.delete_file(global_variables.obj,
-                                      gh_file_path=file_name,
-                                      message=message,
-                                      branch_name=branch_name)
+        args = request.args
+        message = args['commit_message']
+        gh_session_id = utils.session_getter()[0]
+        model_gh.File.delete_file(global_variables.obj,
+                                  gh_file_path=file_name,
+                                  message=message,
+                                  branch_name=branch_name)
+        response = jsonify({
+            'gh_session_id': gh_session_id,
+            'repository': settings.repo,
+            'current_branch': branch_name,
+            'file': file_name,
+            'method': request.method
+        })
+        response.status_code = 200
+        return response

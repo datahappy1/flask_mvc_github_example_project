@@ -1,5 +1,5 @@
 flask
-flask-api
 werkzeug
 PyGithub
 requests
+pytest

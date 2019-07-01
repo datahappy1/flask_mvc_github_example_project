@@ -159,7 +159,6 @@ def file_uploader(branch_name):
 def file_editor(branch_name, file_name):
     if request.method == 'POST':
         file_contents = request.form['file_contents']
-
         message = request.form['commit_message']
         model_gh.File.update_file(global_variables.obj,
                                   gh_file_path=file_name,
