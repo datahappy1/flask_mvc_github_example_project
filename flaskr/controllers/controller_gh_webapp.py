@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, request, flash, redirect, render_template
 from flaskr.lib import global_variables, settings
 from flaskr.models import model_gh
-from flaskr.controllers import functions
+from flaskr.controllers import common_functions
 from werkzeug.utils import secure_filename
 
 controller_gh_webapp = Blueprint('controller_gh_webapp', __name__, template_folder='templates')
@@ -13,12 +13,12 @@ controller_gh_webapp = Blueprint('controller_gh_webapp', __name__, template_fold
 # with the html forms
 @controller_gh_webapp.route('/views/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
-    gh_session_id = functions.session_getter()[0]
+    gh_session_id = common_functions.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
         flash('{}'.format(gh_session_id), category="warning")
         return redirect('/')
 
-    branch_list = functions.branch_lister()
+    branch_list = common_functions.branch_lister()
     if str(branch_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(branch_list[0])), category="warning")
         return redirect('/')
@@ -43,17 +43,17 @@ def delete_branch(branch_name):
 
 @controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def gh_files_manager(branch_name):
-    gh_session_id = functions.session_getter()[0]
+    gh_session_id = common_functions.session_getter()[0]
     if str(gh_session_id).startswith("Github Exception"):
         flash('{}'.format(gh_session_id), category="warning")
         return redirect('/')
 
-    branch_list = functions.branch_lister()
+    branch_list = common_functions.branch_lister()
     if str(branch_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(branch_list[0])), category="warning")
         return redirect('/')
 
-    files_list = functions.file_lister(branch_name)
+    files_list = common_functions.file_lister(branch_name)
     if str(files_list[0]).startswith("Github Exception"):
         flash('{}'.format(str(files_list[0])), category="warning")
         return redirect('/')
@@ -73,9 +73,9 @@ def upload_file(branch_name):
 
 @controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/put/<path:file_name>', methods=['GET'])
 def edit_file(branch_name, file_name):
-    file_status_code = functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
+    file_status_code = common_functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
-        file_contents = functions.file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
+        file_contents = common_functions.file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
         return render_template('views/file_editor.html',
                                template_current_branch=branch_name,
                                file_name=file_name,
@@ -87,7 +87,7 @@ def edit_file(branch_name, file_name):
 
 @controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete_file(branch_name, file_name):
-    file_status_code = functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
+    file_status_code = common_functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
     if file_status_code == 200:
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
