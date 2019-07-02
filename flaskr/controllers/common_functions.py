@@ -3,7 +3,8 @@ from flaskr.lib import global_variables, settings
 from flaskr.models import model_gh
 from github import GithubException
 
-# controller helper functions returning
+
+# controller functions
 def session_getter() -> list:
     try:
         session_id = []
