@@ -2,7 +2,7 @@
 ## 10000 ft. overview
 ![alt text][diagram]
 
-[diagram]: https://github.com/datahappy1/flask_mvc_github_boilerplate/blob/master/docs/diagram.png "diagram"
+[diagram]: https://github.com/datahappy1/flask_mvc_github_boilerplate/blob/master/flaskr/docs/diagram.png "diagram"
 
 ## purpose of this boilerplate Flask project is to demonstrate:
 1) how Flask can be used with the MVC design pattern using api endpoints and using blueprints modular import
@@ -23,7 +23,7 @@ in the MVC design pattern)
 github_token = <your github token value>
 flask_secret_key = <your generated flask secret key> 
 ```
-
+6) setup your github repository name, files playground folder and other settings in flaskr/lib/settings.py
 
 *disclaimer: this boilerplate app comes as is, in a production ready application, you
 should use the OAuth protocol for Github login, this project will
