@@ -7,14 +7,14 @@ import os
 
 @pytest.mark.parametrize(
     "test_name, method, endpoint, params, expected_success_status_code",[
-        # to ensure a unique branch name for our test runner in the repo,
+        # to ensure a unique branch name and filename for our test runner in the repo,
         # concatenate "requests_test_" and this uuid "_51568f0d-5dc4-4f88-b53a-a7a3476203db"
         ('create branch', 'post', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', {'branch_name_src': 'master'}, 201),
         ('get branches', 'get', 'http://127.0.0.1:5000/api/gh_branches_manager/', None, 200),
-        ('create file', 'post', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file.txt/', {'commit_message': 'pytest'} , 201),
-        ('edit file', 'put', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file.txt/', {'commit_message': 'pytest'}, 201),
+        ('create file', 'post', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'} , 201),
+        ('edit file', 'put', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'}, 201),
         ('get files', 'get', 'http://127.0.0.1:5000/api/gh_files_manager/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', None, 200),
-        ('delete file', 'delete', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file.txt/', {'commit_message': 'pytest'}, 200),
+        ('delete file', 'delete', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'}, 200),
         ('delete branch', 'delete', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', None, 200),
     ])
 def test_request(test_name, method, endpoint, params, expected_success_status_code):
