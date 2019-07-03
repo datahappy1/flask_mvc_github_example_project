@@ -94,7 +94,6 @@ def api_file(branch_name, file_name):
         gh_session_id = common_functions.session_getter()[0]
         file_name = secure_filename(file_name)
         file_contents = request.data
-        #TODO remove file_contents start with b''
         model_gh.File.create_file(global_variables.obj,
                                   gh_file_path="flaskr/" + settings.repo_folder + file_name,
                                   message=message,
@@ -119,7 +118,6 @@ def api_file(branch_name, file_name):
         gh_session_id = common_functions.session_getter()[0]
         file_name = secure_filename(file_name)
         file_contents = request.data
-        #TODO remove file_contents start with b''
         model_gh.File.update_file(global_variables.obj,
                                   gh_file_path="flaskr/" + settings.repo_folder + file_name,
                                   message=message,
