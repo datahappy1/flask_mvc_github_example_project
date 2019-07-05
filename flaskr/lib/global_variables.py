@@ -1,1 +1,4 @@
-obj = None
+"""
+global variables module
+"""
+OBJ = None

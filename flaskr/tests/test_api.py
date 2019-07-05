@@ -4,20 +4,34 @@ test api endpoints
 import pytest
 import requests
 import os
+import uuid
+
+TEST_RUNNER_ID = str(uuid.uuid4())
+API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api'
+
 
 @pytest.mark.parametrize(
     "test_name, method, endpoint, params, expected_success_status_code",[
         # to ensure a unique branch name and filename for our test runner in the repo,
-        # concatenate "requests_test_" and this uuid "_51568f0d-5dc4-4f88-b53a-a7a3476203db"
-        ('create branch', 'post', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', {'branch_name_src': 'master'}, 201),
-        ('get branches', 'get', 'http://127.0.0.1:5000/api/gh_branches_manager/', None, 200),
-        ('create file', 'post', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'} , 201),
-        ('edit file', 'put', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'}, 201),
-        ('get files', 'get', 'http://127.0.0.1:5000/api/gh_files_manager/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', None, 200),
-        ('delete file', 'delete', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/file/my-file_51568f0d-5dc4-4f88-b53a-a7a3476203db.txt/', {'commit_message': 'pytest'}, 200),
-        ('delete branch', 'delete', 'http://127.0.0.1:5000/api/branch/requests_test_51568f0d-5dc4-4f88-b53a-a7a3476203db/', None, 200),
+        # concatenate "requests_test_" and the generated test_runner_id uuid var
+        ('create branch', 'post', '{}/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'branch_name_src': 'master'}, 201),
+        ('get branches', 'get', '{}/gh_branches_manager/'.format(API_BASE_ENDPOINT), None, 200),
+        ('create file', 'post', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
+        ('edit file', 'put', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
+        ('get files', 'get', '{}/gh_files_manager/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
+        ('delete file', 'delete', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
+        ('delete branch', 'delete', '{}/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
     ])
 def test_request(test_name, method, endpoint, params, expected_success_status_code):
+    """
+    test request function
+    :param test_name:
+    :param method:
+    :param endpoint:
+    :param params:
+    :param expected_success_status_code:
+    :return:
+    """
     response, file_content = None, None
 
     if method == "get":
