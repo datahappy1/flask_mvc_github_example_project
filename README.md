@@ -1,4 +1,4 @@
-# flask_mvc_github_boilerplate (work in progress)
+# flask_mvc_github_boilerplate
 ## 10000 ft. overview:
 ![alt text][diagram]
 
