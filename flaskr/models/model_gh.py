@@ -1,6 +1,10 @@
+"""
+model github module
+"""
+import requests
+
 from github import Github, GithubException
 from flaskr.lib import settings
-import requests
 
 
 class Model:
@@ -12,69 +16,210 @@ class Model:
         # g = Github("", "")
         # or using an access token
         self.token = init_token
-        self.g = Github(self.token)
-        self.repo = self.g.get_repo(init_repo)
-        self.repo_folder = settings.repo_folder
+        self.github = Github(self.token)
+        self.repo = self.github.get_repo(init_repo)
+        self.repo_folder = settings.REPO_FOLDER
 
-    def get_session_id(self):
-        return self.g
+    def get_session_id(self) -> dict:
+        """
+        get session id function
+        :return:
+        """
+        try:
+            return {'status': 200,
+                    'content': self.github}
+        except Exception as exc:
+            return {'status': 500,
+                    'error': {'ExceptionType': 'PyGithubInitException',
+                              'ExceptionMessage':
+                                  'Could not initialize Github,{}'.format(str(exc))}}
 
 
 class Branch(Model):
-    def list_all_branches(self):
-        branches = self.repo.get_branches()
-        branches_list = []
-        for branch in branches:
-            branches_list.append(str(branch).replace('Branch(name="', '').replace('")', ''))
-        return branches_list
+    """
+    Model subclass Branch
+    """
+    def list_all_branches(self) -> dict:
+        """
+        list all branches function
+        :return:
+        """
+        try:
+            branches = self.repo.get_branches()
+            branches_list = []
+            for branch in branches:
+                branches_list.append(str(branch)
+                                     .replace('Branch(name="', '')
+                                     .replace('")', ''))
+            return {'status': 200,
+                    'content': branches_list}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def create_branch(self, source_branch, target_branch):
-        sb = self.repo.get_branch(source_branch)
-        self.repo.create_git_ref(ref='refs/heads/' + target_branch, sha=sb.commit.sha)
-        return 0
+    def create_branch(self, source_branch, target_branch) -> dict:
+        """
+        create branch function
+        :param source_branch:
+        :param target_branch:
+        :return:
+        """
+        try:
+            srcbranch = self.repo.get_branch(source_branch)
+            self.repo.create_git_ref(ref='refs/heads/' + target_branch,
+                                     sha=srcbranch.commit.sha)
+            return {'status': 201}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def delete_branch(self, branch_name):
-        branch_ref = self.repo.get_git_ref(f"heads/{branch_name}")
-        branch_ref.delete()
-        return 0
+    def delete_branch(self, branch_name) -> dict:
+        """
+        delete branch function
+        :param branch_name:
+        :return:
+        """
+        try:
+            branch_ref = self.repo.get_git_ref(f"heads/{branch_name}")
+            branch_ref.delete()
+            return {'status': 200}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
 
 class File(Model):
-    def list_all_files(self, branch_name):
-        files = self.repo.get_dir_contents("/flaskr/" + self.repo_folder, ref=branch_name)
-        files_list = []
-        for file in files:
-                files_list.append(str(file).replace('ContentFile(path="', '').replace('")', ''))
-        return files_list
+    """
+    Model subclass File
+    """
+    def list_all_files(self, branch_name) -> dict:
+        """
+        list all files function
+        :param branch_name:
+        :return:
+        """
+        try:
+            files = self.repo.get_dir_contents("/flaskr/" + self.repo_folder,
+                                               ref=branch_name)
+            files_list = []
+            for file in files:
+                files_list.append(str(file).
+                                  replace('ContentFile(path="', '').
+                                  replace('")', ''))
+            return {'status': 200,
+                    'content': files_list}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def get_file_status(self, gh_file_path, branch_name):
-        contents = self.repo.get_contents(gh_file_path, ref=branch_name)
-        url = contents.download_url
-        r = requests.get(url)
-        return r.status_code
+    def get_file_status(self, gh_file_path, branch_name) -> dict:
+        """
+        get file status function
+        :param gh_file_path:
+        :param branch_name:
+        :return:
+        """
+        try:
+            contents = self.repo.get_contents(gh_file_path, ref=branch_name)
+            url = contents.download_url
+            req = requests.get(url)
+            return {'status': 200,
+                    'content': req.status_code}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def get_file_sha(self, gh_file_path, branch_name):
-        resp = self.repo.get_contents(gh_file_path, ref=branch_name)
-        sha = resp.sha
-        return sha
+    def get_file_sha(self, gh_file_path, branch_name) -> dict:
+        """
+        get file sha function
+        :param gh_file_path:
+        :param branch_name:
+        :return:
+        """
+        try:
+            resp = self.repo.get_contents(gh_file_path, ref=branch_name)
+            sha = resp.sha
+            return {'status': 200,
+                    'content': sha}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def get_file_contents(self, gh_file_path, branch_name):
-        contents = self.repo.get_contents(gh_file_path, ref=branch_name)
-        url = contents.download_url
-        r = requests.get(url)
-        raw_data = r.content.decode('UTF-8')
-        return raw_data
+    def get_file_contents(self, gh_file_path, branch_name) -> dict:
+        """
+        get file contents function
+        :param gh_file_path:
+        :param branch_name:
+        :return:
+        """
+        try:
+            contents = self.repo.get_file_contents(gh_file_path,
+                                                   ref=branch_name)
+            url = contents.download_url
+            req = requests.get(url)
+            raw_data = req.content.decode('UTF-8')
+            return {'status': 200,
+                    'content': raw_data}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def create_file(self, gh_file_path, message, content, branch_name):
-        self.repo.create_file(gh_file_path, message, content, branch_name)
-        return 0
+    def create_file(self, gh_file_path, message, content, branch_name) -> dict:
+        """
+        create file function
+        :param gh_file_path:
+        :param message:
+        :param content:
+        :param branch_name:
+        :return:
+        """
+        try:
+            self.repo.create_file(gh_file_path, message, content, branch_name)
+            return {'status': 201}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
 
-    def update_file(self, gh_file_path, message, content, branch_name):
-        sha = File.get_file_sha(self, gh_file_path, branch_name)
-        self.repo.update_file(gh_file_path, message, content, sha, branch_name)
-        return 0
+    def update_file(self, gh_file_path, message, content, branch_name) -> dict:
+        """
+        update file function
+        :param gh_file_path:
+        :param message:
+        :param content:
+        :param branch_name:
+        :return:
+        """
+        _sha = File.get_file_sha(self, gh_file_path, branch_name)
+        if _sha.get('status') == 200:
+            sha = _sha.get('content')
+            try:
+                self.repo.update_file(gh_file_path, message, content, sha, branch_name)
+                return {'status': 201}
+            except GithubException as githubexc:
+                return {'status': githubexc.status,
+                        'error': githubexc.data}
+        else:
+            return {'status': _sha.get('status'),
+                    'error': _sha.get('error')}
 
-    def delete_file(self, gh_file_path, message, branch_name):
-        sha = File.get_file_sha(self, gh_file_path, branch_name)
-        self.repo.delete_file(gh_file_path, message, sha, branch=branch_name)
-        return 0
+    def delete_file(self, gh_file_path, message, branch_name) -> dict:
+        """
+        delete file function
+        :param gh_file_path:
+        :param message:
+        :param branch_name:
+        :return:
+        """
+        _sha = File.get_file_sha(self, gh_file_path, branch_name)
+        if _sha.get('status') == 200:
+            sha = _sha.get('content')
+            try:
+                self.repo.delete_file(gh_file_path, message, sha,
+                                      branch=branch_name)
+                return {'status': 200}
+            except GithubException as githubexc:
+                return {'status': githubexc.status,
+                        'error': githubexc.data}
+        else:
+            return {'status': _sha.get('status'),
+                    'error': _sha.get('error')}

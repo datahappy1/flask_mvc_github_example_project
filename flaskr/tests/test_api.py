@@ -23,6 +23,15 @@ API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api'
         ('delete branch', 'delete', '{}/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
     ])
 def test_request(test_name, method, endpoint, params, expected_success_status_code):
+    """
+    test request function
+    :param test_name:
+    :param method:
+    :param endpoint:
+    :param params:
+    :param expected_success_status_code:
+    :return:
+    """
     response, file_content = None, None
 
     if method == "get":
