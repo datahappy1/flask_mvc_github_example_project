@@ -26,12 +26,6 @@ global_variables.OBJ = model_gh.Model(init_token=TOKEN,
                                       init_repo=settings.REPO)
 
 
-@APP.after_request
-def add_header(response):
-    response.cache_control.max_age = 0
-    return response
-
-
 @APP.route('/')
 def index():
     """
