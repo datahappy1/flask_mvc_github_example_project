@@ -9,3 +9,4 @@ op
 axe
 out
 in
+nor
