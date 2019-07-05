@@ -1,131 +1,242 @@
+"""
+controller github webapp module
+"""
 import os
+
+from werkzeug.utils import secure_filename
 from flask import Blueprint, request, flash, redirect, render_template
+
 from flaskr.lib import global_variables, settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
-from werkzeug.utils import secure_filename
 
-controller_gh_webapp = Blueprint('controller_gh_webapp', __name__, template_folder='templates')
+CONTROLLER_GH_WEBAPP = Blueprint('controller_gh_webapp', __name__,
+                                 template_folder='templates')
 
 
 # @controller_gh.routes - views functions for ui user interaction
 # optionally validating the inputs and returning redirects or rendering templates
 # with the html forms
-@controller_gh_webapp.route('/views/gh_branches_manager/', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/',
+                            methods=['GET'])
 def gh_branches_manager():
-    gh_session_id = common_functions.session_getter()[0]
-    if str(gh_session_id).startswith("Github Exception"):
-        flash('{}'.format(gh_session_id), category="warning")
-        return redirect('/')
+    """
+    github branches manager function
+    :return:
+    """
+    _session_id = common_functions.session_getter()
+    session_id_status = _session_id.get('status')
+    if session_id_status == 200:
+        gh_session_id = _session_id.get('content')
+        flash(f'PyGithub connect success {gh_session_id}', category="success")
+    else:
+        session_id_error = _session_id.get('errors')
+        flash(f'PyGithub connect exception {session_id_error}', category="warning")
+        return render_template('error_page.html', template_error_message=session_id_error)
 
-    branch_list = common_functions.branch_lister()
-    if str(branch_list[0]).startswith("Github Exception"):
-        flash('{}'.format(str(branch_list[0])), category="warning")
+    _branch_list = common_functions.branch_lister()
+    branch_list_status = _branch_list.get('status')
+    if branch_list_status == 200:
+        branch_list_content = _branch_list.get('content')
+        flash(f'Branches load success {branch_list_status}', category="success")
+    else:
+        branch_list_error = _branch_list.get('errors')
+        flash(f'Branches load exception {branch_list_error}', category="warning")
         return redirect('/')
 
     return render_template('views/gh_branches_manager.html',
                            gh_session_id=gh_session_id,
-                           template_branch_list=branch_list,
-                           template_repo_name=settings.repo)
+                           template_branch_list=branch_list_content,
+                           template_repo_name=settings.REPO)
 
 
-@controller_gh_webapp.route('/views/gh_branches_manager/branch/<branch_name>/post/', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/post/',
+                            methods=['GET'])
 def create_branch(branch_name):
+    """
+    create branch function
+    :param branch_name:
+    :return:
+    """
     return render_template('views/branch_creator.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh_webapp.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/delete/',
+                            methods=['GET'])
 def delete_branch(branch_name):
+    """
+    delete branch function
+    :param branch_name:
+    :return:
+    """
     return render_template('views/branch_deleter.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/',
+                            methods=['GET'])
 def gh_files_manager(branch_name):
-    gh_session_id = common_functions.session_getter()[0]
-    if str(gh_session_id).startswith("Github Exception"):
-        flash('{}'.format(gh_session_id), category="warning")
+    """
+    github files manager function
+    :param branch_name:
+    :return:
+    """
+    _session_id = common_functions.session_getter()
+    session_id_status = _session_id.get('status')
+    if session_id_status == 200:
+        gh_session_id = _session_id.get('content')
+        flash(f'PyGithub connect success {gh_session_id}', category="success")
+    else:
+        session_id_error = _session_id.get('errors')
+        flash(f'PyGithub connect exception {session_id_error}', category="warning")
+        return render_template('error_page.html',
+                               template_error_message=session_id_error)
+
+    _branch_list = common_functions.branch_lister()
+    branch_list_status = _branch_list.get('status')
+    if branch_list_status == 200:
+        branch_list_content = _branch_list.get('content')
+        flash(f'Branches load success {branch_list_status}', category="success")
+    else:
+        branch_list_error = _branch_list.get('errors')
+        flash(f'Branches load exception {branch_list_error}', category="warning")
         return redirect('/')
 
-    branch_list = common_functions.branch_lister()
-    if str(branch_list[0]).startswith("Github Exception"):
-        flash('{}'.format(str(branch_list[0])), category="warning")
-        return redirect('/')
-
-    files_list = common_functions.file_lister(branch_name)
-    if str(files_list[0]).startswith("Github Exception"):
-        flash('{}'.format(str(files_list[0])), category="warning")
+    _files_list = common_functions.file_lister(branch_name)
+    files_list_status = _files_list.get('status')
+    if files_list_status == 200:
+        files_list_content = _files_list.get('content')
+        flash(f'Files load success {files_list_status}', category="success")
+    else:
+        files_list_error = _files_list.get('errors')
+        flash(f'Files load exception {files_list_error}', category="warning")
         return redirect('/')
 
     return render_template('views/gh_files_manager.html',
                            gh_session_id=gh_session_id,
-                           template_branch_list=branch_list,
+                           template_branch_list=branch_list_content,
                            template_current_branch=branch_name,
-                           template_file_list=files_list)
+                           template_file_list=files_list_content)
 
 
-@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/post/', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/file/post/',
+                            methods=['GET'])
 def upload_file(branch_name):
+    """
+    upload file function
+    :param branch_name:
+    :return:
+    """
     return render_template('views/file_uploader.html',
                            template_current_branch=branch_name)
 
 
-@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/put/<path:file_name>', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
+                            'file/put/<path:file_name>',
+                            methods=['GET'])
 def edit_file(branch_name, file_name):
-    file_status_code = common_functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
-    if file_status_code == 200:
-        file_contents = common_functions.file_content_getter(gh_file_path=file_name, branch_name=branch_name)[0]
+    """
+    edit file function
+    :param branch_name:
+    :param file_name:
+    :return:
+    """
+    _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                        branch_name=branch_name)
+    file_exists_status = _file_exists.get('status')
+    if file_exists_status == 200:
+        file_contents = common_functions.file_content_getter(gh_file_path=file_name,
+                                                             branch_name=branch_name)\
+            .get('content')
         return render_template('views/file_editor.html',
                                template_current_branch=branch_name,
                                file_name=file_name,
                                file_contents=file_contents)
-    elif str(file_status_code).startswith("Github Exception"):
-        flash('{}'.format(file_status_code), category="warning")
+    else:
+        file_exists_error = _file_exists.get('error')
+        flash(f'File exists exception {file_exists_error}', category="warning")
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@controller_gh_webapp.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
+                            'file/delete/<path:file_name>',
+                            methods=['GET'])
 def delete_file(branch_name, file_name):
-    file_status_code = common_functions.file_exists_checker(gh_file_path=file_name, branch_name=branch_name)[0]
-    if file_status_code == 200:
+    """
+    delete file function
+    :param branch_name:
+    :param file_name:
+    :return:
+    """
+    _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                        branch_name=branch_name)
+    file_exists_status = _file_exists.get('status')
+    if file_exists_status == 200:
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
                                file_name=file_name)
-    elif str(file_status_code).startswith("Github Exception"):
-        flash('{}'.format(file_status_code), category="warning")
+    else:
+        file_exists_error = _file_exists.get('error')
+        flash(f'File exists exception {file_exists_error}', category="warning")
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@controller_gh_webapp.route('/branch_creator/', methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/branch_creator/',
+                            methods=['GET', 'POST'])
 def branch_creator():
+    """
+    branch creator function
+    :return:
+    """
     if request.method == 'POST':
         branch_name_src = request.form['branch_name_src']
         branch_name_tgt = request.form['branch_name_tgt']
-        branch_name_tgt = str(branch_name_tgt).replace(' ','')
-        model_gh.Branch.create_branch(global_variables.obj,
-                                      source_branch=branch_name_src,
-                                      target_branch=branch_name_tgt)
-        flash(f'branch {branch_name_tgt} based on {branch_name_src} was created!', category="success")
-
+        _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
+                                                       source_branch=branch_name_src,
+                                                       target_branch=branch_name_tgt)
+        branch_create_status = _branch_create.get('status')
+        if branch_create_status == 201:
+            flash(f'Branch {branch_name_tgt} based on {branch_name_src} was created!',
+                  category="success")
+        elif branch_create_status != 201:
+            branch_create_error = _branch_create.get('error')
+            flash(f'Branch create exception {branch_create_error}', category="warning")
         return redirect('/views/gh_branches_manager/')
 
 
-@controller_gh_webapp.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/branch_deleter/<branch_name>/',
+                            methods=['GET', 'POST'])
 def branch_deleter(branch_name):
+    """
+    branch deleter function
+    :param branch_name:
+    :return:
+    """
     if request.method == 'POST':
-        model_gh.Branch.delete_branch(global_variables.obj,
-                                      branch_name=branch_name)
-        flash(f'branch {branch_name} was deleted!', category="success")
-
+        _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
+                                                       branch_name=branch_name)
+        branch_delete_status = _branch_delete.get('status')
+        if branch_delete_status == 200:
+            flash(f'Branch {branch_name} was deleted!', category="success")
+        elif branch_delete_status != 200:
+            branch_delete_error = _branch_delete.get('error')
+            flash('Branch delete exception {}'.format(branch_delete_error),
+                  category="warning")
         return redirect('/views/gh_branches_manager/')
 
 
-@controller_gh_webapp.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_uploader/<branch_name>/',
+                            methods=['GET', 'POST'])
 def file_uploader(branch_name):
+    """
+    file uploader function
+    :param branch_name:
+    :return:
+    """
     if request.method == 'POST':
         if request.files:
             file = request.files['uploaded_file']
@@ -138,49 +249,78 @@ def file_uploader(branch_name):
             with open(temp_file_path, 'rb') as temp_file_handler:
                 file_contents = temp_file_handler.read()
 
-            model_gh.File.create_file(global_variables.obj,
-                                      gh_file_path="flaskr/" + settings.repo_folder + file_name,
-                                      message=message,
-                                      content=file_contents,
-                                      branch_name=branch_name)
-
-            flash(f'file {file_name} was committed to the repository branch {branch_name} '
-                  f'with the message {message}!', category="success")
+            _file_create = model_gh.File.create_file(global_variables.OBJ,
+                                                     gh_file_path="flaskr/"
+                                                     + settings.REPO_FOLDER
+                                                     + file_name,
+                                                     message=message,
+                                                     content=file_contents,
+                                                     branch_name=branch_name)
+            file_create_status = _file_create.get('status')
+            if file_create_status == 201:
+                flash(f'file {file_name} was committed to the repository branch {branch_name} '
+                      f'with the message {message}!', category="success")
+            elif file_create_status != 201:
+                file_create_error = _file_create.get('error')
+                flash(f'File create exception {file_create_error}', category="warning")
 
             os.unlink(temp_file_path)
             assert not os.path.exists(temp_file_path)
         else:
-            flash('No file uploaded', category="warning")
+            flash(f'No file uploaded', category="warning")
 
-        return redirect('/views/gh_files_manager/branch/'+branch_name)
+        return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@controller_gh_webapp.route('/file_editor/<branch_name>/file/put/<path:file_name>', methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_editor/<branch_name>/file/put/<path:file_name>',
+                            methods=['GET', 'POST'])
 def file_editor(branch_name, file_name):
+    """
+    file editor function
+    :param branch_name:
+    :param file_name:
+    :return:
+    """
     if request.method == 'POST':
         file_contents = request.form['file_contents']
         message = request.form['commit_message']
-        model_gh.File.update_file(global_variables.obj,
-                                  gh_file_path=file_name,
-                                  message=message,
-                                  content=file_contents,
-                                  branch_name=branch_name)
-        flash(f'file {file_name} update was committed to the repository branch {branch_name} '
-              f'with the message {message}!', category="success")
+        _file_edit = model_gh.File.update_file(global_variables.OBJ,
+                                               gh_file_path=file_name,
+                                               message=message,
+                                               content=file_contents,
+                                               branch_name=branch_name)
+        file_edit_status = _file_edit.get('status')
+        if file_edit_status == 201:
+            flash(f'file {file_name} update was committed to the repository '
+                  f'branch {branch_name} with the message {message}!', category="success")
+        elif file_edit_status != 201:
+            file_edit_error = _file_edit.get('error')
+            flash(f'File create exception {file_edit_error}', category="warning")
 
-        return redirect('/views/gh_files_manager/branch/'+branch_name)
+        return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@controller_gh_webapp.route('/file_deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_deleter/<branch_name>/file/delete/<path:file_name>',
+                            methods=['GET', 'POST'])
 def file_deleter(branch_name, file_name):
+    """
+    file deleter function
+    :param branch_name:
+    :param file_name:
+    :return:
+    """
     if request.method == 'POST':
         message = request.form['commit_message']
-        model_gh.File.delete_file(global_variables.obj,
-                                  gh_file_path=file_name,
-                                  message=message,
-                                  branch_name=branch_name)
-        flash(f'file {file_name} deletion was committed to the repository branch {branch_name} '
-              f'with the message {message}!', category="success")
+        _file_delete = model_gh.File.delete_file(global_variables.OBJ,
+                                                 gh_file_path=file_name,
+                                                 message=message,
+                                                 branch_name=branch_name)
+        file_delete_status = _file_delete.get('status')
+        if file_delete_status == 200:
+            flash(f'file {file_name} deletion was committed to the repository '
+                  f'branch {branch_name} with the message {message}!', category="success")
+        elif file_delete_status != 201:
+            file_delete_error = _file_delete.get('error')
+            flash(f'File delete exception {file_delete_error}', category="warning")
 
-        return redirect('/views/gh_files_manager/branch/'+branch_name)
-
+        return redirect('/views/gh_files_manager/branch/' + branch_name)

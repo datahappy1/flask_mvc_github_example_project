@@ -1,4 +1,7 @@
-repo = "datahappy1/flask_mvc_github_boilerplate"
-repo_folder = "files_playground/"
-initial_branch_name = "master"
-editable_file_extensions_list = ['.csv', '.txt', '.json', '.ini']
+"""
+settings module
+"""
+REPO = "datahappy1/flask_mvc_github_boilerplate"
+REPO_FOLDER = "files_playground/"
+INITIAL_BRANCH_NAME = "master"
+EDITABLE_FILE_EXTENSION_LIST = ['.csv', '.txt', '.json', '.ini']
