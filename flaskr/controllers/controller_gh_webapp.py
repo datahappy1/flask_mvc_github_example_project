@@ -294,8 +294,8 @@ def file_editor(branch_name, file_name):
         try:
             file_contents = request.form['file_contents']
         except:
-        # file_contents not coming from the edit textarea form means file
-        # is not editable extension type therefore get the file uploaded with the form
+            # file_contents not coming from the edit textarea form means file
+            # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
             file_name = secure_filename(file.filename)
             temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
@@ -304,8 +304,16 @@ def file_editor(branch_name, file_name):
             with open(temp_file_path, 'rb') as temp_file_handler:
                 file_contents = temp_file_handler.read()
 
+            os.unlink(temp_file_path)
+            assert not os.path.exists(temp_file_path)
+
         message = request.form['commit_message']
         _file_edit = model_gh.File.update_file(global_variables.OBJ,
+
+                                               #gh_file_path="flaskr/"
+                                               #             + settings.REPO_FOLDER
+                                               #             + file_name,
+                                               #
                                                gh_file_path=file_name,
                                                message=message,
                                                content=file_contents,
