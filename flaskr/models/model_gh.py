@@ -87,22 +87,6 @@ class Branch(Model):
             return {'status': githubexc.status,
                     'error': githubexc.data}
 
-    def get_head_commit(self, branch_name) -> dict:
-        """
-        get head commit function
-        :param branch_name:
-        :return:
-        """
-        try:
-            _commit = self.repo.get_branch(branch_name)
-            commit = _commit.commit
-            commit = str(commit).replace('Commit(sha="', '').replace('")', '')
-            return {'status': 200,
-                    'content': commit}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
-
 
 class File(Model):
     """
@@ -124,6 +108,22 @@ class File(Model):
                                   replace('")', ''))
             return {'status': 200,
                     'content': files_list}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
+
+    def get_head_commit(self, branch_name) -> dict:
+        """
+        get head commit function
+        :param branch_name:
+        :return:
+        """
+        try:
+            _commit = self.repo.get_branch(branch_name)
+            commit = _commit.commit
+            commit = str(commit).replace('Commit(sha="', '').replace('")', '')
+            return {'status': 200,
+                    'content': commit}
         except GithubException as githubexc:
             return {'status': githubexc.status,
                     'error': githubexc.data}
@@ -169,9 +169,9 @@ class File(Model):
         :return:
         """
         try:
-            _commit = self.repo.get_head_commit(branch_name)
+            _commit = File.get_head_commit(self, branch_name)
             if _commit.get('status') == 200:
-                ref = _commit.get('contents')
+                ref = _commit.get('content')
             # if cannot retrieve branch head commit sha, use filename
             else:
                 ref = branch_name
