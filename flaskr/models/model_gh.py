@@ -114,7 +114,7 @@ class File(Model):
 
     def get_head_commit(self, branch_name) -> dict:
         """
-        get head commit function
+        get head commit function (needed to get latest file contents)
         :param branch_name:
         :return:
         """
@@ -172,7 +172,7 @@ class File(Model):
             _commit = File.get_head_commit(self, branch_name)
             if _commit.get('status') == 200:
                 ref = _commit.get('content')
-            # if cannot retrieve branch head commit sha, use filename
+            # if cannot retrieve head commit sha, use branch sha
             else:
                 ref = branch_name
 
