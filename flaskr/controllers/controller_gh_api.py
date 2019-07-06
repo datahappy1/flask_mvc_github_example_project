@@ -47,7 +47,7 @@ def api_gh_branches_manager():
                 })
             response.status_code = branch_list_status
         else:
-            session_id_error = _session_id.get('errors')
+            session_id_error = _session_id.get('error')
             response = jsonify({
                 'status': session_id_status,
                 'errors:': session_id_error,
@@ -69,7 +69,6 @@ def api_branch(branch_name):
         args = request.args
         branch_name_src = args['branch_name_src']
         branch_name_tgt = branch_name
-        branch_name_tgt = str(branch_name_tgt).replace(' ', '')
         _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
                                                        source_branch=branch_name_src,
                                                        target_branch=branch_name_tgt)
@@ -161,7 +160,7 @@ def api_gh_files_manager(branch_name):
             response.status_code = files_list_status
 
         else:
-            session_id_error = _session_id.get('errors')
+            session_id_error = _session_id.get('error')
             response = jsonify({
                 'status': session_id_status,
                 'errors:': session_id_error,

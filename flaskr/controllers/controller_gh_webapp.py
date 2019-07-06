@@ -30,7 +30,7 @@ def gh_branches_manager():
         gh_session_id = _session_id.get('content')
         flash(f'PyGithub connect success {gh_session_id}', category="success")
     else:
-        session_id_error = _session_id.get('errors')
+        session_id_error = _session_id.get('error')
         flash(f'PyGithub connect exception {session_id_error}', category="warning")
         return render_template('error_page.html', template_error_message=session_id_error)
 
@@ -40,7 +40,7 @@ def gh_branches_manager():
         branch_list_content = _branch_list.get('content')
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
-        branch_list_error = _branch_list.get('errors')
+        branch_list_error = _branch_list.get('error')
         flash(f'Branches load exception {branch_list_error}', category="warning")
         return redirect('/')
 
@@ -88,7 +88,7 @@ def gh_files_manager(branch_name):
         gh_session_id = _session_id.get('content')
         flash(f'PyGithub connect success {gh_session_id}', category="success")
     else:
-        session_id_error = _session_id.get('errors')
+        session_id_error = _session_id.get('error')
         flash(f'PyGithub connect exception {session_id_error}', category="warning")
         return render_template('error_page.html',
                                template_error_message=session_id_error)
@@ -99,7 +99,7 @@ def gh_files_manager(branch_name):
         branch_list_content = _branch_list.get('content')
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
-        branch_list_error = _branch_list.get('errors')
+        branch_list_error = _branch_list.get('error')
         flash(f'Branches load exception {branch_list_error}', category="warning")
         return redirect('/')
 
@@ -109,7 +109,7 @@ def gh_files_manager(branch_name):
         files_list_content = _files_list.get('content')
         flash(f'Files load success {files_list_status}', category="success")
     else:
-        files_list_error = _files_list.get('errors')
+        files_list_error = _files_list.get('error')
         flash(f'Files load exception {files_list_error}', category="warning")
         return redirect('/')
 
