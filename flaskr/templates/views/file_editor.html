@@ -5,9 +5,13 @@
     <p>Let's update the file contents through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="/file_editor/{{ template_current_branch }}/file/put/{{ file_name }}" method="POST"
+    <form action="/file_editor/{{ template_current_branch }}/file/edit/{{ file_name }}" method="POST"
           enctype="multipart/form-data">
-        <p><textarea name="file_contents" cols="150" rows="20">{{ file_contents }}</textarea></p>
+        {% if file_contents %}
+            <p><textarea name="file_contents" cols="150" rows="20">{{ file_contents }}</textarea></p>
+        {% else %}
+            <p><input type="file" name="uploaded_file"/></p>
+        {% endif %}
         <p><textarea name="commit_message" maxlength="70">Commit message</textarea></p>
         <input type="submit" value="commit">
     </form>
