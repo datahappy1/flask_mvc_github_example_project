@@ -1,17 +1,18 @@
 # flask_mvc_github_boilerplate
-## 10000 ft. overview:
+## a sample project for working with files in your Github repo using Flask webapp / api
+### 10000 ft. overview:
 ![alt text][diagram]
 
 [diagram]: https://github.com/datahappy1/flask_mvc_github_boilerplate/blob/master/flaskr/docs/diagram.png "diagram"
 
-## purpose of this boilerplate Flask project is to demonstrate:
+### purpose of this boilerplate Flask project is to demonstrate:
 1) how Flask can be used with the MVC design pattern using api endpoints and using blueprints modular import
 2) how Flask can deal with Github integration using the Github api v3 (used as the model "persistence" layer
 in the MVC design pattern)
 3) api endpoint requests pytest testing
 4) ability of such a web application to gracefully fail on Github integration exceptions
 
-## how to setup your environment:
+### how to setup your environment:
 1) git clone this repo
 2) setup a virtual environment for this project
 3) create a Github personal access token: login to Github and go to settings - developer settings - Personal access tokens - Generate a new token
