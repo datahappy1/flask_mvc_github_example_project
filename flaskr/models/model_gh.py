@@ -87,6 +87,22 @@ class Branch(Model):
             return {'status': githubexc.status,
                     'error': githubexc.data}
 
+    def get_head_commit(self, branch_name) -> dict:
+        """
+        get head commit function
+        :param branch_name:
+        :return:
+        """
+        try:
+            _commit = self.repo.get_branch(branch_name)
+            commit = _commit.commit
+            commit = str(commit).replace('Commit(sha="', '').replace('")', '')
+            return {'status': 200,
+                    'content': commit}
+        except GithubException as githubexc:
+            return {'status': githubexc.status,
+                    'error': githubexc.data}
+
 
 class File(Model):
     """
@@ -153,8 +169,13 @@ class File(Model):
         :return:
         """
         try:
-            contents = self.repo.get_file_contents(gh_file_path,
-                                                   ref=branch_name)
+            _commit = self.repo.get_head_commit(branch_name)
+            if _commit.get('status') == 200:
+                ref = _commit.get('contents')
+            else:
+                ref = branch_name
+
+            contents = self.repo.get_contents(gh_file_path, ref=ref)
             url = contents.download_url
             req = requests.get(url)
             raw_data = req.content.decode('UTF-8')
