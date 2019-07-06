@@ -8,7 +8,7 @@ from flaskr.lib import settings, global_variables
 from flaskr.models import model_gh
 from flaskr.controllers.controller_gh_webapp import CONTROLLER_GH_WEBAPP
 # you can also import specific functions from a Blueprint module:
-# from flaskr.controllers.utils import session_getter, branch_lister, file_lister
+# from flaskr.controllers.common_functions import session_getter, branch_lister, file_lister
 from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
 
 # flask app starts here
