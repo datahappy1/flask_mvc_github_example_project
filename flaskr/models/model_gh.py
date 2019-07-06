@@ -172,6 +172,7 @@ class File(Model):
             _commit = self.repo.get_head_commit(branch_name)
             if _commit.get('status') == 200:
                 ref = _commit.get('contents')
+            # if cannot retrieve branch head commit sha, use filename
             else:
                 ref = branch_name
 
