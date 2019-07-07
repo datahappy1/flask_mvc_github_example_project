@@ -186,12 +186,13 @@ def api_file(branch_name, file_name):
     gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
     if request.method == 'POST':
-        file_contents = request.data
+        file_contents = request.get_data()
         _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
+
         file_create_status = _file_create.get('status')
 
         if file_create_status == 201:
@@ -214,12 +215,13 @@ def api_file(branch_name, file_name):
         return response
 
     if request.method == 'PUT':
-        file_contents = request.data
+        file_contents = request.get_data()
         _file_update = model_gh.File.update_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
+
         file_update_status = _file_update.get('status')
 
         if file_update_status == 201:
@@ -246,6 +248,7 @@ def api_file(branch_name, file_name):
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  branch_name=branch_name)
+
         file_delete_status = _file_delete.get('status')
 
         if file_delete_status == 201:
