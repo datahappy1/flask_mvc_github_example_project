@@ -192,6 +192,7 @@ def api_file(branch_name, file_name):
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
+
         file_create_status = _file_create.get('status')
 
         if file_create_status == 201:
@@ -220,6 +221,7 @@ def api_file(branch_name, file_name):
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
+
         file_update_status = _file_update.get('status')
 
         if file_update_status == 201:
@@ -246,6 +248,7 @@ def api_file(branch_name, file_name):
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  branch_name=branch_name)
+
         file_delete_status = _file_delete.get('status')
 
         if file_delete_status == 201:
