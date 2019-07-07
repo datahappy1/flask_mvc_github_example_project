@@ -186,7 +186,7 @@ def api_file(branch_name, file_name):
     gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
     if request.method == 'POST':
-        file_contents = request.data
+        file_contents = request.get_data()
         _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
@@ -214,7 +214,7 @@ def api_file(branch_name, file_name):
         return response
 
     if request.method == 'PUT':
-        file_contents = request.data
+        file_contents = request.get_data()
         _file_update = model_gh.File.update_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
