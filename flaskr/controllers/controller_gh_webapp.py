@@ -4,6 +4,7 @@ controller github webapp module
 import os
 
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import BadRequest
 from flask import Blueprint, request, flash, redirect, render_template
 
 from flaskr.lib import global_variables, settings
@@ -50,7 +51,7 @@ def gh_branches_manager():
                            template_repo_name=settings.REPO)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/post/',
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/create/',
                             methods=['GET'])
 def create_branch(branch_name):
     """
@@ -120,7 +121,8 @@ def gh_files_manager(branch_name):
                            template_file_list=files_list_content)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/file/post/',
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
+                            'file/create/',
                             methods=['GET'])
 def upload_file(branch_name):
     """
@@ -133,7 +135,7 @@ def upload_file(branch_name):
 
 
 @CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
-                            'file/put/<path:file_name>',
+                            'file/edit/<path:file_name>',
                             methods=['GET'])
 def edit_file(branch_name, file_name):
     """
@@ -146,9 +148,17 @@ def edit_file(branch_name, file_name):
                                                         branch_name=branch_name)
     file_exists_status = _file_exists.get('status')
     if file_exists_status == 200:
-        file_contents = common_functions.file_content_getter(gh_file_path=file_name,
-                                                             branch_name=branch_name)\
-            .get('content')
+
+        # check if file is editable to load up file contents for the form
+        file_extension = os.path.splitext(str(file_name))[1]
+        if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
+            file_contents = common_functions.file_content_getter(gh_file_path=file_name,
+                                                                 branch_name=branch_name)\
+                .get('content')
+        else:
+            # file exists but is not editable
+            file_contents = None
+
         return render_template('views/file_editor.html',
                                template_current_branch=branch_name,
                                file_name=file_name,
@@ -156,6 +166,7 @@ def edit_file(branch_name, file_name):
     else:
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
+
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
@@ -179,6 +190,7 @@ def delete_file(branch_name, file_name):
     else:
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
+
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
@@ -205,6 +217,7 @@ def branch_creator():
         elif branch_create_status != 201:
             branch_create_error = _branch_create.get('error')
             flash(f'Branch create exception {branch_create_error}', category="warning")
+
         return redirect('/views/gh_branches_manager/')
 
 
@@ -226,6 +239,7 @@ def branch_deleter(branch_name):
             branch_delete_error = _branch_delete.get('error')
             flash('Branch delete exception {}'.format(branch_delete_error),
                   category="warning")
+
         return redirect('/views/gh_branches_manager/')
 
 
@@ -249,16 +263,16 @@ def file_uploader(branch_name):
             with open(temp_file_path, 'rb') as temp_file_handler:
                 file_contents = temp_file_handler.read()
 
+            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
             _file_create = model_gh.File.create_file(global_variables.OBJ,
-                                                     gh_file_path="flaskr/"
-                                                     + settings.REPO_FOLDER
-                                                     + file_name,
+                                                     gh_file_path=gh_file_path,
                                                      message=message,
                                                      content=file_contents,
                                                      branch_name=branch_name)
             file_create_status = _file_create.get('status')
             if file_create_status == 201:
-                flash(f'file {file_name} was committed to the repository branch {branch_name} '
+                flash(f'File {file_name} was committed to the repository branch {branch_name} '
                       f'with the message {message}!', category="success")
             elif file_create_status != 201:
                 file_create_error = _file_create.get('error')
@@ -272,7 +286,7 @@ def file_uploader(branch_name):
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/file_editor/<branch_name>/file/put/<path:file_name>',
+@CONTROLLER_GH_WEBAPP.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
                             methods=['GET', 'POST'])
 def file_editor(branch_name, file_name):
     """
@@ -282,20 +296,38 @@ def file_editor(branch_name, file_name):
     :return:
     """
     if request.method == 'POST':
-        file_contents = request.form['file_contents']
+        try:
+            file_contents = request.form['file_contents']
+            gh_file_path = file_name
+        except BadRequest:
+            # file_contents not coming from the edit textarea form means file
+            # is not editable extension type therefore get the file uploaded with the form
+            file = request.files['uploaded_file']
+            file_name = secure_filename(file.filename)
+            temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+            file.save(temp_file_path)
+
+            with open(temp_file_path, 'rb') as temp_file_handler:
+                file_contents = temp_file_handler.read()
+
+            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
+            os.unlink(temp_file_path)
+            assert not os.path.exists(temp_file_path)
+
         message = request.form['commit_message']
         _file_edit = model_gh.File.update_file(global_variables.OBJ,
-                                               gh_file_path=file_name,
+                                               gh_file_path=gh_file_path,
                                                message=message,
                                                content=file_contents,
                                                branch_name=branch_name)
         file_edit_status = _file_edit.get('status')
         if file_edit_status == 201:
-            flash(f'file {file_name} update was committed to the repository '
+            flash(f'File {file_name} update was committed to the repository '
                   f'branch {branch_name} with the message {message}!', category="success")
         elif file_edit_status != 201:
             file_edit_error = _file_edit.get('error')
-            flash(f'File create exception {file_edit_error}', category="warning")
+            flash(f'File edit exception {file_edit_error}', category="warning")
 
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
@@ -317,7 +349,7 @@ def file_deleter(branch_name, file_name):
                                                  branch_name=branch_name)
         file_delete_status = _file_delete.get('status')
         if file_delete_status == 200:
-            flash(f'file {file_name} deletion was committed to the repository '
+            flash(f'File {file_name} deletion was committed to the repository '
                   f'branch {branch_name} with the message {message}!', category="success")
         elif file_delete_status != 201:
             file_delete_error = _file_delete.get('error')

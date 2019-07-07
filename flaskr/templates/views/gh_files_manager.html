@@ -8,8 +8,11 @@
         <li>Github session object ID: {{ gh_session_id }}</li>
         <li>Choose a Github branch:
             {% for branch in template_branch_list %}
-            <a href="/views/gh_files_manager/branch/{{ branch }}"
-               {% if branch== template_current_branch %} class="selected" {% endif %}>{{branch}}</a>
+            {% if branch == template_current_branch %}
+                <a href="/views/gh_files_manager/branch/{{ branch }}" class="selected" >{{branch}}</a>
+            {% else %}
+                <a href="/views/gh_files_manager/branch/{{ branch }}">{{branch}}</a>
+            {% endif %}
             {% endfor %}
         </li>
         <li>Commit a new file to the branch {{ template_current_branch }}
@@ -30,6 +33,10 @@
                 <td>{% if file[1] %} <!-- if file is "editable" based on file extension type, show edit link -->
                     <a href="{{ url_for('controller_gh_webapp.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
                         edit file
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('controller_gh_webapp.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                        override file
                     </a>
                     {% endif %}
                 </td>

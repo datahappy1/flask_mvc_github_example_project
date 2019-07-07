@@ -53,9 +53,9 @@ class Branch(Model):
                                      .replace('")', ''))
             return {'status': 200,
                     'content': branches_list}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def create_branch(self, source_branch, target_branch) -> dict:
         """
@@ -69,9 +69,9 @@ class Branch(Model):
             self.repo.create_git_ref(ref='refs/heads/' + target_branch,
                                      sha=srcbranch.commit.sha)
             return {'status': 201}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def delete_branch(self, branch_name) -> dict:
         """
@@ -83,9 +83,9 @@ class Branch(Model):
             branch_ref = self.repo.get_git_ref(f"heads/{branch_name}")
             branch_ref.delete()
             return {'status': 200}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
 
 class File(Model):
@@ -108,9 +108,9 @@ class File(Model):
                                   replace('")', ''))
             return {'status': 200,
                     'content': files_list}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def get_head_commit(self, branch_name) -> dict:
         """
@@ -124,9 +124,9 @@ class File(Model):
             commit = str(commit).replace('Commit(sha="', '').replace('")', '')
             return {'status': 200,
                     'content': commit}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def get_file_status(self, gh_file_path, branch_name) -> dict:
         """
@@ -141,9 +141,9 @@ class File(Model):
             req = requests.get(url)
             return {'status': 200,
                     'content': req.status_code}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def get_file_sha(self, gh_file_path, branch_name) -> dict:
         """
@@ -157,9 +157,9 @@ class File(Model):
             sha = resp.sha
             return {'status': 200,
                     'content': sha}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def get_file_contents(self, gh_file_path, branch_name) -> dict:
         """
@@ -182,9 +182,9 @@ class File(Model):
             raw_data = req.content.decode('UTF-8')
             return {'status': 200,
                     'content': raw_data}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def create_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
@@ -198,9 +198,9 @@ class File(Model):
         try:
             self.repo.create_file(gh_file_path, message, content, branch_name)
             return {'status': 201}
-        except GithubException as githubexc:
-            return {'status': githubexc.status,
-                    'error': githubexc.data}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
     def update_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
@@ -217,9 +217,9 @@ class File(Model):
             try:
                 self.repo.update_file(gh_file_path, message, content, sha, branch_name)
                 return {'status': 201}
-            except GithubException as githubexc:
-                return {'status': githubexc.status,
-                        'error': githubexc.data}
+            except GithubException as github_exc:
+                return {'status': github_exc.status,
+                        'error': github_exc.data}
         else:
             return {'status': _sha.get('status'),
                     'error': _sha.get('error')}
@@ -239,9 +239,9 @@ class File(Model):
                 self.repo.delete_file(gh_file_path, message, sha,
                                       branch=branch_name)
                 return {'status': 200}
-            except GithubException as githubexc:
-                return {'status': githubexc.status,
-                        'error': githubexc.data}
+            except GithubException as github_exc:
+                return {'status': github_exc.status,
+                        'error': github_exc.data}
         else:
             return {'status': _sha.get('status'),
                     'error': _sha.get('error')}

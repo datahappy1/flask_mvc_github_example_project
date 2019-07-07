@@ -180,15 +180,15 @@ def api_file(branch_name, file_name):
     :param file_name:
     :return:
     """
+    args = request.args
+    message = args['commit_message']
+    file_name = secure_filename(file_name)
+    gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
     if request.method == 'POST':
-        args = request.args
-        message = args['commit_message']
-        file_name = secure_filename(file_name)
         file_contents = request.data
         _file_create = model_gh.File.create_file(global_variables.OBJ,
-                                                 gh_file_path="flaskr/"
-                                                 + settings.REPO_FOLDER
-                                                 + file_name,
+                                                 gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
@@ -214,14 +214,9 @@ def api_file(branch_name, file_name):
         return response
 
     if request.method == 'PUT':
-        args = request.args
-        message = args['commit_message']
-        file_name = secure_filename(file_name)
         file_contents = request.data
         _file_update = model_gh.File.update_file(global_variables.OBJ,
-                                                 gh_file_path="flaskr/"
-                                                 + settings.REPO_FOLDER
-                                                 + file_name,
+                                                 gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
                                                  branch_name=branch_name)
@@ -247,12 +242,8 @@ def api_file(branch_name, file_name):
         return response
 
     if request.method == 'DELETE':
-        args = request.args
-        message = args['commit_message']
         _file_delete = model_gh.File.delete_file(global_variables.OBJ,
-                                                 gh_file_path="flaskr/"
-                                                 + settings.REPO_FOLDER
-                                                 + file_name,
+                                                 gh_file_path=gh_file_path,
                                                  message=message,
                                                  branch_name=branch_name)
         file_delete_status = _file_delete.get('status')
