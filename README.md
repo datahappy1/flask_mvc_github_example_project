@@ -1,17 +1,17 @@
-# flask_mvc_github_boilerplate
-## a simple UI for branches and files management in a Github repo build with Flask
+# flask_mvc_github_example_project
+## an example project for working with branches and files in your Github repo using Flask webapp / api
 ### 10000 ft. overview:
 ![alt text][diagram]
 
-[diagram]: https://github.com/datahappy1/flask_mvc_github_boilerplate/blob/master/flaskr/docs/diagram.png "diagram"
+[diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/diagram.png "diagram"
 
-### purpose of this boilerplate Flask project is to demonstrate:
-1) how Flask can be used with the MVC design pattern using blueprints modular import
-2) how such a Flask project can deliver the same features using both api endpoints and static html forms
-3) how Flask can deal with the Github integration using the Github api v3 used as the model "persistence" layer
-in the MVC design pattern ( using PyGithub ) 
-4) api endpoint requests pytest testing done simple yet delivering a fair portion of project test coverage
-5) ability of such a web application to gracefully fail on Github exceptions
+### purpose of this Flask project is to demonstrate:
+1) how to deliver the same features in both api endpoints and static html forms in one Flask project
+2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
+3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
+in the MVC design pattern)
+4) api endpoint pytest testing using the requests library
+5) ability of such a web application to gracefully fail on Github integration exceptions
 
 ### how to setup your environment:
 1) git clone this repo
@@ -29,9 +29,9 @@ flask_secret_key = <your generated flask secret key>
 
 ![alt text][setup]
 
-[setup]: https://github.com/datahappy1/flask_mvc_github_boilerplate/blob/master/flaskr/docs/setup.png "setup"
+[setup]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/setup.png "setup"
 
 
-*disclaimer: this boilerplate app comes as is, in a production ready application, you
-should use the OAuth protocol for Github login, this project will
+*disclaimer: this example project codebase comes as is, in a production ready application, besides other things, 
+you should use the OAuth protocol for the Github login, this library can
 get you started: https://github-flask.readthedocs.io/en/latest/
