@@ -42,7 +42,7 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
             file_content = None
         elif test_name == "create file":
             # use the test file content as request data located in tests/files/test_file.txt for testing the post method
-            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt')) as fp:
+            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
                 file_content = fp.read()
         else:
             raise NotImplementedError
@@ -52,7 +52,7 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
     elif method == "put":
         if test_name == "edit file":
             # use the test file content as request data located in tests/files/test_file.txt for testing the put method
-            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt')) as fp:
+            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
                 file_content = fp.read()
         else:
             raise NotImplementedError
