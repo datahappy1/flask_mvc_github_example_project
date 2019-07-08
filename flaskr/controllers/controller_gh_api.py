@@ -181,12 +181,27 @@ def api_file(branch_name, file_name):
     :return:
     """
     args = request.args
-    message = args['commit_message']
+    #message = args['commit_message']
+    message = request.form['commit_message']
     file_name = secure_filename(file_name)
     gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
     if request.method == 'POST':
-        file_contents = request.get_data()
+        #file_contents = request.get_data()
+        file_contents = request.files['uploaded_file'] # TODO breaks the test
+        file_contents = file_contents.read()
+        print(file_contents)
+
+        # curl - X POST - F commit_message = Test - F uploaded_file =@/home/pavelp/GIT_PROJECTS/flask_mvc_github_boilerplate/flaskr/docs/setup.png http://127.0.0.1:5000/api/branch/dev/file/setup.png/
+        # {
+        #     "current_branch": "dev",
+        #     "file": "setup.png",
+        #     "method": "POST",
+        #     "mimetype": "application/json",
+        #     "repository": "datahappy1/flask_mvc_github_example_project",
+        #     "status": 201
+        # }
+
         _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
