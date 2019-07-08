@@ -192,6 +192,7 @@ def api_file(branch_name, file_name):
         file_contents = file_contents.read()
         print(file_contents)
 
+        # https://stackoverflow.com/questions/20759981/python-trying-to-post-form-using-requests
         # https://stackoverflow.com/questions/17329087/upload-a-file-to-a-python-flask-server-using-curl
         # curl - X POST - F commit_message = Test - F uploaded_file =@/home/pavelp/GIT_PROJECTS/flask_mvc_github_boilerplate/flaskr/docs/setup.png http://127.0.0.1:5000/api/branch/dev/file/setup.png/
         # {
