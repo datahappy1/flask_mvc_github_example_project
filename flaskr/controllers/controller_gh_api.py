@@ -181,17 +181,18 @@ def api_file(branch_name, file_name):
     :return:
     """
     args = request.args
-    #message = args['commit_message']
+    # message = args['commit_message']
     message = request.form['commit_message']
     file_name = secure_filename(file_name)
     gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
     if request.method == 'POST':
-        #file_contents = request.get_data()
-        file_contents = request.files['uploaded_file'] # TODO breaks the test
+        # file_contents = request.get_data()
+        file_contents = request.files['uploaded_file']  # TODO breaks the test
         file_contents = file_contents.read()
         print(file_contents)
 
+        # https://stackoverflow.com/questions/17329087/upload-a-file-to-a-python-flask-server-using-curl
         # curl - X POST - F commit_message = Test - F uploaded_file =@/home/pavelp/GIT_PROJECTS/flask_mvc_github_boilerplate/flaskr/docs/setup.png http://127.0.0.1:5000/api/branch/dev/file/setup.png/
         # {
         #     "current_branch": "dev",
