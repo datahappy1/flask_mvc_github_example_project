@@ -182,6 +182,10 @@ def api_gh_files_manager(branch_name):
 def api_create_file(branch_name):
     """
     api create file endpoint function
+
+    curl post files example:
+    curl - X POST - F commit_message=Test - F uploaded_file=@/home/filepathxxx http://127.0.0.1:5000/api/branch/dev/file/filenamexxx/
+
     :param branch_name:
     :param file_name:
     :return:
@@ -206,16 +210,6 @@ def api_create_file(branch_name):
             file_name = request.form['file_name']
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
-
-        # curl - X POST - F commit_message=Test - F uploaded_file=@/home/pavelp/GIT_PROJECTS/flask_mvc_github_boilerplate/flaskr/docs/setup.png http://127.0.0.1:5000/api/branch/dev/file/setup.png/
-        # {
-        #     "current_branch": "dev",
-        #     "file": "setup.png",
-        #     "method": "POST",
-        #     "mimetype": "application/json",
-        #     "repository": "datahappy1/flask_mvc_github_example_project",
-        #     "status": 201
-        # }
 
         _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
