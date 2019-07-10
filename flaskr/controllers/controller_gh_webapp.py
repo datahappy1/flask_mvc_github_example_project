@@ -18,8 +18,7 @@ CONTROLLER_GH_WEBAPP = Blueprint('controller_gh_webapp', __name__,
 # @controller_gh.routes - views functions for ui user interaction
 # optionally validating the inputs and returning redirects or rendering templates
 # with the html forms
-@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
     """
     github branches manager function
@@ -51,8 +50,7 @@ def gh_branches_manager():
                            template_repo_name=settings.REPO)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/create/',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/create/', methods=['GET'])
 def create_branch(branch_name):
     """
     create branch function
@@ -63,8 +61,7 @@ def create_branch(branch_name):
                            template_current_branch=branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/delete/',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
 def delete_branch(branch_name):
     """
     delete branch function
@@ -75,8 +72,7 @@ def delete_branch(branch_name):
                            template_current_branch=branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def gh_files_manager(branch_name):
     """
     github files manager function
@@ -121,9 +117,7 @@ def gh_files_manager(branch_name):
                            template_file_list=files_list_content)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
-                            'file/create/',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/file/create/', methods=['GET'])
 def upload_file(branch_name):
     """
     upload file function
@@ -134,9 +128,7 @@ def upload_file(branch_name):
                            template_current_branch=branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
-                            'file/edit/<path:file_name>',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/file/edit/<path:file_name>', methods=['GET'])
 def edit_file(branch_name, file_name):
     """
     edit file function
@@ -170,9 +162,7 @@ def edit_file(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/'
-                            'file/delete/<path:file_name>',
-                            methods=['GET'])
+@CONTROLLER_GH_WEBAPP.route('/views/gh_files_manager/branch/<branch_name>/file/delete/<path:file_name>', methods=['GET'])
 def delete_file(branch_name, file_name):
     """
     delete file function
@@ -197,8 +187,7 @@ def delete_file(branch_name, file_name):
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@CONTROLLER_GH_WEBAPP.route('/branch_creator/',
-                            methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/branch_creator/', methods=['GET', 'POST'])
 def branch_creator():
     """
     branch creator function
@@ -221,8 +210,7 @@ def branch_creator():
         return redirect('/views/gh_branches_manager/')
 
 
-@CONTROLLER_GH_WEBAPP.route('/branch_deleter/<branch_name>/',
-                            methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
 def branch_deleter(branch_name):
     """
     branch deleter function
@@ -243,8 +231,7 @@ def branch_deleter(branch_name):
         return redirect('/views/gh_branches_manager/')
 
 
-@CONTROLLER_GH_WEBAPP.route('/file_uploader/<branch_name>/',
-                            methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
 def file_uploader(branch_name):
     """
     file uploader function
@@ -252,10 +239,9 @@ def file_uploader(branch_name):
     :return:
     """
     if request.method == 'POST':
-        if request.files:
+        message = request.form['commit_message']
+        try:
             file = request.files['uploaded_file']
-            message = request.form['commit_message']
-
             file_name = secure_filename(file.filename)
             temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
             file.save(temp_file_path)
@@ -263,31 +249,37 @@ def file_uploader(branch_name):
             with open(temp_file_path, 'rb') as temp_file_handler:
                 file_contents = temp_file_handler.read()
 
-            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
-
-            _file_create = model_gh.File.create_file(global_variables.OBJ,
-                                                     gh_file_path=gh_file_path,
-                                                     message=message,
-                                                     content=file_contents,
-                                                     branch_name=branch_name)
-            file_create_status = _file_create.get('status')
-            if file_create_status == 201:
-                flash(f'File {file_name} was committed to the repository branch {branch_name} '
-                      f'with the message {message}!', category="success")
-            elif file_create_status != 201:
-                file_create_error = _file_create.get('error')
-                flash(f'File create exception {file_create_error}', category="warning")
-
             os.unlink(temp_file_path)
             assert not os.path.exists(temp_file_path)
-        else:
-            flash(f'No file uploaded', category="warning")
 
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
+        except BadRequest:
+            file_contents = request.form['file_contents']
+            file_name = request.form['file_name']
+
+        gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
+        _file_create = model_gh.File.create_file(global_variables.OBJ,
+                                                 gh_file_path=gh_file_path,
+                                                 message=message,
+                                                 content=file_contents,
+                                                 branch_name=branch_name)
+
+        file_create_status = _file_create.get('status')
+
+        if file_create_status == 201:
+            flash(f'File {file_name} was committed to the repository branch {branch_name} '
+                  f'with the message {message}!', category="success")
+        elif file_create_status != 201:
+            file_create_error = _file_create.get('error')
+            flash(f'File create exception {file_create_error}', category="warning")
+
+    else:
+        flash(f'No file uploaded', category="warning")
+
+    return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
-                            methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_editor/<branch_name>/file/edit/<path:file_name>', methods=['GET', 'POST'])
 def file_editor(branch_name, file_name):
     """
     file editor function
@@ -296,9 +288,11 @@ def file_editor(branch_name, file_name):
     :return:
     """
     if request.method == 'POST':
+        message = request.form['commit_message']
         try:
             file_contents = request.form['file_contents']
             gh_file_path = file_name
+
         except BadRequest:
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
@@ -315,7 +309,6 @@ def file_editor(branch_name, file_name):
             os.unlink(temp_file_path)
             assert not os.path.exists(temp_file_path)
 
-        message = request.form['commit_message']
         _file_edit = model_gh.File.update_file(global_variables.OBJ,
                                                gh_file_path=gh_file_path,
                                                message=message,
@@ -332,8 +325,7 @@ def file_editor(branch_name, file_name):
         return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
-@CONTROLLER_GH_WEBAPP.route('/file_deleter/<branch_name>/file/delete/<path:file_name>',
-                            methods=['GET', 'POST'])
+@CONTROLLER_GH_WEBAPP.route('/file_deleter/<branch_name>/file/delete/<path:file_name>', methods=['GET', 'POST'])
 def file_deleter(branch_name, file_name):
     """
     file deleter function

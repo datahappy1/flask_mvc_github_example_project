@@ -1,7 +1,10 @@
 """
 controller github api module
 """
+import os
+
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import BadRequest, NotFound
 from flask import Blueprint, jsonify, request
 
 from flaskr.lib import global_variables, settings
@@ -12,8 +15,7 @@ from flaskr.controllers import common_functions
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
 
 
-@CONTROLLER_GH_API.route('/api/gh_branches_manager/',
-                         methods=['GET'])
+@CONTROLLER_GH_API.route('/api/gh_branches_manager/', methods=['GET'])
 def api_gh_branches_manager():
     """
     api github branches manager endpoint function
@@ -57,18 +59,16 @@ def api_gh_branches_manager():
         return response
 
 
-@CONTROLLER_GH_API.route('/api/branch/<branch_name>/',
-                         methods=['POST', 'DELETE'])
-def api_branch(branch_name):
+@CONTROLLER_GH_API.route('/api/branch/', methods=['POST'])
+def api_create_branch():
     """
-    api branch endpoint function
+    api create branch endpoint function
     :param branch_name:
     :return:
     """
     if request.method == 'POST':
-        args = request.args
-        branch_name_src = args['branch_name_src']
-        branch_name_tgt = branch_name
+        branch_name_src = request.form['branch_name_src']
+        branch_name_tgt = request.form['branch_name_tgt']
         _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
                                                        source_branch=branch_name_src,
                                                        target_branch=branch_name_tgt)
@@ -93,6 +93,14 @@ def api_branch(branch_name):
         response.status_code = branch_create_status
         return response
 
+
+@CONTROLLER_GH_API.route('/api/branch/<branch_name>/', methods=['DELETE'])
+def api_existing_branch(branch_name):
+    """
+    api existing branch endpoint function
+    :param branch_name:
+    :return:
+    """
     if request.method == 'DELETE':
         _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
                                                        branch_name=branch_name)
@@ -117,8 +125,7 @@ def api_branch(branch_name):
         return response
 
 
-@CONTROLLER_GH_API.route('/api/gh_files_manager/branch/<branch_name>/',
-                         methods=['GET'])
+@CONTROLLER_GH_API.route('/api/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def api_gh_files_manager(branch_name):
     """
     api github files manager endpoint function
@@ -171,22 +178,45 @@ def api_gh_files_manager(branch_name):
         return response
 
 
-@CONTROLLER_GH_API.route('/api/branch/<branch_name>/file/<file_name>/',
-                         methods=['POST', 'PUT', 'DELETE'])
-def api_file(branch_name, file_name):
+@CONTROLLER_GH_API.route('/api/branch/<branch_name>/file/', methods=['POST'])
+def api_create_file(branch_name):
     """
-    api file endpoint function
+    api create file endpoint function
     :param branch_name:
     :param file_name:
     :return:
     """
-    args = request.args
-    message = args['commit_message']
-    file_name = secure_filename(file_name)
-    gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
-
     if request.method == 'POST':
-        file_contents = request.get_data()
+        message = request.form['commit_message']
+
+        try:
+            file = request.files['uploaded_file']
+            file_name = secure_filename(file.filename)
+            temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+            file.save(temp_file_path)
+
+            with open(temp_file_path, 'rb') as temp_file_handler:
+                file_contents = temp_file_handler.read()
+
+            os.unlink(temp_file_path)
+            assert not os.path.exists(temp_file_path)
+
+        except BadRequest:
+            file_contents = request.form['file_contents']
+            file_name = request.form['file_name']
+
+        gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
+        # curl - X POST - F commit_message=Test - F uploaded_file=@/home/pavelp/GIT_PROJECTS/flask_mvc_github_boilerplate/flaskr/docs/setup.png http://127.0.0.1:5000/api/branch/dev/file/setup.png/
+        # {
+        #     "current_branch": "dev",
+        #     "file": "setup.png",
+        #     "method": "POST",
+        #     "mimetype": "application/json",
+        #     "repository": "datahappy1/flask_mvc_github_example_project",
+        #     "status": 201
+        # }
+
         _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
@@ -213,9 +243,41 @@ def api_file(branch_name, file_name):
             })
         response.status_code = file_create_status
         return response
+    else:
+        raise NotFound
+
+
+@CONTROLLER_GH_API.route('/api/branch/<branch_name>/file/<file_name>/', methods=['PUT', 'DELETE'])
+def api_existing_file(branch_name, file_name):
+    """
+    api existing file endpoint function
+    :param branch_name:
+    :param file_name:
+    :return:
+    """
+    message = request.form['commit_message']
+    file_name = secure_filename(file_name)
+    gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
     if request.method == 'PUT':
-        file_contents = request.get_data()
+        try:
+            file_contents = request.form['file_contents']
+
+        except BadRequest:
+            # file_contents not coming from the edit textarea form means file
+            # is not editable extension type therefore get the file uploaded with the form
+            file = request.files['uploaded_file']
+            temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+            file.save(temp_file_path)
+
+            with open(temp_file_path, 'rb') as temp_file_handler:
+                file_contents = temp_file_handler.read()
+
+            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+
+            os.unlink(temp_file_path)
+            assert not os.path.exists(temp_file_path)
+
         _file_update = model_gh.File.update_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
@@ -269,3 +331,5 @@ def api_file(branch_name, file_name):
             })
         response.status_code = file_delete_status
         return response
+    else:
+        raise NotFound
