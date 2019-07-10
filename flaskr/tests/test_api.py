@@ -17,13 +17,12 @@ API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api'
         ('create branch', 'post', '{}/branch/'.format(API_BASE_ENDPOINT), {'branch_name_tgt': 'requests_test_{}'.format(TEST_RUNNER_ID), 'branch_name_src': 'master'}, 201),
         ('get branches', 'get', '{}/gh_branches_manager/'.format(API_BASE_ENDPOINT), None, 200),
         ('create file upload', 'post', '{}/branch/requests_test_{}/file/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
-        #TODO FIX
-        #('create file form', 'post', '{}/branch/requests_test_{}/file/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
-
-        #('edit file', 'put', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
-        #('override file', 'put', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
-        #('get files', 'get', '{}/gh_files_manager/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
-        #('delete file', 'delete', '{}/branch/requests_test_{}/file/my-file_{}.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
+        ('edit file', 'put', '{}/branch/requests_test_{}/file/test_file.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
+        ('delete file', 'delete','{}/branch/requests_test_{}/file/test_file.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
+        ('create file form', 'post', '{}/branch/requests_test_{}/file/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest', 'file_name': 'test_file.txt'}, 201),
+        ('override file', 'put', '{}/branch/requests_test_{}/file/test_file.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
+        ('get files', 'get', '{}/gh_files_manager/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
+        ('delete file', 'delete', '{}/branch/requests_test_{}/file/test_file.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
         ('delete branch', 'delete', '{}/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
     ])
 def test_request(test_name, method, endpoint, params, expected_success_status_code):
@@ -43,22 +42,21 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
 
     elif method == "post":
         if test_name == "create branch":
-            file_content = None
-            response = requests.post(endpoint, data=file_content, params=params)
+            response = requests.post(endpoint, data=params)
 
         elif test_name == "create file upload":
             # use the test file content as request data located in tests/files/test_file.txt for testing the post method
-            file = open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb')
-            files = {'uploaded_file': file}
-            response = requests.post(endpoint, files=files, data=params)
-            file.close()
+            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
+                files = {'uploaded_file': fp}
+                response = requests.post(endpoint, files=files, data=params)
 
         elif test_name == "create file form":
             # use the test file content as request data located in tests/files/test_file.txt for testing the post method
             with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
                 file_content = fp.read()
-
-            response = requests.post(endpoint, data=file_content, params=params)
+                data = params
+                data['file_contents'] = file_content
+                response = requests.post(endpoint, data=data)
 
         else:
             raise NotImplementedError
@@ -68,18 +66,20 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
             # use the test file content as request data located in tests/files/test_file.txt for testing the put method
             with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
                 file_content = fp.read()
-                response = requests.put(endpoint, data=file_content, params=params)
+                data = params
+                data['file_contents'] = file_content
+                response = requests.put(endpoint, data=data)
 
-        if test_name == "override file":
+        elif test_name == "override file":
             # use the test file content as request data located in tests/files/test_file.txt for testing the put method
-            file = open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb')
-            files = {'uploaded_file': file}
-            response = requests.post(endpoint, files=files, data=params)
+            with open(os.path.join(os.getcwd(), 'files', 'test_file.txt'), 'rb') as fp:
+                files = {'uploaded_file': fp}
+                response = requests.put(endpoint, files=files, data=params)
 
         else:
             raise NotImplementedError
 
     elif method == "delete":
-        response = requests.delete(endpoint, params=params)
+        response = requests.delete(endpoint, data=params)
 
     assert response.status_code == expected_success_status_code

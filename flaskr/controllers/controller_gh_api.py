@@ -67,9 +67,8 @@ def api_create_branch():
     :return:
     """
     if request.method == 'POST':
-        args = request.args
-        branch_name_src = args['branch_name_src']
-        branch_name_tgt = args['branch_name_tgt']
+        branch_name_src = request.form['branch_name_src']
+        branch_name_tgt = request.form['branch_name_tgt']
         _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
                                                        source_branch=branch_name_src,
                                                        target_branch=branch_name_tgt)
@@ -263,7 +262,6 @@ def api_existing_file(branch_name, file_name):
     if request.method == 'PUT':
         try:
             file_contents = request.form['file_contents']
-            gh_file_path = file_name
 
         except BadRequest:
             # file_contents not coming from the edit textarea form means file
