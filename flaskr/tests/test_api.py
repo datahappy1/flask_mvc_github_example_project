@@ -7,21 +7,22 @@ import os
 import uuid
 
 TEST_RUNNER_ID = str(uuid.uuid4())
-API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api'
+API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api/version1/resource'
 
 
 @pytest.mark.parametrize(
     "test_name, method, endpoint, params, expected_success_status_code",[
-        # to ensure a unique branch name and filename for our test runner in the repo,
+        # to ensure a unique branch name for our test runner in the repo,
         # concatenate "requests_test_" and the generated test_runner_id uuid var
+        # to ensure unique test file name, uuid concatenated to the filename
         ('create branch', 'post', '{}/branch/'.format(API_BASE_ENDPOINT), {'branch_name_tgt': 'requests_test_{}'.format(TEST_RUNNER_ID), 'branch_name_src': 'master'}, 201),
-        ('get branches', 'get', '{}/gh_branches_manager/'.format(API_BASE_ENDPOINT), None, 200),
+        ('get branches', 'get', '{}/branches/all/'.format(API_BASE_ENDPOINT), None, 200),
         ('create file upload', 'post', '{}/branch/requests_test_{}/file/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
         ('edit file', 'put', '{}/branch/requests_test_{}/file/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
         ('delete file', 'delete','{}/branch/requests_test_{}/file/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
         ('create file form', 'post', '{}/branch/requests_test_{}/file/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest', 'file_name': 'test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt'}, 201),
         ('override file', 'put', '{}/branch/requests_test_{}/file/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 201),
-        ('get files', 'get', '{}/gh_files_manager/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
+        ('get files', 'get', '{}/branch/requests_test_{}/files/all/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
         ('delete file', 'delete', '{}/branch/requests_test_{}/file/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), {'commit_message': 'pytest'}, 200),
         ('delete branch', 'delete', '{}/branch/requests_test_{}/'.format(API_BASE_ENDPOINT, TEST_RUNNER_ID), None, 200),
     ])

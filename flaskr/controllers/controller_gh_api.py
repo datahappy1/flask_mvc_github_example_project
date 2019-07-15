@@ -15,51 +15,54 @@ from flaskr.controllers import common_functions
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
 
 
-@CONTROLLER_GH_API.route('/api/gh_branches_manager/', methods=['GET'])
+def custom_error(status_code):
+    """
+    custom error handling function
+    :param status_code:
+    :return:
+    """
+    if status_code == 404:
+        custom_error_response = jsonify(404, "resource not found")
+    elif status_code == 405:
+        custom_error_response = jsonify(405, "method not allowed")
+    else:
+        custom_error_response = jsonify(400, "bad request")
+    return custom_error_response
+
+
+@CONTROLLER_GH_API.route('/api/version1/resource/branches/all/', methods=['GET'])
 def api_gh_branches_manager():
     """
     api github branches manager endpoint function
     :return:
     """
     if request.method == "GET":
-        _session_id = common_functions.session_getter()
-        session_id_status = _session_id.get('status')
+        _branch_list = common_functions.branch_lister()
+        branch_list_status = _branch_list.get('status')
 
-        if session_id_status == 200:
-            _branch_list = common_functions.branch_lister()
-            branch_list_status = _branch_list.get('status')
-
-            if branch_list_status == 200:
-                session_id_content = str(_session_id.get('content'))
-                branch_list_content = _branch_list.get('content')
-                response = jsonify({
-                    'session_id': session_id_content,
-                    'branches': branch_list_content,
-                    'repository': settings.REPO,
-                    'method': request.method,
-                    'status': branch_list_status,
-                    'mimetype': 'application/json'
-                })
-            else:
-                branch_list_error = _branch_list.get('error')
-                response = jsonify({
-                    'status': branch_list_status,
-                    'errors': branch_list_error,
-                    'mimetype': 'application/json'
-                })
-            response.status_code = branch_list_status
-        else:
-            session_id_error = _session_id.get('error')
+        if branch_list_status == 200:
+            branch_list_content = _branch_list.get('content')
             response = jsonify({
-                'status': session_id_status,
-                'errors:': session_id_error,
+                'branches': branch_list_content,
+                'repository': settings.REPO,
+                'method': request.method,
+                'status': branch_list_status,
                 'mimetype': 'application/json'
             })
-        response.status_code = session_id_status
+        else:
+            branch_list_error = _branch_list.get('error')
+            response = jsonify({
+                'status': branch_list_status,
+                'errors': branch_list_error,
+                'mimetype': 'application/json'
+            })
+        response.status_code = branch_list_status
         return response
+    else:
+        custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/branch/', methods=['POST'])
+@CONTROLLER_GH_API.route('/api/version1/resource/branch/', methods=['POST'])
 def api_create_branch():
     """
     api create branch endpoint function
@@ -92,9 +95,11 @@ def api_create_branch():
             })
         response.status_code = branch_create_status
         return response
+    else:
+        custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/branch/<branch_name>/', methods=['DELETE'])
+@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/', methods=['DELETE'])
 def api_existing_branch(branch_name):
     """
     api existing branch endpoint function
@@ -123,9 +128,11 @@ def api_existing_branch(branch_name):
             })
         response.status_code = branch_delete_status
         return response
+    else:
+        custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/gh_files_manager/branch/<branch_name>/', methods=['GET'])
+@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/files/all/', methods=['GET'])
 def api_gh_files_manager(branch_name):
     """
     api github files manager endpoint function
@@ -133,52 +140,38 @@ def api_gh_files_manager(branch_name):
     :return:
     """
     if request.method == "GET":
-        _session_id = common_functions.session_getter()
-        session_id_status = _session_id.get('status')
+        _branch_list = common_functions.branch_lister()
+        branch_list_status = _branch_list.get('status')
+        _files_list = common_functions.file_lister(branch_name)
+        files_list_status = _files_list.get('status')
 
-        if session_id_status == 200:
-            _branch_list = common_functions.branch_lister()
-            branch_list_status = _branch_list.get('status')
-            _files_list = common_functions.file_lister(branch_name)
-            files_list_status = _files_list.get('status')
-
-            if branch_list_status == 200 and files_list_status == 200:
-                session_id_content = str(_session_id.get('content'))
-                branch_list_content = _branch_list.get('content')
-                files_list_content = _files_list.get('content')
-                response = jsonify({
-                    'gh_session_id': session_id_content,
-                    'branches': branch_list_content,
-                    'repository': settings.REPO,
-                    'current_branch': branch_name,
-                    'files': files_list_content,
-                    'method': request.method,
-                    'status': 'OK',
-                    'mimetype': 'application/json'
-                })
-            else:
-                branch_list_error = _branch_list.get('error')
-                files_list_error = _files_list.get('error')
-                response = jsonify({
-                    'status': files_list_status,
-                    'errors': [branch_list_error, files_list_error],
-                    'mimetype': 'application/json'
-                })
-            response.status_code = files_list_status
-
-        else:
-            session_id_error = _session_id.get('error')
+        if branch_list_status == 200 and files_list_status == 200:
+            branch_list_content = _branch_list.get('content')
+            files_list_content = _files_list.get('content')
             response = jsonify({
-                'status': session_id_status,
-                'errors:': session_id_error,
+                'branches': branch_list_content,
+                'repository': settings.REPO,
+                'current_branch': branch_name,
+                'files': files_list_content,
+                'method': request.method,
+                'status': 'OK',
                 'mimetype': 'application/json'
             })
-            response.status_code = session_id_status
-
+        else:
+            branch_list_error = _branch_list.get('error')
+            files_list_error = _files_list.get('error')
+            response = jsonify({
+                'status': files_list_status,
+                'errors': [branch_list_error, files_list_error],
+                'mimetype': 'application/json'
+            })
+        response.status_code = files_list_status
         return response
+    else:
+        custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/branch/<branch_name>/file/', methods=['POST'])
+@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/file/', methods=['POST'])
 def api_create_file(branch_name):
     """
     api create file endpoint function
@@ -238,10 +231,10 @@ def api_create_file(branch_name):
         response.status_code = file_create_status
         return response
     else:
-        raise NotFound
+        custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/branch/<branch_name>/file/<file_name>/', methods=['PUT', 'DELETE'])
+@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/file/<file_name>/', methods=['PUT', 'DELETE'])
 def api_existing_file(branch_name, file_name):
     """
     api existing file endpoint function
@@ -326,4 +319,4 @@ def api_existing_file(branch_name, file_name):
         response.status_code = file_delete_status
         return response
     else:
-        raise NotFound
+        custom_error(405)
