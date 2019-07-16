@@ -16,7 +16,7 @@
             {% endfor %}
         </li>
         <li>Commit a new file to the branch {{ template_current_branch }}
-            <a href="{{ url_for('controller_gh_webapp.upload_file', branch_name=template_current_branch) }}">here</a></li>
+            <a href="{{ url_for('controller_gh_ui.upload_file', branch_name=template_current_branch) }}">here</a></li>
         <li>Files list in the {{ template_current_branch }} branch:</li>
     </ul>
 
@@ -31,17 +31,17 @@
             <tr>
                 <td>{{ file[0] }}</td>
                 <td>{% if file[1] %} <!-- if file is "editable" based on file extension type, show edit link -->
-                    <a href="{{ url_for('controller_gh_webapp.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
                         edit file
                     </a>
                     {% else %}
-                    <a href="{{ url_for('controller_gh_webapp.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
                         override file
                     </a>
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('controller_gh_webapp.delete_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    <a href="{{ url_for('controller_gh_ui.delete_file', branch_name=template_current_branch, file_name=file[0]) }}">
                         delete file
                     </a>
                 </td>

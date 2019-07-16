@@ -6,7 +6,7 @@ import os.path
 from flask import Flask, render_template
 from flaskr.lib import settings, global_variables
 from flaskr.models import model_gh
-from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_WEBAPP
+from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
 # you can also import specific functions from a Blueprint module:
 # from flaskr.controllers.common_functions import session_getter, branch_lister, file_lister
 from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
@@ -14,7 +14,7 @@ from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
 # flask app starts here
 APP = Flask(__name__)
 APP.secret_key = os.environ['flask_secret_key']
-APP.register_blueprint(CONTROLLER_GH_WEBAPP)
+APP.register_blueprint(CONTROLLER_GH_UI)
 APP.register_blueprint(CONTROLLER_GH_API)
 
 

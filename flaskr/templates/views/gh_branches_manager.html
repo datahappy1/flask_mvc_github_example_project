@@ -20,12 +20,12 @@
             <tr>
                 <td>{{ branch }}</td>
                 <td>
-                    <a href="{{ url_for('controller_gh_webapp.create_branch', branch_name=branch) }}">
+                    <a href="{{ url_for('controller_gh_ui.create_branch', branch_name=branch) }}">
                         use as a base for creating a new branch
                     </a>
                 </td>
                 <td>
-                    <a href="{{ url_for('controller_gh_webapp.delete_branch', branch_name=branch) }}">
+                    <a href="{{ url_for('controller_gh_ui.delete_branch', branch_name=branch) }}">
                         delete branch
                     </a>
                 </td>
