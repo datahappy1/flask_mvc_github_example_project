@@ -3,7 +3,7 @@ main project function
 """
 import os.path
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 from flaskr.lib import settings, global_variables
 from flaskr.models import model_gh
 from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
@@ -24,6 +24,32 @@ TOKEN = os.environ['github_token']
 # init the github class
 global_variables.OBJ = model_gh.Model(init_token=TOKEN,
                                       init_repo=settings.REPO)
+
+
+@APP.errorhandler(405)
+def not_allowed(error):
+    if request.path.startswith(settings.API_PATH_PREFIX):
+        response = jsonify({
+            'status': 405,
+            'errors': str(error),
+            'mimetype': 'application/json'
+        })
+        response.status_code = 405
+        return response
+    return render_template('error_page.html', template_error_message=error)
+
+
+@APP.errorhandler(404)
+def not_found(error):
+    if request.path.startswith(settings.API_PATH_PREFIX):
+        response = jsonify({
+            'status': 404,
+            'errors': str(error),
+            'mimetype':'application/json'
+        })
+        response.status_code = 404
+        return response
+    return render_template('error_page.html', template_error_message=error)
 
 
 @APP.route('/')
