@@ -15,22 +15,6 @@ from flaskr.controllers import common_functions
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
 
 
-def custom_error(status_code):
-    """
-    custom error handling function
-    :param status_code:
-    :return:
-    """
-    if status_code == 404:
-        custom_error_response = jsonify(404, "resource not found", mimetype="application/json")
-    elif status_code == 405:
-        custom_error_response = jsonify(405, "method not allowed", mimetype="application/json")
-    else:
-        custom_error_response = jsonify(400, "bad request", mimetype="application/json")
-    print(custom_error_response)
-    return custom_error_response
-
-
 @CONTROLLER_GH_API.route('/api/version1/branches', methods=['GET', 'POST'])
 def api_collection_branches():
     """
@@ -86,9 +70,6 @@ def api_collection_branches():
         response.status_code = branch_create_status
         return response
 
-    else:
-        custom_error(405)
-
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>', methods=['DELETE'])
 def api_singleton_branch(branch_name):
@@ -119,9 +100,6 @@ def api_singleton_branch(branch_name):
             })
         response.status_code = branch_delete_status
         return response
-
-    else:
-        custom_error(405)
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files', methods=['GET', 'POST'])
@@ -206,9 +184,6 @@ def api_collection_files(branch_name):
             })
         response.status_code = file_create_status
         return response
-
-    else:
-        custom_error(405)
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files/<file_name>', methods=['PUT', 'DELETE'])
@@ -295,6 +270,3 @@ def api_singleton_file(branch_name, file_name):
             })
         response.status_code = file_delete_status
         return response
-
-    else:
-        custom_error(405)
