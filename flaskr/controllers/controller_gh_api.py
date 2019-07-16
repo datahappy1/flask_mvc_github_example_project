@@ -4,7 +4,7 @@ controller github api module
 import os
 
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 
 from flaskr.lib import global_variables, settings
@@ -22,18 +22,19 @@ def custom_error(status_code):
     :return:
     """
     if status_code == 404:
-        custom_error_response = jsonify(404, "resource not found")
+        custom_error_response = jsonify(404, "resource not found", mimetype="application/json")
     elif status_code == 405:
-        custom_error_response = jsonify(405, "method not allowed")
+        custom_error_response = jsonify(405, "method not allowed", mimetype="application/json")
     else:
-        custom_error_response = jsonify(400, "bad request")
+        custom_error_response = jsonify(400, "bad request", mimetype="application/json")
+    print(custom_error_response)
     return custom_error_response
 
 
-@CONTROLLER_GH_API.route('/api/version1/resource/branches/all/', methods=['GET'])
-def api_gh_branches_manager():
+@CONTROLLER_GH_API.route('/api/version1/branches', methods=['GET', 'POST'])
+def api_collection_branches():
     """
-    api github branches manager endpoint function
+    api collection branches endpoint function
     :return:
     """
     if request.method == "GET":
@@ -58,17 +59,7 @@ def api_gh_branches_manager():
             })
         response.status_code = branch_list_status
         return response
-    else:
-        custom_error(405)
 
-
-@CONTROLLER_GH_API.route('/api/version1/resource/branch/', methods=['POST'])
-def api_create_branch():
-    """
-    api create branch endpoint function
-    :param branch_name:
-    :return:
-    """
     if request.method == 'POST':
         branch_name_src = request.form['branch_name_src']
         branch_name_tgt = request.form['branch_name_tgt']
@@ -80,8 +71,7 @@ def api_create_branch():
         if branch_create_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'branch_target': branch_name_tgt,
-                'branch_source': branch_name_src,
+                'branches': [branch_name_src, branch_name_tgt],
                 'method': request.method,
                 'status': branch_create_status,
                 'mimetype': 'application/json'
@@ -95,14 +85,15 @@ def api_create_branch():
             })
         response.status_code = branch_create_status
         return response
+
     else:
         custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/', methods=['DELETE'])
-def api_existing_branch(branch_name):
+@CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>', methods=['DELETE'])
+def api_singleton_branch(branch_name):
     """
-    api existing branch endpoint function
+    api singleton branch endpoint function
     :param branch_name:
     :return:
     """
@@ -128,28 +119,25 @@ def api_existing_branch(branch_name):
             })
         response.status_code = branch_delete_status
         return response
+
     else:
         custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/files/all/', methods=['GET'])
-def api_gh_files_manager(branch_name):
+@CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files', methods=['GET', 'POST'])
+def api_collection_files(branch_name):
     """
-    api github files manager endpoint function
+    api collection files endpoint function
     :param branch_name:
     :return:
     """
     if request.method == "GET":
-        _branch_list = common_functions.branch_lister()
-        branch_list_status = _branch_list.get('status')
         _files_list = common_functions.file_lister(branch_name)
         files_list_status = _files_list.get('status')
 
-        if branch_list_status == 200 and files_list_status == 200:
-            branch_list_content = _branch_list.get('content')
+        if files_list_status == 200:
             files_list_content = _files_list.get('content')
             response = jsonify({
-                'branches': branch_list_content,
                 'repository': settings.REPO,
                 'current_branch': branch_name,
                 'files': files_list_content,
@@ -158,31 +146,18 @@ def api_gh_files_manager(branch_name):
                 'mimetype': 'application/json'
             })
         else:
-            branch_list_error = _branch_list.get('error')
             files_list_error = _files_list.get('error')
             response = jsonify({
                 'status': files_list_status,
-                'errors': [branch_list_error, files_list_error],
+                'errors': files_list_error,
                 'mimetype': 'application/json'
             })
         response.status_code = files_list_status
         return response
-    else:
-        custom_error(405)
 
+    # curl post files example:
+    # curl - X POST - F commit_message=Test - F uploaded_file=@/home/filepathxxx http://127.0.0.1:5000/api/version1/branches/dev/file/filenamexxx/
 
-@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/file/', methods=['POST'])
-def api_create_file(branch_name):
-    """
-    api create file endpoint function
-
-    curl post files example:
-    curl - X POST - F commit_message=Test - F uploaded_file=@/home/filepathxxx http://127.0.0.1:5000/api/branch/dev/file/filenamexxx/
-
-    :param branch_name:
-    :param file_name:
-    :return:
-    """
     if request.method == 'POST':
         message = request.form['commit_message']
 
@@ -214,6 +189,7 @@ def api_create_file(branch_name):
 
         if file_create_status == 201:
             response = jsonify({
+                'branches': '',
                 'repository': settings.REPO,
                 'current_branch': branch_name,
                 'file': file_name,
@@ -230,14 +206,15 @@ def api_create_file(branch_name):
             })
         response.status_code = file_create_status
         return response
+
     else:
         custom_error(405)
 
 
-@CONTROLLER_GH_API.route('/api/version1/resource/branch/<branch_name>/file/<file_name>/', methods=['PUT', 'DELETE'])
-def api_existing_file(branch_name, file_name):
+@CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files/<file_name>', methods=['PUT', 'DELETE'])
+def api_singleton_file(branch_name, file_name):
     """
-    api existing file endpoint function
+    api singleton file endpoint function
     :param branch_name:
     :param file_name:
     :return:
@@ -318,5 +295,6 @@ def api_existing_file(branch_name, file_name):
             })
         response.status_code = file_delete_status
         return response
+
     else:
         custom_error(405)
