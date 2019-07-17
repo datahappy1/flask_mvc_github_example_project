@@ -28,8 +28,8 @@ def api_collection_branches():
         if branch_list_status == 200:
             branch_list_content = _branch_list.get('content')
             response = jsonify({
-                'branches': branch_list_content,
                 'repository': settings.REPO,
+                'branches': branch_list_content,
                 'method': request.method,
                 'status': branch_list_status,
                 'mimetype': 'application/json'
@@ -55,7 +55,7 @@ def api_collection_branches():
         if branch_create_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'branches': [branch_name_src, branch_name_tgt],
+                'branch': branch_name_tgt,
                 'method': request.method,
                 'status': branch_create_status,
                 'mimetype': 'application/json'
@@ -86,7 +86,7 @@ def api_singleton_branch(branch_name):
         if branch_delete_status == 200:
             response = jsonify({
                 'repository': settings.REPO,
-                'branch_name': branch_name,
+                'branch': branch_name,
                 'method': request.method,
                 'status': branch_delete_status,
                 'mimetype': 'application/json'
@@ -167,7 +167,6 @@ def api_collection_files(branch_name):
 
         if file_create_status == 201:
             response = jsonify({
-                'branches': '',
                 'repository': settings.REPO,
                 'current_branch': branch_name,
                 'file': file_name,
