@@ -28,8 +28,8 @@ def api_collection_branches():
         if branch_list_status == 200:
             branch_list_content = _branch_list.get('content')
             response = jsonify({
-                'branches': branch_list_content,
                 'repository': settings.REPO,
+                'branches': branch_list_content,
                 'method': request.method,
                 'status': branch_list_status,
                 'mimetype': 'application/json'
@@ -38,7 +38,7 @@ def api_collection_branches():
             branch_list_error = _branch_list.get('error')
             response = jsonify({
                 'status': branch_list_status,
-                'errors': branch_list_error,
+                'error': branch_list_error,
                 'mimetype': 'application/json'
             })
         response.status_code = branch_list_status
@@ -55,7 +55,7 @@ def api_collection_branches():
         if branch_create_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'branches': [branch_name_src, branch_name_tgt],
+                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name_tgt,
                 'method': request.method,
                 'status': branch_create_status,
                 'mimetype': 'application/json'
@@ -64,7 +64,7 @@ def api_collection_branches():
             branch_create_error = _branch_create.get('error')
             response = jsonify({
                 'status': branch_create_status,
-                'errors': branch_create_error,
+                'error': branch_create_error,
                 'mimetype': 'application/json'
             })
         response.status_code = branch_create_status
@@ -86,7 +86,6 @@ def api_singleton_branch(branch_name):
         if branch_delete_status == 200:
             response = jsonify({
                 'repository': settings.REPO,
-                'branch_name': branch_name,
                 'method': request.method,
                 'status': branch_delete_status,
                 'mimetype': 'application/json'
@@ -95,7 +94,7 @@ def api_singleton_branch(branch_name):
             branch_delete_error = _branch_delete.get('error')
             response = jsonify({
                 'status': branch_delete_status,
-                'errors': branch_delete_error,
+                'error': branch_delete_error,
                 'mimetype': 'application/json'
             })
         response.status_code = branch_delete_status
@@ -117,17 +116,17 @@ def api_collection_files(branch_name):
             files_list_content = _files_list.get('content')
             response = jsonify({
                 'repository': settings.REPO,
-                'current_branch': branch_name,
+                'branch': branch_name,
                 'files': files_list_content,
                 'method': request.method,
-                'status': 'OK',
+                'status': files_list_status,
                 'mimetype': 'application/json'
             })
         else:
             files_list_error = _files_list.get('error')
             response = jsonify({
                 'status': files_list_status,
-                'errors': files_list_error,
+                'error': files_list_error,
                 'mimetype': 'application/json'
             })
         response.status_code = files_list_status
@@ -167,10 +166,9 @@ def api_collection_files(branch_name):
 
         if file_create_status == 201:
             response = jsonify({
-                'branches': '',
                 'repository': settings.REPO,
-                'current_branch': branch_name,
-                'file': file_name,
+                'branch': branch_name,
+                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name + '/files/' + file_name,
                 'method': request.method,
                 'status': file_create_status,
                 'mimetype': 'application/json'
@@ -179,7 +177,7 @@ def api_collection_files(branch_name):
             file_create_error = _file_create.get('error')
             response = jsonify({
                 'status': file_create_status,
-                'errors': file_create_error,
+                'error': file_create_error,
                 'mimetype': 'application/json'
             })
         response.status_code = file_create_status
@@ -228,8 +226,8 @@ def api_singleton_file(branch_name, file_name):
         if file_update_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'current_branch': branch_name,
-                'file': file_name,
+                'branch': branch_name,
+                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name + '/files/' + file_name,
                 'method': request.method,
                 'status': file_update_status,
                 'mimetype': 'application/json'
@@ -238,7 +236,7 @@ def api_singleton_file(branch_name, file_name):
             file_update_error = _file_update.get('error')
             response = jsonify({
                 'status': file_update_status,
-                'errors': file_update_error,
+                'error': file_update_error,
                 'mimetype': 'application/json'
             })
         response.status_code = file_update_status
@@ -255,8 +253,7 @@ def api_singleton_file(branch_name, file_name):
         if file_delete_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'current_branch': branch_name,
-                'file': file_name,
+                'branch': branch_name,
                 'method': request.method,
                 'status': file_delete_status,
                 'mimetype': 'application/json'
@@ -265,7 +262,7 @@ def api_singleton_file(branch_name, file_name):
             file_update_error = _file_delete.get('error')
             response = jsonify({
                 'status': file_delete_status,
-                'errors': file_update_error,
+                'error': file_update_error,
                 'mimetype': 'application/json'
             })
         response.status_code = file_delete_status

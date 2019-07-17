@@ -1,5 +1,5 @@
 """
-controller github webapp module
+controller github ui module
 """
 import os
 

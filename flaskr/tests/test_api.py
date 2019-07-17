@@ -6,8 +6,9 @@ import requests
 import os
 import uuid
 
+from flaskr.lib.settings import API_BASE_ENDPOINT
+
 TEST_RUNNER_ID = str(uuid.uuid4())
-API_BASE_ENDPOINT = 'http://127.0.0.1:5000/api/version1'
 
 
 @pytest.mark.parametrize(

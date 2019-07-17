@@ -28,10 +28,15 @@ global_variables.OBJ = model_gh.Model(init_token=TOKEN,
 
 @APP.errorhandler(405)
 def not_allowed(error):
+    """
+    not allowed method error handler function
+    :param error:
+    :return:error html page or api response
+    """
     if request.path.startswith(settings.API_PATH_PREFIX):
         response = jsonify({
             'status': 405,
-            'errors': str(error),
+            'error': str(error),
             'mimetype': 'application/json'
         })
         response.status_code = 405
@@ -41,10 +46,15 @@ def not_allowed(error):
 
 @APP.errorhandler(404)
 def not_found(error):
+    """
+    not found app error handler function
+    :param error:
+    :return:error html page or api response
+    """
     if request.path.startswith(settings.API_PATH_PREFIX):
         response = jsonify({
             'status': 404,
-            'errors': str(error),
+            'error': str(error),
             'mimetype':'application/json'
         })
         response.status_code = 404
