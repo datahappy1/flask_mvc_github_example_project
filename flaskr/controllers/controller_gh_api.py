@@ -1,13 +1,12 @@
 """
 controller github api module
 """
-import os
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 
-from flaskr.lib import global_variables, settings
+from flaskr.project_variables import global_variables, settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
 
@@ -21,6 +20,8 @@ def api_collection_branches():
     api collection branches endpoint function
     :return:
     """
+    response = None
+
     if request.method == "GET":
         _branch_list = common_functions.branch_lister()
         branch_list_status = _branch_list.get('status')
@@ -42,7 +43,6 @@ def api_collection_branches():
                 'mimetype': 'application/json'
             })
         response.status_code = branch_list_status
-        return response
 
     if request.method == 'POST':
         branch_name_src = request.form['branch_name_src']
@@ -68,7 +68,8 @@ def api_collection_branches():
                 'mimetype': 'application/json'
             })
         response.status_code = branch_create_status
-        return response
+
+    return response
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>', methods=['DELETE'])
@@ -78,6 +79,8 @@ def api_singleton_branch(branch_name):
     :param branch_name:
     :return:
     """
+    response = None
+
     if request.method == 'DELETE':
         _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
                                                        branch_name=branch_name)
@@ -98,7 +101,8 @@ def api_singleton_branch(branch_name):
                 'mimetype': 'application/json'
             })
         response.status_code = branch_delete_status
-        return response
+
+    return response
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files', methods=['GET', 'POST'])
@@ -108,6 +112,8 @@ def api_collection_files(branch_name):
     :param branch_name:
     :return:
     """
+    response = None
+
     if request.method == "GET":
         _files_list = common_functions.file_lister(branch_name)
         files_list_status = _files_list.get('status')
@@ -130,25 +136,17 @@ def api_collection_files(branch_name):
                 'mimetype': 'application/json'
             })
         response.status_code = files_list_status
-        return response
 
     # curl post files example:
-    # curl - X POST - F commit_message=Test - F uploaded_file=@/home/filepathxxx http://127.0.0.1:5000/api/version1/branches/dev/file/filenamexxx/
+    # curl - X POST - F commit_message=Test - F uploaded_file=@/home/filepathxxx
+    # http://127.0.0.1:5000/api/version1/branches/dev/file/filenamexxx/
 
     if request.method == 'POST':
         message = request.form['commit_message']
 
         try:
             file = request.files['uploaded_file']
-            file_name = secure_filename(file.filename)
-            temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
-            file.save(temp_file_path)
-
-            with open(temp_file_path, 'rb') as temp_file_handler:
-                file_contents = temp_file_handler.read()
-
-            os.unlink(temp_file_path)
-            assert not os.path.exists(temp_file_path)
+            file_name, file_contents = common_functions.file_uploader_helper(file)
 
         except BadRequest:
             file_contents = request.form['file_contents']
@@ -168,7 +166,8 @@ def api_collection_files(branch_name):
             response = jsonify({
                 'repository': settings.REPO,
                 'branch': branch_name,
-                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name + '/files/' + file_name,
+                'location': settings.API_BASE_ENDPOINT + '/branches/'
+                            + branch_name + '/files/' + file_name,
                 'method': request.method,
                 'status': file_create_status,
                 'mimetype': 'application/json'
@@ -181,10 +180,12 @@ def api_collection_files(branch_name):
                 'mimetype': 'application/json'
             })
         response.status_code = file_create_status
-        return response
+
+    return response
 
 
-@CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files/<file_name>', methods=['PUT', 'DELETE'])
+@CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files/<file_name>',
+                         methods=['PUT', 'DELETE'])
 def api_singleton_file(branch_name, file_name):
     """
     api singleton file endpoint function
@@ -192,6 +193,7 @@ def api_singleton_file(branch_name, file_name):
     :param file_name:
     :return:
     """
+    response = None
     message = request.form['commit_message']
     file_name = secure_filename(file_name)
     gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
@@ -204,16 +206,9 @@ def api_singleton_file(branch_name, file_name):
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
-            temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
-            file.save(temp_file_path)
-
-            with open(temp_file_path, 'rb') as temp_file_handler:
-                file_contents = temp_file_handler.read()
+            file_name, file_contents = common_functions.file_uploader_helper(file)
 
             gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
-
-            os.unlink(temp_file_path)
-            assert not os.path.exists(temp_file_path)
 
         _file_update = model_gh.File.update_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
@@ -227,7 +222,8 @@ def api_singleton_file(branch_name, file_name):
             response = jsonify({
                 'repository': settings.REPO,
                 'branch': branch_name,
-                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name + '/files/' + file_name,
+                'location': settings.API_BASE_ENDPOINT + '/branches/'
+                            + branch_name + '/files/' + file_name,
                 'method': request.method,
                 'status': file_update_status,
                 'mimetype': 'application/json'
@@ -240,7 +236,6 @@ def api_singleton_file(branch_name, file_name):
                 'mimetype': 'application/json'
             })
         response.status_code = file_update_status
-        return response
 
     if request.method == 'DELETE':
         _file_delete = model_gh.File.delete_file(global_variables.OBJ,
@@ -266,4 +261,5 @@ def api_singleton_file(branch_name, file_name):
                 'mimetype': 'application/json'
             })
         response.status_code = file_delete_status
-        return response
+
+    return response

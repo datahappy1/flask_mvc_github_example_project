@@ -4,10 +4,10 @@ model github module
 import requests
 
 from github import Github, GithubException
-from flaskr.lib import settings
+from flaskr.project_variables import settings
 
 
-class Model:
+class Model: # pylint: disable=too-few-public-methods
     """
     project parent github class
     """
@@ -25,14 +25,8 @@ class Model:
         get session id function
         :return:
         """
-        try:
-            return {'status': 200,
-                    'content': self.github}
-        except Exception as exc:
-            return {'status': 500,
-                    'error': {'ExceptionType': 'PyGithubInitException',
-                              'ExceptionMessage':
-                                  'Could not initialize Github,{}'.format(str(exc))}}
+        return {'status': 200,
+                'content': self.github}
 
 
 class Branch(Model):

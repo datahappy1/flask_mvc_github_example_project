@@ -1,4 +1,6 @@
 # flask_mvc_github_example_project
+
+![](https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/rating.svg)
 ## an example project for working with branches and files in your Github repo using Flask webapp / api
 ### 10000 ft. overview:
 ![alt text][diagram]

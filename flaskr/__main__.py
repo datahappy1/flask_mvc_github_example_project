@@ -4,7 +4,7 @@ main project function
 import os.path
 
 from flask import Flask, render_template, jsonify, request
-from flaskr.lib import settings, global_variables
+from flaskr.project_variables import settings, global_variables
 from flaskr.models import model_gh
 from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
 # you can also import specific functions from a Blueprint module:
