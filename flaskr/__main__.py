@@ -55,7 +55,7 @@ def not_found(error):
         response = jsonify({
             'status': 404,
             'error': str(error),
-            'mimetype':'application/json'
+            'mimetype': 'application/json'
         })
         response.status_code = 404
         return response
