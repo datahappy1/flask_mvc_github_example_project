@@ -18,7 +18,7 @@
             </thead>
             {% for branch in template_branch_list %}
             <tr>
-                <td>{{ branch }}</td>
+                <td><a href="/views/gh_files_manager/branch/{{ branch }}">{{ branch }}</a></td>
                 <td>
                     <a href="{{ url_for('controller_gh_ui.create_branch', branch_name=branch) }}">
                         use as a base for creating a new branch
