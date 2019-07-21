@@ -10,7 +10,7 @@
         {% if file_contents != None %}
             <p><textarea name="file_contents" cols="150" rows="20">{{ file_contents }}</textarea></p>
         {% else %}
-            <p><input type="file" name="uploaded_file" required /></p>
+            <p><input type="file" name="uploaded_file" /></p>
         {% endif %}
         <p><textarea name="commit_message" maxlength="70" placeholder="commit message"></textarea></p>
         <input type="submit" value="commit">
