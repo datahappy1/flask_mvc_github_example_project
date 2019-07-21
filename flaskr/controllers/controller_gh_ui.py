@@ -24,14 +24,8 @@ def gh_branches_manager():
     :return:
     """
     _session_id = common_functions.session_getter()
-    session_id_status = _session_id.get('status')
-    if session_id_status == 200:
-        gh_session_id = _session_id.get('content')
-        flash(f'PyGithub connect success {gh_session_id}', category="success")
-    else:
-        session_id_error = _session_id.get('error')
-        flash(f'PyGithub connect exception {session_id_error}', category="warning")
-        return render_template('error_page.html', template_error_message=session_id_error)
+    gh_session_status, gh_session_id = _session_id.get('status'), _session_id.get('content')
+    flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
     _branch_list = common_functions.branch_lister()
     branch_list_status = _branch_list.get('status')
@@ -79,15 +73,8 @@ def gh_files_manager(branch_name):
     :return:
     """
     _session_id = common_functions.session_getter()
-    session_id_status = _session_id.get('status')
-    if session_id_status == 200:
-        gh_session_id = _session_id.get('content')
-        flash(f'PyGithub connect success {gh_session_id}', category="success")
-    else:
-        session_id_error = _session_id.get('error')
-        flash(f'PyGithub connect exception {session_id_error}', category="warning")
-        return render_template('error_page.html',
-                               template_error_message=session_id_error)
+    gh_session_status, gh_session_id = _session_id.get('status'), _session_id.get('content')
+    flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
     _branch_list = common_functions.branch_lister()
     branch_list_status = _branch_list.get('status')
