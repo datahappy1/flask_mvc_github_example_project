@@ -3,7 +3,6 @@ controller github ui module
 """
 import os
 
-from werkzeug.exceptions import BadRequest
 from flask import Blueprint, request, flash, redirect, render_template, abort
 
 from flaskr.project_variables import global_variables, settings
@@ -238,7 +237,7 @@ def file_uploader(branch_name):
             file = request.files['uploaded_file']
             file_name, file_contents = common_functions.file_uploader_helper(file)
 
-        except (BadRequest, FileNotFoundError):
+        except FileNotFoundError:
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
 
@@ -279,7 +278,7 @@ def file_editor(branch_name, file_name):
             file_contents = request.form['file_contents']
             gh_file_path = file_name
 
-        except (BadRequest, FileNotFoundError):
+        except FileNotFoundError:
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
