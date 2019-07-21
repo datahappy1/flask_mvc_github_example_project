@@ -238,7 +238,7 @@ def file_uploader(branch_name):
             file = request.files['uploaded_file']
             file_name, file_contents = common_functions.file_uploader_helper(file)
 
-        except BadRequest:
+        except (BadRequest, FileNotFoundError):
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
 
@@ -259,10 +259,9 @@ def file_uploader(branch_name):
             file_create_error = _file_create.get('error')
             flash(f'File create exception {file_create_error}', category="warning")
 
+        return redirect('/views/gh_files_manager/branch/' + branch_name)
     else:
-        flash(f'No file uploaded', category="warning")
-
-    return redirect('/views/gh_files_manager/branch/' + branch_name)
+        return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
@@ -280,7 +279,7 @@ def file_editor(branch_name, file_name):
             file_contents = request.form['file_contents']
             gh_file_path = file_name
 
-        except BadRequest:
+        except (BadRequest, FileNotFoundError):
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
