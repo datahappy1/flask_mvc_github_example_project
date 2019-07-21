@@ -4,6 +4,7 @@ controller github ui module
 import os
 
 from flask import Blueprint, request, flash, redirect, render_template, abort
+from werkzeug.exceptions import BadRequestKeyError
 
 from flaskr.project_variables import global_variables, settings
 from flaskr.models import model_gh
@@ -278,17 +279,16 @@ def file_editor(branch_name, file_name):
     """
     if request.method == 'POST':
         message = request.form['commit_message']
+        gh_file_path = file_name
+
         try:
             file_contents = request.form['file_contents']
-            gh_file_path = file_name
 
-        except FileNotFoundError:
-            # file_contents not coming from the edit textarea form means file
-            # is not editable extension type therefore get the file uploaded with the form
+        except BadRequestKeyError:
             file = request.files['uploaded_file']
-            file_name, file_contents = common_functions.file_uploader_helper(file)
-
-            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+            file_name_upload, file_contents = common_functions.file_uploader_helper(file)
+            flash(f"File {file_name} updated with contents from {file_name_upload}",
+                  category="info")
 
         _file_edit = model_gh.File.update_file(global_variables.OBJ,
                                                gh_file_path=gh_file_path,
@@ -298,7 +298,8 @@ def file_editor(branch_name, file_name):
         file_edit_status = _file_edit.get('status')
         if file_edit_status == 201:
             flash(f'File {file_name} update was committed to the repository '
-                  f'branch {branch_name} with the message {message}!', category="success")
+                  f'branch {branch_name} with the message {message}!',
+                  category="success")
         elif file_edit_status != 201:
             file_edit_error = _file_edit.get('error')
             flash(f'File edit exception {file_edit_error}', category="warning")

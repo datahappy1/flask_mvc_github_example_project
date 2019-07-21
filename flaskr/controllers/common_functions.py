@@ -79,8 +79,8 @@ def file_uploader_helper(file) -> tuple:
     """
     file_name = secure_filename(file.filename)
     temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
-    file.save(temp_file_path)
 
+    file.save(temp_file_path)
     with open(temp_file_path, 'rb') as temp_file_handler:
         file_contents = temp_file_handler.read()
 
