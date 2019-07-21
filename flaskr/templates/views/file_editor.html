@@ -7,7 +7,7 @@
 
     <form action="/file_editor/{{ template_current_branch }}/file/edit/{{ file_name }}" method="POST"
           enctype="multipart/form-data">
-        {% if file_contents %}
+        {% if file_contents != None %}
             <p><textarea name="file_contents" cols="150" rows="20">{{ file_contents }}</textarea></p>
         {% else %}
             <p><input type="file" name="uploaded_file"/></p>

@@ -30,15 +30,14 @@
             {% for file in template_file_list %}
             <tr>
                 <td>{{ file[0] }}</td>
-                <td>{% if file[1] %} <!-- if file is "editable" based on file extension type, show edit link -->
+                <td>
                     <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    {% if file[1] %} <!-- if file is "text-editable" based on file extension type, show edit link -->
                         edit file
-                    </a>
                     {% else %}
-                    <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
                         override file
-                    </a>
                     {% endif %}
+                    </a>
                 </td>
                 <td>
                     <a href="{{ url_for('controller_gh_ui.delete_file', branch_name=template_current_branch, file_name=file[0]) }}">

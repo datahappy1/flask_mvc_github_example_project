@@ -114,8 +114,8 @@ def upload_file(branch_name):
                            template_current_branch=branch_name)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>/file/edit/<path:file_name>',
-                        methods=['GET'])
+@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
+                        '/file/edit/<path:file_name>', methods=['GET'])
 def edit_file(branch_name, file_name):
     """
     edit file function
@@ -128,14 +128,18 @@ def edit_file(branch_name, file_name):
     file_exists_status = _file_exists.get('status')
     if file_exists_status == 200:
 
-        # check if file is editable to load up file contents for the form
+        # check if file is text-editable type to load up file contents for the form
         file_extension = os.path.splitext(str(file_name))[1]
         if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
             file_contents = common_functions.file_content_getter(gh_file_path=file_name,
                                                                  branch_name=branch_name)\
                 .get('content')
+
+            # if file is text-editable type but empty, so the form shows the file content textarea
+            if not file_contents:
+                file_contents = ''
         else:
-            # file exists but is not editable
+            # file exists but is not text-editable type, so the form shows the file upload
             file_contents = None
 
         return render_template('views/file_editor.html',
