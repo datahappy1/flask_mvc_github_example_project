@@ -247,7 +247,7 @@ def file_uploader(branch_name):
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
             if file_name == '':
-                flash('No file uploaded, also no file content found', category="warning")
+                flash('No file uploaded, no file content found', category="warning")
                 return redirect('/views/gh_files_manager/branch/' + branch_name)
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
@@ -289,10 +289,10 @@ def file_editor(branch_name, file_name):
             file = request.files['uploaded_file']
             if file:
                 file_name_upload, file_contents = common_functions.file_uploader_helper(file)
-                flash(f"File {file_name} updated with contents from {file_name_upload}",
+                flash(f"File {file_name} is the target for contents from {file_name_upload}",
                       category="info")
             else:
-                flash('No file uploaded, nothing was updated', category="warning")
+                flash('No file uploaded', category="warning")
                 return redirect('/views/gh_files_manager/branch/' + branch_name)
 
         # except FileNotFoundError in case file uploaded through textarea instead of input file
