@@ -9,9 +9,10 @@
         <li>Choose a Github branch:
             {% for branch in template_branch_list %}
             {% if branch == template_current_branch %}
-                <a href="/views/gh_files_manager/branch/{{ branch }}" class="selected" >{{branch}}</a>
+            <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=branch)}}"
+               class="selected">{{branch}}</a>
             {% else %}
-                <a href="/views/gh_files_manager/branch/{{ branch }}">{{branch}}</a>
+            <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=branch)}}">{{branch}}</a>
             {% endif %}
             {% endfor %}
         </li>
@@ -20,33 +21,34 @@
         <li>Files list in the {{ template_current_branch }} branch:</li>
     </ul>
 
-        <table class="customTable">
-            <thead>
-            <tr>
-                <td>file name</td>
-                <td colspan="2">available actions</td>
-            </tr>
-            </thead>
-            {% for file in template_file_list %}
-            <tr>
-                <td>{{ file[0] }}</td>
-                <td>
-                    <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
-                    {% if file[1] %} <!-- if file is "text-editable" based on file extension type, show edit link -->
-                        edit file
+    <table class="customTable">
+        <thead>
+        <tr>
+            <td>file name</td>
+            <td colspan="2">available actions</td>
+        </tr>
+        </thead>
+        {% for file in template_file_list %}
+        <tr>
+            <td>{{ file[0] }}</td>
+            <td>
+                <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    {% if file[1] %} <!-- if file is "text-editable" based on file extension type, show "edit" in the link
+                    otherwise show "override" in the link-->
+                    edit file
                     {% else %}
-                        override file
+                    override file
                     {% endif %}
-                    </a>
-                </td>
-                <td>
-                    <a href="{{ url_for('controller_gh_ui.delete_file', branch_name=template_current_branch, file_name=file[0]) }}">
-                        delete file
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+                </a>
+            </td>
+            <td>
+                <a href="{{ url_for('controller_gh_ui.delete_file', branch_name=template_current_branch, file_name=file[0]) }}">
+                    delete file
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
 </div>
 {% endblock %}

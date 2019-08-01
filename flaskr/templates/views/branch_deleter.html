@@ -5,8 +5,8 @@
     <p>Let's delete the branch in the Github repository
         ( Github repo represents the model in the MVC pattern )</p>
     <p>Are you sure?</p>
-    <form action="/branch_deleter/{{ template_current_branch }}/" method="POST"
-          enctype="multipart/form-data">
+    <form action="{{url_for('controller_gh_ui.branch_deleter', branch_name=template_current_branch)}}"
+          method="POST" enctype="multipart/form-data">
         <input type="submit" value="yes - delete">
     </form>
 
