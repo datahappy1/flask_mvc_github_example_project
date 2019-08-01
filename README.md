@@ -37,7 +37,7 @@ in the MVC design pattern)
 github_token = <your github token value>
 flask_secret_key = <your generated flask secret key> 
 ```
-6) setup your github repository name, files playground folder and other settings in flaskr/lib/settings.py
+6) setup your github repository name, the "files playground" folder and other settings in flaskr/project_variables/settings.py
 7) your startup configuration should look like this:
 
 ![alt text][setup]
