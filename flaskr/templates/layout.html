@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>flask_mvc_github_example_project</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -21,9 +21,9 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
 
-    {% for category,message in messages %}
-    <div class="messages {{ category }}">{{ message }}</div>
-    {% endfor %}
+        {% for category,message in messages %}
+            <div class="messages {{ category }}">{{ message }}</div>
+        {% endfor %}
 
     {% endif %}
     {% endwith %}

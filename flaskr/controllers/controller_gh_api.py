@@ -218,7 +218,7 @@ def api_singleton_file(branch_name, file_name):
 
         file_update_status = _file_update.get('status')
 
-        if file_update_status == 201:
+        if file_update_status == 200:
             response = jsonify({
                 'repository': settings.REPO,
                 'branch': branch_name,
@@ -245,7 +245,7 @@ def api_singleton_file(branch_name, file_name):
 
         file_delete_status = _file_delete.get('status')
 
-        if file_delete_status == 201:
+        if file_delete_status == 200:
             response = jsonify({
                 'repository': settings.REPO,
                 'branch': branch_name,

@@ -210,7 +210,7 @@ class File(Model):
             sha = _sha.get('content')
             try:
                 self.repo.update_file(gh_file_path, message, content, sha, branch_name)
-                return {'status': 201}
+                return {'status': 200}
             except GithubException as github_exc:
                 return {'status': github_exc.status,
                         'error': github_exc.data}

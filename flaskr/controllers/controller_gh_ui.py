@@ -307,11 +307,11 @@ def file_editor(branch_name, file_name):
                                                content=file_contents,
                                                branch_name=branch_name)
         file_edit_status = _file_edit.get('status')
-        if file_edit_status == 201:
+        if file_edit_status == 200:
             flash(f'File {file_name} update was committed to the repository '
                   f'branch {branch_name} with the message {message}!',
                   category="success")
-        elif file_edit_status != 201:
+        elif file_edit_status != 200:
             file_edit_error = _file_edit.get('error')
             flash(f'File edit exception {file_edit_error}', category="warning")
 
@@ -339,7 +339,7 @@ def file_deleter(branch_name, file_name):
         if file_delete_status == 200:
             flash(f'File {file_name} deletion was committed to the repository '
                   f'branch {branch_name} with the message {message}!', category="success")
-        elif file_delete_status != 201:
+        elif file_delete_status != 200:
             file_delete_error = _file_delete.get('error')
             flash(f'File delete exception {file_delete_error}', category="warning")
 
