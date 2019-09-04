@@ -143,15 +143,16 @@ def edit_file(branch_name, file_name):
             # file exists but is not text-editable type, so the form shows the file upload
             file_contents = None
 
-        return render_template('views/file_editor.html',
-                               template_current_branch=branch_name,
-                               file_name=file_name,
-                               file_contents=file_contents)
     else:
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
+        return abort(404)
+        #return redirect('/views/gh_files_manager/branch/' + branch_name)
 
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
+    return render_template('views/file_editor.html',
+                           template_current_branch=branch_name,
+                           file_name=file_name,
+                           file_contents=file_contents)
 
 
 @CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
@@ -167,20 +168,22 @@ def delete_file(branch_name, file_name):
                                                         branch_name=branch_name)
     file_exists_status = _file_exists.get('status')
     if file_exists_status == 200:
-        return render_template('views/file_deleter.html',
-                               template_current_branch=branch_name,
-                               file_name=file_name)
+        pass
+    else:
+        file_exists_error = _file_exists.get('error')
+        flash(f'File exists exception {file_exists_error}', category="warning")
+        return abort(404)
+        #return redirect('/views/gh_files_manager/branch/' + branch_name)
 
-    file_exists_error = _file_exists.get('error')
-    flash(f'File exists exception {file_exists_error}', category="warning")
-
-    return redirect('/views/gh_files_manager/branch/' + branch_name)
+    return render_template('views/file_deleter.html',
+                           template_current_branch=branch_name,
+                           file_name=file_name)
 
 
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@CONTROLLER_GH_UI.route('/branch_creator/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/branch_creator/', methods=['POST'])
 def branch_creator():
     """
     branch creator function
@@ -196,7 +199,7 @@ def branch_creator():
         if branch_create_status == 201:
             flash(f'Branch {branch_name_tgt_ui} based on {branch_name_src_ui} was created!',
                   category="success")
-        elif branch_create_status != 201:
+        else:
             branch_create_error = _branch_create.get('error')
             flash(f'Branch create exception {branch_create_error}', category="warning")
 
@@ -205,7 +208,7 @@ def branch_creator():
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/branch_deleter/<branch_name>/', methods=['POST'])
 def branch_deleter(branch_name):
     """
     branch deleter function
@@ -218,7 +221,7 @@ def branch_deleter(branch_name):
         branch_delete_status = _branch_delete.get('status')
         if branch_delete_status == 200:
             flash(f'Branch {branch_name} was deleted!', category="success")
-        elif branch_delete_status != 200:
+        else:
             branch_delete_error = _branch_delete.get('error')
             flash('Branch delete exception {}'.format(branch_delete_error),
                   category="warning")
@@ -228,7 +231,7 @@ def branch_deleter(branch_name):
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/file_uploader/<branch_name>/', methods=['POST'])
 def file_uploader(branch_name):
     """
     file uploader function
@@ -263,7 +266,7 @@ def file_uploader(branch_name):
         if file_create_status == 201:
             flash(f'File {file_name} was committed to the repository branch {branch_name} '
                   f'with the message {message}!', category="success")
-        elif file_create_status != 201:
+        else:
             file_create_error = _file_create.get('error')
             flash(f'File create exception {file_create_error}', category="warning")
 
@@ -273,7 +276,7 @@ def file_uploader(branch_name):
 
 
 @CONTROLLER_GH_UI.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
-                        methods=['GET', 'POST'])
+                        methods=['POST'])
 def file_editor(branch_name, file_name):
     """
     file editor function
@@ -321,7 +324,7 @@ def file_editor(branch_name, file_name):
 
 
 @CONTROLLER_GH_UI.route('/file_deleter/<branch_name>/file/delete/'
-                        '<path:file_name>', methods=['GET', 'POST'])
+                        '<path:file_name>', methods=['POST'])
 def file_deleter(branch_name, file_name):
     """
     file deleter function
@@ -339,7 +342,7 @@ def file_deleter(branch_name, file_name):
         if file_delete_status == 200:
             flash(f'File {file_name} deletion was committed to the repository '
                   f'branch {branch_name} with the message {message}!', category="success")
-        elif file_delete_status != 200:
+        else:
             file_delete_error = _file_delete.get('error')
             flash(f'File delete exception {file_delete_error}', category="warning")
 
