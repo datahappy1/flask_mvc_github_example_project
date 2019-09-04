@@ -180,7 +180,7 @@ def delete_file(branch_name, file_name):
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
 # proceeding with the desired actions and returning redirects to lead the
 # ui user back to the branches or files manager
-@CONTROLLER_GH_UI.route('/branch_creator/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/branch_creator/', methods=['POST'])
 def branch_creator():
     """
     branch creator function
@@ -205,7 +205,7 @@ def branch_creator():
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/branch_deleter/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/branch_deleter/<branch_name>/', methods=['POST'])
 def branch_deleter(branch_name):
     """
     branch deleter function
@@ -228,7 +228,7 @@ def branch_deleter(branch_name):
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/file_uploader/<branch_name>/', methods=['GET', 'POST'])
+@CONTROLLER_GH_UI.route('/file_uploader/<branch_name>/', methods=['POST'])
 def file_uploader(branch_name):
     """
     file uploader function
@@ -273,7 +273,7 @@ def file_uploader(branch_name):
 
 
 @CONTROLLER_GH_UI.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
-                        methods=['GET', 'POST'])
+                        methods=['POST'])
 def file_editor(branch_name, file_name):
     """
     file editor function
@@ -321,7 +321,7 @@ def file_editor(branch_name, file_name):
 
 
 @CONTROLLER_GH_UI.route('/file_deleter/<branch_name>/file/delete/'
-                        '<path:file_name>', methods=['GET', 'POST'])
+                        '<path:file_name>', methods=['POST'])
 def file_deleter(branch_name, file_name):
     """
     file deleter function
