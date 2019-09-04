@@ -31,18 +31,17 @@ def gh_branches_manager():
     branch_list_status = _branch_list.get('status')
     if branch_list_status == 200:
         branch_list_content = _branch_list.get('content')
-        flash(f'Branches load success {branch_list_status}', category="success")
+        flash(f'Branches load success {branch_list_status}', category="success")        
     else:
         branch_list_error = _branch_list.get('error')
         flash(f'Branches load exception {branch_list_error}', category="warning")
         return redirect('/')
-
+      
     return render_template('views/gh_branches_manager.html',
-                           gh_session_id=gh_session_id,
-                           template_branch_list=branch_list_content,
-                           template_repo_name=settings.REPO)
-
-
+               gh_session_id=gh_session_id,
+               template_branch_list=branch_list_content,
+               template_repo_name=settings.REPO)
+        
 @CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/create/', methods=['GET'])
 def create_branch(branch_name):
     """
@@ -95,7 +94,7 @@ def gh_files_manager(branch_name):
         files_list_error = _files_list.get('error')
         flash(f'Files load exception {files_list_error}', category="warning")
         return redirect('/')
-
+        
     return render_template('views/gh_files_manager.html',
                            gh_session_id=gh_session_id,
                            template_branch_list=branch_list_content,
@@ -150,9 +149,8 @@ def edit_file(branch_name, file_name):
     else:
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
-
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
-
+        #return redirect('/views/gh_files_manager/branch/' + branch_name)
+        return abort(404)
 
 @CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
                         '/file/delete/<path:file_name>', methods=['GET'])
@@ -171,10 +169,12 @@ def delete_file(branch_name, file_name):
                                template_current_branch=branch_name,
                                file_name=file_name)
 
-    file_exists_error = _file_exists.get('error')
-    flash(f'File exists exception {file_exists_error}', category="warning")
-
-    return redirect('/views/gh_files_manager/branch/' + branch_name)
+    elif file_exists_status != 200:
+        file_exists_error = _file_exists.get('error')
+        flash(f'File exists exception {file_exists_error}', category="warning")
+        return abort(404)
+    
+    #return redirect('/views/gh_files_manager/branch/' + branch_name)
 
 
 # @controller_gh.routes - worker functions accepting form requests from the html forms,
@@ -199,7 +199,7 @@ def branch_creator():
         elif branch_create_status != 201:
             branch_create_error = _branch_create.get('error')
             flash(f'Branch create exception {branch_create_error}', category="warning")
-
+            
         return redirect('/views/gh_branches_manager/')
     else:
         return abort(405)
@@ -218,11 +218,12 @@ def branch_deleter(branch_name):
         branch_delete_status = _branch_delete.get('status')
         if branch_delete_status == 200:
             flash(f'Branch {branch_name} was deleted!', category="success")
+            
         elif branch_delete_status != 200:
             branch_delete_error = _branch_delete.get('error')
             flash('Branch delete exception {}'.format(branch_delete_error),
                   category="warning")
-
+            
         return redirect('/views/gh_branches_manager/')
     else:
         return abort(405)
@@ -263,11 +264,13 @@ def file_uploader(branch_name):
         if file_create_status == 201:
             flash(f'File {file_name} was committed to the repository branch {branch_name} '
                   f'with the message {message}!', category="success")
+            return redirect('/views/gh_files_manager/branch/' + branch_name)
+          
         elif file_create_status != 201:
             file_create_error = _file_create.get('error')
             flash(f'File create exception {file_create_error}', category="warning")
-
         return redirect('/views/gh_files_manager/branch/' + branch_name)
+      
     else:
         return abort(405)
 
