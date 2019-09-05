@@ -1,7 +1,7 @@
 """
 main project function
 """
-import os.path
+import os
 
 from flask import Flask, render_template, jsonify, request
 from flaskr.project_variables import settings, global_variables

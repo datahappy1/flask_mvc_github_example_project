@@ -147,7 +147,6 @@ def edit_file(branch_name, file_name):
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
         return abort(404)
-        #return redirect('/views/gh_files_manager/branch/' + branch_name)
 
     return render_template('views/file_editor.html',
                            template_current_branch=branch_name,
@@ -173,7 +172,6 @@ def delete_file(branch_name, file_name):
         file_exists_error = _file_exists.get('error')
         flash(f'File exists exception {file_exists_error}', category="warning")
         return abort(404)
-        #return redirect('/views/gh_files_manager/branch/' + branch_name)
 
     return render_template('views/file_deleter.html',
                            template_current_branch=branch_name,
