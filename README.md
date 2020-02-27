@@ -16,6 +16,10 @@ in the MVC design pattern)
 5) ability of such a web application to gracefully fail on Github integration exceptions
 
 ### screenshots of the web ui
+![alt text][mainscreen]
+
+[mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/main_screen.png "main screen"
+
 ![alt text][branchesmanager]
 
 [branchesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/branches_manager.png "branchesmanager"
