@@ -11,14 +11,18 @@ from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
 # from flaskr.controllers.common_functions import session_getter, branch_lister, file_lister
 from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
 
-# app factory pattern
+
 def create_app():
+    """
+    create app factory pattern
+    :return:
+    """
     # flask app starts here
-    APP = Flask(__name__)
-    APP.secret_key = os.environ['flask_secret_key']
-    APP.register_blueprint(CONTROLLER_GH_UI)
-    APP.register_blueprint(CONTROLLER_GH_API)
-    return APP
+    _app = Flask(__name__)
+    _app.secret_key = os.environ['flask_secret_key']
+    _app.register_blueprint(CONTROLLER_GH_UI)
+    _app.register_blueprint(CONTROLLER_GH_API)
+    return _app
 
 
 APP = create_app()
