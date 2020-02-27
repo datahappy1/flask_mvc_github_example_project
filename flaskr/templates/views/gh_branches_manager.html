@@ -1,20 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="manager_config">
-    <h1>Github branches manager</h1>
-    <p>Let's see how we can work with Github branches using PyGithub library.</p>
+
+    <h3>Github branches manager</h3>
 
     <ul>
         <li>Github session object ID: {{ gh_session_id }}</li>
-        <li>Branches list in the {{ template_repo_name }} repository:</li>
+        <li>List of branches in the {{ template_repo_name }} repository:</li>
     </ul>
 
-    <table class="customTable">
+    <table class="table table-hover">
         <thead>
-        <tr>
-            <td>branch name</td>
-            <td colspan="2">available actions</td>
-        </tr>
+            <tr>
+                <th scope="col">branch name</th>
+                <th scope="col" colspan="2" style="width: 30%">available actions</th>
+            </tr>
         </thead>
         {% for branch in template_branch_list %}
         <tr>
@@ -22,7 +21,7 @@
                 {{ branch }}</a></td>
             <td>
                 <a href="{{ url_for('controller_gh_ui.create_branch', branch_name=branch) }}">
-                    use as a base for creating a new branch
+                    copy to a new branch
                 </a>
             </td>
             <td>
@@ -34,5 +33,4 @@
         {% endfor %}
     </table>
 
-</div>
 {% endblock %}

@@ -1,5 +1,4 @@
 flask
-werkzeug
 PyGithub
 requests
 pytest

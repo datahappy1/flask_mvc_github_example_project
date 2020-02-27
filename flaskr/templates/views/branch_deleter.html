@@ -1,14 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="config">
-    <h1>Branch deleter - {{ template_current_branch }}</h1>
+
+    <h3>Branch deleter - {{ template_current_branch }}</h3>
+
     <p>Let's delete the branch in the Github repository
         ( Github repo represents the model in the MVC pattern )</p>
+
     <p>Are you sure?</p>
+
     <form action="{{url_for('controller_gh_ui.branch_deleter', branch_name=template_current_branch)}}"
           method="POST" enctype="multipart/form-data">
-        <input type="submit" value="yes - delete">
+        <div class="form-group">
+        </div>
+        <button type="submit" class="btn btn-primary">yes - delete</button>
+        <button onclick="goBack()" class="btn btn-secondary">go back</button>
     </form>
 
-</div>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+
 {% endblock %}

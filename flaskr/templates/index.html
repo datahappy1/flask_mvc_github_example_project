@@ -1,11 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="home">
-    <h1>Flask, MVC, Github integration example project</h1>
-    <p>This website was built with Python via the Flask framework.</p>
-    <p><a href="{{url_for('controller_gh_ui.gh_branches_manager')}}">
-        Github branches manager</a></p>
-    <p><a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=template_current_branch)}}">
-        Github files manager</a></p>
+
+<div class="row mt-3">
+    <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Github branches manager</h5>
+        <p class="card-text">Here you can manage the Github branches in the repo.</p>
+        <a href="{{url_for('controller_gh_ui.gh_branches_manager')}}"
+           class="btn btn-primary">Github branches manager</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Github files manager</h5>
+        <p class="card-text">Here you can manage the files in the Github branches in the repo.</p>
+        <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=template_current_branch)}}"
+           class="btn btn-primary">Github files manager</a>
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

@@ -38,7 +38,7 @@ def not_allowed(error):
     :param error:
     :return:error html page or api response
     """
-    if request.path.startswith(settings.API_PATH_PREFIX):
+    if request.path.startswith(settings.API_BASE_ENDPOINT):
         response = jsonify({
             'status': 405,
             'error': str(error),
@@ -56,7 +56,7 @@ def not_found(error):
     :param error:
     :return:error html page or api response
     """
-    if request.path.startswith(settings.API_PATH_PREFIX):
+    if request.path.startswith(settings.API_BASE_ENDPOINT):
         response = jsonify({
             'status': 404,
             'error': str(error),
