@@ -1,20 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="config">
-    <h1>File uploader</h1>
+
+    <h3>File uploader</h3>
+
     <p>Let's pass the file contents through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
     <form action="{{url_for('controller_gh_ui.file_uploader', branch_name=template_current_branch)}}"
           method="POST" enctype="multipart/form-data">
-        You can either upload an existing file:
-        <p><input type="file" name="uploaded_file"/></p>
-        or create new file via this form:
-        <p><input type="text" name="file_name" placeholder="file name"></p>
-        <p><textarea name="file_contents" cols="150" rows="20" placeholder="file content"></textarea></p>
-        <p><textarea name="commit_message" maxlength="70" placeholder="commit message"></textarea></p>
-        <input type="submit" value="commit">
+        <div class="form-group">
+            <label for="exampleFormControlFile1">You can either upload an existing file:</label>
+            <input type="file" name="uploaded_file" class="form-control-file" id="exampleFormControlFile1">
+        </div>
+        <div class="form-group">
+            <label for="FormControlFileContent">or create new file using this form:</label>
+            <input id="FormControlFileContent" type="text" name="file_name" placeholder="file name" class="form-control" maxlength="260">
+        </div>
+        <div class="form-group">
+            <textarea name="file_contents" cols="150" rows="10" placeholder="file content" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <textarea name="commit_message" maxlength="70" placeholder="commit message" class="form-control" rows="1"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">commit</button>
+        <a href="#" onclick="goBack()" class="btn btn-secondary">go back</a>
     </form>
 
-</div>
+<script src="{{ url_for('static', filename='functions.js')}}"></script>
+
 {% endblock %}

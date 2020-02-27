@@ -1,20 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="config">
-    <h1>File editor - {{ file_name }}</h1>
+
+    <h3>File editor - {{ file_name }}</h3>
+
     <p>Let's update the file contents through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
     <form action="{{url_for('controller_gh_ui.file_editor', branch_name=template_current_branch, file_name=file_name)}}"
           method="POST" enctype="multipart/form-data">
-        {% if file_contents != None %}
-            <p><textarea name="file_contents" cols="150" rows="20">{{ file_contents }}</textarea></p>
-        {% else %}
-            <p><input type="file" name="uploaded_file" /></p>
-        {% endif %}
-        <p><textarea name="commit_message" maxlength="70" placeholder="commit message"></textarea></p>
-        <input type="submit" value="commit">
+        <div class="form-group">
+            {% if file_contents != None %}
+                <textarea name="file_contents" cols="150" rows="10" class="form-control">{{ file_contents }}</textarea>
+            {% else %}
+                <input type="file" name="uploaded_file" />
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <textarea name="commit_message" maxlength="70" placeholder="commit message" class="form-control" rows="1"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">commit</button>
+        <a href="#" onclick="goBack()" class="btn btn-secondary">go back</a>
     </form>
 
-</div>
+<script src="{{ url_for('static', filename='functions.js')}}"></script>
+
 {% endblock %}
