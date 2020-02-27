@@ -11,12 +11,17 @@ from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
 # from flaskr.controllers.common_functions import session_getter, branch_lister, file_lister
 from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
 
-# flask app starts here
-APP = Flask(__name__)
-APP.secret_key = os.environ['flask_secret_key']
-APP.register_blueprint(CONTROLLER_GH_UI)
-APP.register_blueprint(CONTROLLER_GH_API)
+# app factory pattern
+def create_app():
+    # flask app starts here
+    APP = Flask(__name__)
+    APP.secret_key = os.environ['flask_secret_key']
+    APP.register_blueprint(CONTROLLER_GH_UI)
+    APP.register_blueprint(CONTROLLER_GH_API)
+    return APP
 
+
+APP = create_app()
 
 # github related variables
 TOKEN = os.environ['github_token']
@@ -33,7 +38,7 @@ def not_allowed(error):
     :param error:
     :return:error html page or api response
     """
-    if request.path.startswith(settings.API_PATH_PREFIX):
+    if request.path.startswith(settings.API_BASE_ENDPOINT):
         response = jsonify({
             'status': 405,
             'error': str(error),
@@ -51,7 +56,7 @@ def not_found(error):
     :param error:
     :return:error html page or api response
     """
-    if request.path.startswith(settings.API_PATH_PREFIX):
+    if request.path.startswith(settings.API_BASE_ENDPOINT):
         response = jsonify({
             'status': 404,
             'error': str(error),

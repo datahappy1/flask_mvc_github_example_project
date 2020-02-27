@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>flask_mvc_github_example_project</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-<header>
-    <div class="container">
-        <h1 class="logo"><a href="/">Flask, MVC, Github example project</a></h1>
-        <nav>
-            <ul class="menu">
-                <!-- here can be a top level menu -->
-            </ul>
-        </nav>
-    </div>
-</header>
-<div class="container">
+
+<nav class="navbar navbar-dark bg-primary">
+    <a class="navbar-brand" href="/">Flask, MVC, Github example project</a>
+</nav>
+
+<div class="container-fluid">
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
 
-        {% for category,message in messages %}
-            <div class="messages {{ category }}">{{ message }}</div>
-        {% endfor %}
+            {% for category,message in messages %}
+                <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+            {% endfor %}
 
     {% endif %}
     {% endwith %}

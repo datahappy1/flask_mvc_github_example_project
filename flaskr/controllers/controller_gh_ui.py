@@ -34,7 +34,7 @@ def gh_branches_manager():
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
         branch_list_error = _branch_list.get('error')
-        flash(f'Branches load exception {branch_list_error}', category="warning")
+        flash(f'Branches load exception {branch_list_error}', category="danger")
         return redirect('/')
 
     return render_template('views/gh_branches_manager.html',
@@ -83,7 +83,7 @@ def gh_files_manager(branch_name):
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
         branch_list_error = _branch_list.get('error')
-        flash(f'Branches load exception {branch_list_error}', category="warning")
+        flash(f'Branches load exception {branch_list_error}', category="danger")
         return redirect('/')
 
     _files_list = common_functions.file_lister(branch_name)
@@ -93,7 +93,7 @@ def gh_files_manager(branch_name):
         flash(f'Files load success {files_list_status}', category="success")
     else:
         files_list_error = _files_list.get('error')
-        flash(f'Files load exception {files_list_error}', category="warning")
+        flash(f'Files load exception {files_list_error}', category="danger")
         return redirect('/')
 
     return render_template('views/gh_files_manager.html',
@@ -145,7 +145,7 @@ def edit_file(branch_name, file_name):
 
     else:
         file_exists_error = _file_exists.get('error')
-        flash(f'File exists exception {file_exists_error}', category="warning")
+        flash(f'File exists exception {file_exists_error}', category="danger")
         return abort(404)
 
     return render_template('views/file_editor.html',
@@ -170,7 +170,7 @@ def delete_file(branch_name, file_name):
         pass
     else:
         file_exists_error = _file_exists.get('error')
-        flash(f'File exists exception {file_exists_error}', category="warning")
+        flash(f'File exists exception {file_exists_error}', category="danger")
         return abort(404)
 
     return render_template('views/file_deleter.html',
@@ -199,7 +199,7 @@ def branch_creator():
                   category="success")
         else:
             branch_create_error = _branch_create.get('error')
-            flash(f'Branch create exception {branch_create_error}', category="warning")
+            flash(f'Branch create exception {branch_create_error}', category="danger")
 
         return redirect('/views/gh_branches_manager/')
     else:
@@ -222,7 +222,7 @@ def branch_deleter(branch_name):
         else:
             branch_delete_error = _branch_delete.get('error')
             flash('Branch delete exception {}'.format(branch_delete_error),
-                  category="warning")
+                  category="danger")
 
         return redirect('/views/gh_branches_manager/')
     else:
@@ -248,7 +248,7 @@ def file_uploader(branch_name):
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
             if file_name == '':
-                flash('No file uploaded, no file content found', category="warning")
+                flash('No file uploaded, no file content found', category="danger")
                 return redirect('/views/gh_files_manager/branch/' + branch_name)
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
@@ -266,7 +266,7 @@ def file_uploader(branch_name):
                   f'with the message {message}!', category="success")
         else:
             file_create_error = _file_create.get('error')
-            flash(f'File create exception {file_create_error}', category="warning")
+            flash(f'File create exception {file_create_error}', category="danger")
 
         return redirect('/views/gh_files_manager/branch/' + branch_name)
     else:
@@ -293,7 +293,7 @@ def file_editor(branch_name, file_name):
                 flash(f"File {file_name} is the target for contents from {file_name_upload}",
                       category="info")
             else:
-                flash('No file uploaded', category="warning")
+                flash('No file uploaded', category="danger")
                 return redirect('/views/gh_files_manager/branch/' + branch_name)
 
         # except FileNotFoundError in case file uploaded through textarea instead of input file
@@ -314,7 +314,7 @@ def file_editor(branch_name, file_name):
                   category="success")
         elif file_edit_status != 200:
             file_edit_error = _file_edit.get('error')
-            flash(f'File edit exception {file_edit_error}', category="warning")
+            flash(f'File edit exception {file_edit_error}', category="danger")
 
         return redirect('/views/gh_files_manager/branch/' + branch_name)
     else:
@@ -342,7 +342,7 @@ def file_deleter(branch_name, file_name):
                   f'branch {branch_name} with the message {message}!', category="success")
         else:
             file_delete_error = _file_delete.get('error')
-            flash(f'File delete exception {file_delete_error}', category="warning")
+            flash(f'File delete exception {file_delete_error}', category="danger")
 
         return redirect('/views/gh_files_manager/branch/' + branch_name)
     else:

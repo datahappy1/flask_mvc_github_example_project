@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="manager_config">
-    <h1>Github files manager</h1>
-    <p>Let's see how we can work with Github files using PyGithub library.</p>
+
+    <h3>Github files manager</h3>
 
     <ul>
         <li>Github session object ID: {{ gh_session_id }}</li>
@@ -10,7 +9,7 @@
             {% for branch in template_branch_list %}
             {% if branch == template_current_branch %}
             <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=branch)}}"
-               class="selected">{{branch}}</a>
+               class="badge badge-info">{{branch}}</a>
             {% else %}
             <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=branch)}}">{{branch}}</a>
             {% endif %}
@@ -21,20 +20,20 @@
         <li>Files list in the {{ template_current_branch }} branch:</li>
     </ul>
 
-    <table class="customTable">
+    <table class="table table-hover">
         <thead>
-        <tr>
-            <td>file name</td>
-            <td colspan="2">available actions</td>
-        </tr>
+            <tr>
+                <th scope="col">file name</th>
+                <th scope="col" colspan="2" style="width: 30%">available actions</th>
+            </tr>
         </thead>
         {% for file in template_file_list %}
         <tr>
             <td>{{ file[0] }}</td>
             <td>
                 <a href="{{ url_for('controller_gh_ui.edit_file', branch_name=template_current_branch, file_name=file[0]) }}">
-                    {% if file[1] %} <!-- if file is "text-editable" based on file extension type, show "edit" in the link
-                    otherwise show "override" in the link-->
+                    {% if file[1] %} <!-- if file is "text-editable" based on file extension type,
+                    show "edit" in the link otherwise show "override" in the link-->
                     edit file
                     {% else %}
                     override file
@@ -50,5 +49,4 @@
         {% endfor %}
     </table>
 
-</div>
 {% endblock %}

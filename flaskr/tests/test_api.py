@@ -3,10 +3,10 @@ test api endpoints
 """
 import uuid
 import os
-import requests
 import pytest
 
 from flaskr.project_variables.settings import API_BASE_ENDPOINT
+from flaskr.__main__ import APP
 
 TEST_RUNNER_ID = str(uuid.uuid4())
 
@@ -52,18 +52,19 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
     response, file_content = None, None
 
     if method == "get":
-        response = requests.get(endpoint)
+        response = APP.test_client().get(endpoint)
 
     elif method == "post":
         if test_name == "create branch":
-            response = requests.post(endpoint, data=params)
+            response = APP.test_client().post(endpoint, data=params)
 
         elif test_name == "create file upload":
             # use the test file content as request data located in tests/files/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt for testing the post method
             with open(os.path.join(os.getcwd(), 'files', 'test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt'),
                       'rb') as fp:
-                files = {'uploaded_file': fp}
-                response = requests.post(endpoint, files=files, data=params)
+                data = params
+                data['uploaded_file'] = (fp, fp.name)
+                response = APP.test_client().post(endpoint, content_type="multipart/form-data", data=data)
 
         elif test_name == "create file form":
             # use the test file content as request data located in tests/files/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt for testing the post method
@@ -72,7 +73,7 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
                 file_content = fp.read()
                 data = params
                 data['file_contents'] = file_content
-                response = requests.post(endpoint, data=data)
+                response = APP.test_client().post(endpoint, data=data)
 
         else:
             raise NotImplementedError
@@ -85,19 +86,20 @@ def test_request(test_name, method, endpoint, params, expected_success_status_co
                 file_content = fp.read()
                 data = params
                 data['file_contents'] = file_content
-                response = requests.put(endpoint, data=data)
+                response = APP.test_client().put(endpoint, data=data)
 
         elif test_name == "override file":
             # use the test file content as request data located in tests/files/test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt for testing the put method
             with open(os.path.join(os.getcwd(), 'files', 'test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt'),
                       'rb') as fp:
-                files = {'uploaded_file': fp}
-                response = requests.put(endpoint, files=files, data=params)
+                data = params
+                data['uploaded_file'] = (fp, fp.name)
+                response = APP.test_client().put(endpoint, content_type="multipart/form-data", data=data)
 
         else:
             raise NotImplementedError
 
     elif method == "delete":
-        response = requests.delete(endpoint, data=params)
+        response = APP.test_client().delete(endpoint, data=params)
 
     assert response.status_code == expected_success_status_code

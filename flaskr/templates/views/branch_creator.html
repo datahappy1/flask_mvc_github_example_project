@@ -1,16 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="config">
-    <h1>Branch creator</h1>
+
+    <h3>Branch creator</h3>
+
     <p>Let's create the branch based on the source branch {{ template_current_branch }} in the Github repository
         ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="{{url_for('controller_gh_ui.branch_creator')}}" method="POST"
-          enctype="multipart/form-data">
-        <input type="hidden" name="branch_name_src" value="{{ template_current_branch }}">
-        <p><textarea name="branch_name_tgt" maxlength="70" placeholder="branch name"></textarea></p>
-        <input type="submit" value="create">
+    <form action="{{url_for('controller_gh_ui.branch_creator')}}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="hidden" name="branch_name_src" value="{{ template_current_branch }}">
+            <textarea name="branch_name_tgt" maxlength="70" placeholder="branch name" class="form-control" rows="1"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">create</button>
+        <a href="#" onclick="goBack()" class="btn btn-secondary">go back</a>
     </form>
 
-</div>
+<script src="{{ url_for('static', filename='functions.js')}}"></script>
+
 {% endblock %}

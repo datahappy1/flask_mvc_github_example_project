@@ -12,10 +12,14 @@
 2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
 3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
 in the MVC design pattern)
-4) api endpoint pytest testing using the requests library
+4) api endpoint pytest testing
 5) ability of such a web application to gracefully fail on Github integration exceptions
 
 ### screenshots of the web ui
+![alt text][mainscreen]
+
+[mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/main_screen.png "main screen"
+
 ![alt text][branchesmanager]
 
 [branchesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/branches_manager.png "branchesmanager"
