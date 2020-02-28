@@ -12,10 +12,11 @@
 2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
 3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
 in the MVC design pattern)
-4) api endpoint pytest testing with importing the app factory
+4) API endpoint pytest testing with importing the app factory
 5) ability of such a web application to gracefully fail on Github integration exceptions
+6) how easy it is to integrate a Flask web application with Bootstrap used for styling
 
-### screenshots of the web ui
+### few screenshots of the Flask web application UI:
 ![alt text][mainscreen]
 
 [mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/main_screen.png "main screen"
