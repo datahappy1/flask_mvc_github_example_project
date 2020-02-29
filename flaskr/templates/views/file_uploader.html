@@ -23,9 +23,7 @@
             <textarea name="commit_message" maxlength="70" placeholder="commit message" class="form-control" rows="1"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">commit</button>
-        <a href="#" onclick="goBack()" class="btn btn-secondary">go back</a>
+        <a href="javascript:history.back()" class="btn btn-secondary">go back</a>
     </form>
-
-<script src="{{ url_for('static', filename='functions.js')}}"></script>
 
 {% endblock %}

@@ -1,5 +1,5 @@
 """
-main project function
+main project file
 """
 import os
 
