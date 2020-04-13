@@ -18,11 +18,11 @@ def create_app():
     :return:
     """
     # flask app starts here
-    _app = Flask(__name__)
-    _app.secret_key = os.environ['flask_secret_key']
-    _app.register_blueprint(CONTROLLER_GH_UI)
-    _app.register_blueprint(CONTROLLER_GH_API)
-    return _app
+    app = Flask(__name__)
+    app.secret_key = os.environ['flask_secret_key']
+    app.register_blueprint(CONTROLLER_GH_UI)
+    app.register_blueprint(CONTROLLER_GH_API)
+    return app
 
 
 APP = create_app()
