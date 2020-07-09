@@ -6,7 +6,7 @@ import os
 from flask import Blueprint, request, flash, redirect, render_template, abort
 from werkzeug.exceptions import BadRequestKeyError
 
-from flaskr.project_variables import global_variables, settings
+from flaskr.project_variables import settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
 

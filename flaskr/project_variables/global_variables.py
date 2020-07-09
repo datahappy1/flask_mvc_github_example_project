@@ -1,4 +1,4 @@
 """
 global variables module
 """
-OBJ = None
+GH_OBJ = None

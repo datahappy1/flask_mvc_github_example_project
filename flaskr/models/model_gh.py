@@ -7,7 +7,7 @@ from github import Github, GithubException
 from flaskr.project_variables import settings
 
 
-class Model: # pylint: disable=too-few-public-methods
+class Model:  # pylint: disable=too-few-public-methods
     """
     project parent github class
     """

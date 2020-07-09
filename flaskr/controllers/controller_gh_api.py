@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 
-from flaskr.project_variables import global_variables, settings
+from flaskr.project_variables import settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
 

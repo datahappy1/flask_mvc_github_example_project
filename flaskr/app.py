@@ -1,38 +1,9 @@
 """
 main project file
 """
-import os
-
-from flask import Flask, render_template, jsonify, request
-from flaskr.project_variables import settings, global_variables
-from flaskr.models import model_gh
-from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
-# you can also import specific functions from a Blueprint module:
-# from flaskr.controllers.common_functions import session_getter, branch_lister, file_lister
-from flaskr.controllers.controller_gh_api import CONTROLLER_GH_API
-
-
-def create_app():
-    """
-    create app factory pattern
-    :return:
-    """
-    # flask app starts here
-    app = Flask(__name__)
-    app.secret_key = os.environ['flask_secret_key']
-    app.register_blueprint(CONTROLLER_GH_UI)
-    app.register_blueprint(CONTROLLER_GH_API)
-    return app
-
-
-APP = create_app()
-
-# github related variables
-TOKEN = os.environ['github_token']
-
-# init the github class
-global_variables.OBJ = model_gh.Model(init_token=TOKEN,
-                                      init_repo=settings.REPO)
+from flaskr import APP
+from flask import render_template, jsonify, request
+from flaskr.project_variables import settings
 
 
 @APP.errorhandler(405)

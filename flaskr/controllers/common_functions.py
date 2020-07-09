@@ -5,7 +5,7 @@ import os
 
 from werkzeug.utils import secure_filename
 
-from flaskr.project_variables import global_variables, settings
+from flaskr.project_variables import settings, global_variables
 from flaskr.models import model_gh
 
 
@@ -15,7 +15,8 @@ def session_getter() -> dict:
     session getter function
     :return:
     """
-    github_session_id = model_gh.Model.get_session_id(global_variables.OBJ)
+
+    github_session_id = model_gh.Model.get_session_id(global_variables.GH_OBJ)
     return github_session_id
 
 
@@ -24,7 +25,7 @@ def branch_lister() -> dict:
     branch lister function
     :return:
     """
-    branch_list = model_gh.Branch.list_all_branches(global_variables.OBJ)
+    branch_list = model_gh.Branch.list_all_branches(global_variables.GH_OBJ)
     return branch_list
 
 
@@ -34,7 +35,7 @@ def file_lister(branch_name) -> dict:
     :param branch_name:
     :return:
     """
-    files_list = model_gh.File.list_all_files(global_variables.OBJ, branch_name)
+    files_list = model_gh.File.list_all_files(global_variables.GH_OBJ, branch_name)
     if files_list.get('status') == 200:
         _files_list = []
         for file in files_list.get('content'):
@@ -54,7 +55,7 @@ def file_exists_checker(gh_file_path, branch_name) -> dict:
     :param branch_name:
     :return:
     """
-    github_file_status = model_gh.File.get_file_status(global_variables.OBJ,
+    github_file_status = model_gh.File.get_file_status(global_variables.GH_OBJ,
                                                        gh_file_path, branch_name)
     return github_file_status
 
@@ -66,7 +67,7 @@ def file_content_getter(gh_file_path, branch_name) -> dict:
     :param branch_name:
     :return:
     """
-    github_file_content = model_gh.File.get_file_contents(global_variables.OBJ,
+    github_file_content = model_gh.File.get_file_contents(global_variables.GH_OBJ,
                                                           gh_file_path, branch_name)
     return github_file_content
 
