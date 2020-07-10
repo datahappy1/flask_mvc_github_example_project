@@ -6,7 +6,7 @@ import os
 from flask import Blueprint, request, flash, redirect, render_template, abort
 from werkzeug.exceptions import BadRequestKeyError
 
-from flaskr.project_variables import settings, global_variables
+from flaskr.project_variables import settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
 
@@ -190,7 +190,7 @@ def branch_creator():
     if request.method == 'POST':
         branch_name_src_ui = request.form['branch_name_src']
         branch_name_tgt_ui = request.form['branch_name_tgt']
-        _branch_create = model_gh.Branch.create_branch(global_variables.GH_OBJ,
+        _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
                                                        source_branch=branch_name_src_ui,
                                                        target_branch=branch_name_tgt_ui)
         branch_create_status = _branch_create.get('status')
@@ -214,7 +214,7 @@ def branch_deleter(branch_name):
     :return:
     """
     if request.method == 'POST':
-        _branch_delete = model_gh.Branch.delete_branch(global_variables.GH_OBJ,
+        _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
                                                        branch_name=branch_name)
         branch_delete_status = _branch_delete.get('status')
         if branch_delete_status == 200:
@@ -253,7 +253,7 @@ def file_uploader(branch_name):
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_create = model_gh.File.create_file(global_variables.GH_OBJ,
+        _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
@@ -302,7 +302,7 @@ def file_editor(branch_name, file_name):
         except (FileNotFoundError, BadRequestKeyError):
             file_contents = request.form['file_contents']
 
-        _file_edit = model_gh.File.update_file(global_variables.GH_OBJ,
+        _file_edit = model_gh.File.update_file(global_variables.OBJ,
                                                gh_file_path=gh_file_path,
                                                message=message,
                                                content=file_contents,
@@ -332,7 +332,7 @@ def file_deleter(branch_name, file_name):
     """
     if request.method == 'POST':
         message = request.form['commit_message']
-        _file_delete = model_gh.File.delete_file(global_variables.GH_OBJ,
+        _file_delete = model_gh.File.delete_file(global_variables.OBJ,
                                                  gh_file_path=file_name,
                                                  message=message,
                                                  branch_name=branch_name)
