@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 
-from flaskr.project_variables import settings, global_variables
+from flaskr.project_variables import settings
 from flaskr.models import model_gh
 from flaskr.controllers import common_functions
 
@@ -47,7 +47,7 @@ def api_collection_branches():
     if request.method == 'POST':
         branch_name_src = request.form['branch_name_src']
         branch_name_tgt = request.form['branch_name_tgt']
-        _branch_create = model_gh.Branch.create_branch(global_variables.GH_OBJ,
+        _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
                                                        source_branch=branch_name_src,
                                                        target_branch=branch_name_tgt)
         branch_create_status = _branch_create.get('status')
@@ -82,7 +82,7 @@ def api_singleton_branch(branch_name):
     response = None
 
     if request.method == 'DELETE':
-        _branch_delete = model_gh.Branch.delete_branch(global_variables.GH_OBJ,
+        _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
                                                        branch_name=branch_name)
         branch_delete_status = _branch_delete.get('status')
 
@@ -154,7 +154,7 @@ def api_collection_files(branch_name):
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_create = model_gh.File.create_file(global_variables.GH_OBJ,
+        _file_create = model_gh.File.create_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
@@ -210,7 +210,7 @@ def api_singleton_file(branch_name, file_name):
 
             gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_update = model_gh.File.update_file(global_variables.GH_OBJ,
+        _file_update = model_gh.File.update_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  content=file_contents,
@@ -238,7 +238,7 @@ def api_singleton_file(branch_name, file_name):
         response.status_code = file_update_status
 
     if request.method == 'DELETE':
-        _file_delete = model_gh.File.delete_file(global_variables.GH_OBJ,
+        _file_delete = model_gh.File.delete_file(global_variables.OBJ,
                                                  gh_file_path=gh_file_path,
                                                  message=message,
                                                  branch_name=branch_name)
