@@ -6,10 +6,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
 from flask import Blueprint, jsonify, request
 
-from flaskr.project_variables import settings
-from flaskr.models import model_gh
+from flaskr import settings, utils
 from flaskr.controllers import common_functions
-
 
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
 
@@ -47,9 +45,7 @@ def api_collection_branches():
     if request.method == 'POST':
         branch_name_src = request.form['branch_name_src']
         branch_name_tgt = request.form['branch_name_tgt']
-        _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
-                                                       source_branch=branch_name_src,
-                                                       target_branch=branch_name_tgt)
+        _branch_create = common_functions.branch_creator(branch_name_src, branch_name_tgt)
         branch_create_status = _branch_create.get('status')
 
         if branch_create_status == 201:
@@ -82,8 +78,7 @@ def api_singleton_branch(branch_name):
     response = None
 
     if request.method == 'DELETE':
-        _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
-                                                       branch_name=branch_name)
+        _branch_delete = common_functions.branch_deleter(branch_name)
         branch_delete_status = _branch_delete.get('status')
 
         if branch_delete_status == 200:
@@ -146,7 +141,7 @@ def api_collection_files(branch_name):
 
         try:
             file = request.files['uploaded_file']
-            file_name, file_contents = common_functions.file_uploader_helper(file)
+            file_name, file_contents = utils.file_uploader_helper(file)
 
         except BadRequest:
             file_contents = request.form['file_contents']
@@ -154,11 +149,11 @@ def api_collection_files(branch_name):
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_create = model_gh.File.create_file(global_variables.OBJ,
-                                                 gh_file_path=gh_file_path,
-                                                 message=message,
-                                                 content=file_contents,
-                                                 branch_name=branch_name)
+        _file_create = common_functions.file_creator(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=file_contents,
+            branch_name=branch_name)
 
         file_create_status = _file_create.get('status')
 
@@ -206,15 +201,15 @@ def api_singleton_file(branch_name, file_name):
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
-            file_name, file_contents = common_functions.file_uploader_helper(file)
+            file_name, file_contents = flaskr.utils.file_uploader_helper(file)
 
             gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_update = model_gh.File.update_file(global_variables.OBJ,
-                                                 gh_file_path=gh_file_path,
-                                                 message=message,
-                                                 content=file_contents,
-                                                 branch_name=branch_name)
+        _file_update = common_functions.file_updater(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=file_contents,
+            branch_name=branch_name)
 
         file_update_status = _file_update.get('status')
 
@@ -238,10 +233,10 @@ def api_singleton_file(branch_name, file_name):
         response.status_code = file_update_status
 
     if request.method == 'DELETE':
-        _file_delete = model_gh.File.delete_file(global_variables.OBJ,
-                                                 gh_file_path=gh_file_path,
-                                                 message=message,
-                                                 branch_name=branch_name)
+        _file_delete = common_functions.file_deleter(
+            gh_file_path=gh_file_path,
+            message=message,
+            branch_name=branch_name)
 
         file_delete_status = _file_delete.get('status')
 

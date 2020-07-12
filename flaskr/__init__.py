@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from flaskr.project_variables import settings, global_variables
+from flaskr import settings
 from flaskr.models import model_gh
 from flaskr.controllers.controller_gh_ui import CONTROLLER_GH_UI
 # you can also import specific functions from a Blueprint module:
@@ -16,12 +16,13 @@ def create_app():
     # flask app starts here
     app = Flask(__name__)
     app.secret_key = os.environ['flask_secret_key']
+
     app.register_blueprint(CONTROLLER_GH_UI)
     app.register_blueprint(CONTROLLER_GH_API)
 
     # init the github class
-    global_variables.GH_OBJ = model_gh.Model(init_token=os.environ['github_token'],
-                                             init_repo=settings.REPO)
+    model_gh.Global = model_gh.Model(init_token=os.environ['github_token'],
+                                     init_repo=settings.REPO)
 
     return app
 

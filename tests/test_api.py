@@ -5,7 +5,7 @@ import uuid
 import os
 import pytest
 
-from flaskr.project_variables.settings import API_BASE_ENDPOINT
+from flaskr.settings import API_BASE_ENDPOINT
 from flaskr.app import APP
 
 TEST_RUNNER_ID = str(uuid.uuid4())

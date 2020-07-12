@@ -6,8 +6,7 @@ import os
 from flask import Blueprint, request, flash, redirect, render_template, abort
 from werkzeug.exceptions import BadRequestKeyError
 
-from flaskr.project_variables import settings
-from flaskr.models import model_gh
+from flaskr import settings, utils
 from flaskr.controllers import common_functions
 
 CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__,
@@ -133,7 +132,7 @@ def edit_file(branch_name, file_name):
         file_extension = os.path.splitext(str(file_name))[1]
         if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
             file_contents = common_functions.file_content_getter(gh_file_path=file_name,
-                                                                 branch_name=branch_name)\
+                                                                 branch_name=branch_name) \
                 .get('content')
 
             # if file is text-editable type but empty, so the form shows the file content textarea
@@ -190,9 +189,7 @@ def branch_creator():
     if request.method == 'POST':
         branch_name_src_ui = request.form['branch_name_src']
         branch_name_tgt_ui = request.form['branch_name_tgt']
-        _branch_create = model_gh.Branch.create_branch(global_variables.OBJ,
-                                                       source_branch=branch_name_src_ui,
-                                                       target_branch=branch_name_tgt_ui)
+        _branch_create = common_functions.branch_creator(branch_name_src_ui, branch_name_tgt_ui)
         branch_create_status = _branch_create.get('status')
         if branch_create_status == 201:
             flash(f'Branch {branch_name_tgt_ui} based on {branch_name_src_ui} was created!',
@@ -214,8 +211,8 @@ def branch_deleter(branch_name):
     :return:
     """
     if request.method == 'POST':
-        _branch_delete = model_gh.Branch.delete_branch(global_variables.OBJ,
-                                                       branch_name=branch_name)
+        _branch_delete = common_functions.branch_deleter(
+            branch_name=branch_name)
         branch_delete_status = _branch_delete.get('status')
         if branch_delete_status == 200:
             flash(f'Branch {branch_name} was deleted!', category="success")
@@ -241,7 +238,7 @@ def file_uploader(branch_name):
 
         try:
             file = request.files['uploaded_file']
-            file_name, file_contents = common_functions.file_uploader_helper(file)
+            file_name, file_contents = utils.file_uploader_helper(file)
 
         # except FileNotFoundError in case file uploaded through textarea instead of input file
         except FileNotFoundError:
@@ -253,11 +250,11 @@ def file_uploader(branch_name):
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
-        _file_create = model_gh.File.create_file(global_variables.OBJ,
-                                                 gh_file_path=gh_file_path,
-                                                 message=message,
-                                                 content=file_contents,
-                                                 branch_name=branch_name)
+        _file_create = common_functions.file_creator(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=file_contents,
+            branch_name=branch_name)
 
         file_create_status = _file_create.get('status')
 
@@ -289,7 +286,7 @@ def file_editor(branch_name, file_name):
         try:
             file = request.files['uploaded_file']
             if file:
-                file_name_upload, file_contents = common_functions.file_uploader_helper(file)
+                file_name_upload, file_contents = utils.file_uploader_helper(file)
                 flash(f"File {file_name} is the target for contents from {file_name_upload}",
                       category="info")
             else:
@@ -302,11 +299,11 @@ def file_editor(branch_name, file_name):
         except (FileNotFoundError, BadRequestKeyError):
             file_contents = request.form['file_contents']
 
-        _file_edit = model_gh.File.update_file(global_variables.OBJ,
-                                               gh_file_path=gh_file_path,
-                                               message=message,
-                                               content=file_contents,
-                                               branch_name=branch_name)
+        _file_edit = common_functions.file_updater(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=file_contents,
+            branch_name=branch_name)
         file_edit_status = _file_edit.get('status')
         if file_edit_status == 200:
             flash(f'File {file_name} update was committed to the repository '
@@ -332,10 +329,10 @@ def file_deleter(branch_name, file_name):
     """
     if request.method == 'POST':
         message = request.form['commit_message']
-        _file_delete = model_gh.File.delete_file(global_variables.OBJ,
-                                                 gh_file_path=file_name,
-                                                 message=message,
-                                                 branch_name=branch_name)
+        _file_delete = common_functions.file_deleter(
+            gh_file_path=file_name,
+            message=message,
+            branch_name=branch_name)
         file_delete_status = _file_delete.get('status')
         if file_delete_status == 200:
             flash(f'File {file_name} deletion was committed to the repository '

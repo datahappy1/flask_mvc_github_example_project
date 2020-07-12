@@ -1,9 +1,8 @@
 """
 main project file
 """
-from flaskr import APP
 from flask import render_template, jsonify, request
-from flaskr.project_variables import settings
+from flaskr import APP, settings
 
 
 @APP.errorhandler(405)
@@ -48,8 +47,9 @@ def index():
     index route render template function
     :return:
     """
-    return render_template('index.html',
-                           template_current_branch=settings.INITIAL_BRANCH_NAME)
+    with APP.app_context():
+        return render_template('index.html',
+                               template_current_branch=settings.INITIAL_BRANCH_NAME)
 
 
 if __name__ == '__main__':

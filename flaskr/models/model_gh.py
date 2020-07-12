@@ -4,19 +4,24 @@ model github module
 import requests
 
 from github import Github, GithubException
-from flaskr.project_variables import settings
+from flaskr import settings
+
+
+class Global:
+    def __init__(self, gh_global):
+        self.gh_global_object = gh_global
+
+    def __repr__(self):
+        return self.gh_global_object
 
 
 class Model:  # pylint: disable=too-few-public-methods
     """
     project parent github class
     """
+
     def __init__(self, init_token, init_repo):
-        # using username and password
-        # g = Github("", "")
-        # or using an access token
-        self.token = init_token
-        self.github = Github(self.token)
+        self.github = Github(init_token)
         self.repo = self.github.get_repo(init_repo)
         self.repo_folder = settings.REPO_FOLDER
 
@@ -33,6 +38,7 @@ class Branch(Model):
     """
     Model subclass Branch
     """
+
     def list_all_branches(self) -> dict:
         """
         list all branches function
@@ -42,9 +48,7 @@ class Branch(Model):
             branches = self.repo.get_branches()
             branches_list = []
             for branch in branches:
-                branches_list.append(str(branch)
-                                     .replace('Branch(name="', '')
-                                     .replace('")', ''))
+                branches_list.append(branch.raw_data.get('name'))
             return {'status': 200,
                     'content': branches_list}
         except GithubException as github_exc:
@@ -86,6 +90,7 @@ class File(Model):
     """
     Model subclass File
     """
+
     def list_all_files(self, branch_name) -> dict:
         """
         list all files function
@@ -97,9 +102,7 @@ class File(Model):
                                                ref=branch_name)
             files_list = []
             for file in files:
-                files_list.append(str(file).
-                                  replace('ContentFile(path="', '').
-                                  replace('")', ''))
+                files_list.append(file.raw_data.get('path'))
             return {'status': 200,
                     'content': files_list}
         except GithubException as github_exc:
@@ -115,7 +118,7 @@ class File(Model):
         try:
             _commit = self.repo.get_branch(branch_name)
             commit = _commit.commit
-            commit = str(commit).replace('Commit(sha="', '').replace('")', '')
+            commit = commit.raw_data.get('sha')
             return {'status': 200,
                     'content': commit}
         except GithubException as github_exc:
