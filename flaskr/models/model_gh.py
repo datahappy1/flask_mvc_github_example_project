@@ -8,6 +8,9 @@ from flaskr import settings
 
 
 class Global:
+    """"
+    global class for access to the Pygithub instance
+    """
     def __init__(self, gh_global):
         self.gh_global_object = gh_global
 

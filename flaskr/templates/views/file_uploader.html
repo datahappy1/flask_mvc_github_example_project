@@ -6,7 +6,7 @@
     <p>Let's pass the file contents through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="{{url_for('controller_gh_ui.file_uploader', branch_name=template_current_branch)}}"
+    <form action="{{url_for('controller_gh_ui.upload_file', branch_name=template_current_branch)}}"
           method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="exampleFormControlFile1">You can either upload an existing file:</label>

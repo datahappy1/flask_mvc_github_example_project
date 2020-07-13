@@ -201,7 +201,7 @@ def api_singleton_file(branch_name, file_name):
             # file_contents not coming from the edit textarea form means file
             # is not editable extension type therefore get the file uploaded with the form
             file = request.files['uploaded_file']
-            file_name, file_contents = flaskr.utils.file_uploader_helper(file)
+            file_name, file_contents = utils.file_uploader_helper(file)
 
             gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 

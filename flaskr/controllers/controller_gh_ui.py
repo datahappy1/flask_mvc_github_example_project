@@ -13,9 +13,6 @@ CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__,
                              template_folder='templates')
 
 
-# @controller_gh.routes - views functions for ui user interaction
-# optionally validating the inputs and returning redirects or rendering templates
-# with the html forms
 @CONTROLLER_GH_UI.route('/views/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
     """
@@ -42,26 +39,59 @@ def gh_branches_manager():
                            template_repo_name=settings.REPO)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/create/', methods=['GET'])
+@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/create/',
+                        methods=['GET', 'POST'])
 def create_branch(branch_name):
     """
     create branch function
     :param branch_name:
     :return:
     """
-    return render_template('views/branch_creator.html',
-                           template_current_branch=branch_name)
+    if request.method == "GET":
+        return render_template('views/branch_creator.html',
+                               template_current_branch=branch_name)
+    elif request.method == "POST":
+        branch_name_src_ui = request.form['branch_name_src']
+        branch_name_tgt_ui = request.form['branch_name_tgt']
+        _branch_create = common_functions.branch_creator(branch_name_src_ui, branch_name_tgt_ui)
+        branch_create_status = _branch_create.get('status')
+        if branch_create_status == 201:
+            flash(f'Branch {branch_name_tgt_ui} based on {branch_name_src_ui} was created!',
+                  category="success")
+        else:
+            branch_create_error = _branch_create.get('error')
+            flash(f'Branch create exception {branch_create_error}', category="danger")
+
+        return redirect('/views/gh_branches_manager/')
+    else:
+        return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/delete/', methods=['GET'])
+@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/delete/',
+                        methods=['GET', 'POST'])
 def delete_branch(branch_name):
     """
     delete branch function
     :param branch_name:
     :return:
     """
-    return render_template('views/branch_deleter.html',
-                           template_current_branch=branch_name)
+    if request.method == "GET":
+        return render_template('views/branch_deleter.html',
+                               template_current_branch=branch_name)
+    elif request.method == "POST":
+        _branch_delete = common_functions.branch_deleter(
+            branch_name=branch_name)
+        branch_delete_status = _branch_delete.get('status')
+        if branch_delete_status == 200:
+            flash(f'Branch {branch_name} was deleted!', category="success")
+        else:
+            branch_delete_error = _branch_delete.get('error')
+            flash('Branch delete exception {}'.format(branch_delete_error),
+                  category="danger")
+
+        return redirect('/views/gh_branches_manager/')
+    else:
+        return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
@@ -103,137 +133,17 @@ def gh_files_manager(branch_name):
 
 
 @CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>/file/create/',
-                        methods=['GET'])
+                        methods=['GET', 'POST'])
 def upload_file(branch_name):
     """
     upload file function
     :param branch_name:
     :return:
     """
-    return render_template('views/file_uploader.html',
-                           template_current_branch=branch_name)
-
-
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
-                        '/file/edit/<path:file_name>', methods=['GET'])
-def edit_file(branch_name, file_name):
-    """
-    edit file function
-    :param branch_name:
-    :param file_name:
-    :return:
-    """
-    _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
-                                                        branch_name=branch_name)
-    file_exists_status = _file_exists.get('status')
-    if file_exists_status == 200:
-
-        # check if file is text-editable type to load up file contents for the form
-        file_extension = os.path.splitext(str(file_name))[1]
-        if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
-            file_contents = common_functions.file_content_getter(gh_file_path=file_name,
-                                                                 branch_name=branch_name) \
-                .get('content')
-
-            # if file is text-editable type but empty, so the form shows the file content textarea
-            if not file_contents:
-                file_contents = ''
-        else:
-            # file exists but is not text-editable type, so the form shows the file upload
-            file_contents = None
-
-    else:
-        file_exists_error = _file_exists.get('error')
-        flash(f'File exists exception {file_exists_error}', category="danger")
-        return abort(404)
-
-    return render_template('views/file_editor.html',
-                           template_current_branch=branch_name,
-                           file_name=file_name,
-                           file_contents=file_contents)
-
-
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
-                        '/file/delete/<path:file_name>', methods=['GET'])
-def delete_file(branch_name, file_name):
-    """
-    delete file function
-    :param branch_name:
-    :param file_name:
-    :return:
-    """
-    _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
-                                                        branch_name=branch_name)
-    file_exists_status = _file_exists.get('status')
-    if file_exists_status == 200:
-        pass
-    else:
-        file_exists_error = _file_exists.get('error')
-        flash(f'File exists exception {file_exists_error}', category="danger")
-        return abort(404)
-
-    return render_template('views/file_deleter.html',
-                           template_current_branch=branch_name,
-                           file_name=file_name)
-
-
-# @controller_gh.routes - worker functions accepting form requests from the html forms,
-# proceeding with the desired actions and returning redirects to lead the
-# ui user back to the branches or files manager
-@CONTROLLER_GH_UI.route('/branch_creator/', methods=['POST'])
-def branch_creator():
-    """
-    branch creator function
-    :return:
-    """
-    if request.method == 'POST':
-        branch_name_src_ui = request.form['branch_name_src']
-        branch_name_tgt_ui = request.form['branch_name_tgt']
-        _branch_create = common_functions.branch_creator(branch_name_src_ui, branch_name_tgt_ui)
-        branch_create_status = _branch_create.get('status')
-        if branch_create_status == 201:
-            flash(f'Branch {branch_name_tgt_ui} based on {branch_name_src_ui} was created!',
-                  category="success")
-        else:
-            branch_create_error = _branch_create.get('error')
-            flash(f'Branch create exception {branch_create_error}', category="danger")
-
-        return redirect('/views/gh_branches_manager/')
-    else:
-        return abort(405)
-
-
-@CONTROLLER_GH_UI.route('/branch_deleter/<branch_name>/', methods=['POST'])
-def branch_deleter(branch_name):
-    """
-    branch deleter function
-    :param branch_name:
-    :return:
-    """
-    if request.method == 'POST':
-        _branch_delete = common_functions.branch_deleter(
-            branch_name=branch_name)
-        branch_delete_status = _branch_delete.get('status')
-        if branch_delete_status == 200:
-            flash(f'Branch {branch_name} was deleted!', category="success")
-        else:
-            branch_delete_error = _branch_delete.get('error')
-            flash('Branch delete exception {}'.format(branch_delete_error),
-                  category="danger")
-
-        return redirect('/views/gh_branches_manager/')
-    else:
-        return abort(405)
-
-
-@CONTROLLER_GH_UI.route('/file_uploader/<branch_name>/', methods=['POST'])
-def file_uploader(branch_name):
-    """
-    file uploader function
-    :param branch_name:
-    :return:
-    """
-    if request.method == 'POST':
+    if request.method == "GET":
+        return render_template('views/file_uploader.html',
+                               template_current_branch=branch_name)
+    elif request.method == "POST":
         message = request.form['commit_message']
 
         try:
@@ -270,16 +180,45 @@ def file_uploader(branch_name):
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/file_editor/<branch_name>/file/edit/<path:file_name>',
-                        methods=['POST'])
-def file_editor(branch_name, file_name):
+@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
+                        '/file/edit/<path:file_name>', methods=['GET', 'POST'])
+def edit_file(branch_name, file_name):
     """
-    file editor function
+    edit file function
     :param branch_name:
     :param file_name:
     :return:
     """
-    if request.method == 'POST':
+    if request.method == "GET":
+        _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                            branch_name=branch_name)
+        file_exists_status = _file_exists.get('status')
+        if file_exists_status == 200:
+
+            # check if file is text-editable type to load up file contents for the form
+            file_extension = os.path.splitext(str(file_name))[1]
+            if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
+                file_contents = common_functions.file_content_getter(gh_file_path=file_name,
+                                                                     branch_name=branch_name) \
+                    .get('content')
+
+                # if file is text-editable type but empty, so the form shows the file content textarea
+                if not file_contents:
+                    file_contents = ''
+            else:
+                # file exists but is not text-editable type, so the form shows the file upload
+                file_contents = None
+
+        else:
+            file_exists_error = _file_exists.get('error')
+            flash(f'File exists exception {file_exists_error}', category="danger")
+            return abort(404)
+
+        return render_template('views/file_editor.html',
+                               template_current_branch=branch_name,
+                               file_name=file_name,
+                               file_contents=file_contents)
+    elif request.method == "POST":
         message = request.form['commit_message']
         gh_file_path = file_name
 
@@ -318,16 +257,30 @@ def file_editor(branch_name, file_name):
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/file_deleter/<branch_name>/file/delete/'
-                        '<path:file_name>', methods=['POST'])
-def file_deleter(branch_name, file_name):
+@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
+                        '/file/delete/<path:file_name>', methods=['GET', 'POST'])
+def delete_file(branch_name, file_name):
     """
-    file deleter function
+    delete file function
     :param branch_name:
     :param file_name:
     :return:
     """
-    if request.method == 'POST':
+    if request.method == "GET":
+        _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                            branch_name=branch_name)
+        file_exists_status = _file_exists.get('status')
+        if file_exists_status == 200:
+            pass
+        else:
+            file_exists_error = _file_exists.get('error')
+            flash(f'File exists exception {file_exists_error}', category="danger")
+            return abort(404)
+
+        return render_template('views/file_deleter.html',
+                               template_current_branch=branch_name,
+                               file_name=file_name)
+    elif request.method == "POST":
         message = request.form['commit_message']
         _file_delete = common_functions.file_deleter(
             gh_file_path=file_name,

@@ -13,9 +13,7 @@ def session_getter() -> dict:
     session getter function
     :return:
     """
-
-    github_session_id = model_gh.Model.get_session_id(model_gh.Global)
-    return github_session_id
+    return model_gh.Model.get_session_id(model_gh.Global)
 
 
 def branch_lister() -> dict:
@@ -23,17 +21,27 @@ def branch_lister() -> dict:
     branch lister function
     :return:
     """
-    branch_list = model_gh.Branch.list_all_branches(model_gh.Global)
-    return branch_list
+    return model_gh.Branch.list_all_branches(model_gh.Global)
 
 
 def branch_creator(source_branch_name, target_branch_name):
+    """
+    branch creator function
+    :param source_branch_name:
+    :param target_branch_name:
+    :return:
+    """
     return model_gh.Branch.create_branch(model_gh.Global,
                                          source_branch=source_branch_name,
                                          target_branch=target_branch_name)
 
 
 def branch_deleter(branch_name):
+    """
+    branch deleter function
+    :param branch_name:
+    :return:
+    """
     return model_gh.Branch.delete_branch(model_gh.Global,
                                          branch_name=branch_name)
 
@@ -80,6 +88,14 @@ def file_content_getter(gh_file_path, branch_name) -> dict:
 
 
 def file_creator(gh_file_path, message, content, branch_name):
+    """
+    file creator function
+    :param gh_file_path:
+    :param message:
+    :param content:
+    :param branch_name:
+    :return:
+    """
     return model_gh.File.create_file(model_gh.Global,
                                      gh_file_path=gh_file_path,
                                      message=message,
@@ -88,6 +104,14 @@ def file_creator(gh_file_path, message, content, branch_name):
 
 
 def file_updater(gh_file_path, message, content, branch_name):
+    """
+    file updater function
+    :param gh_file_path:
+    :param message:
+    :param content:
+    :param branch_name:
+    :return:
+    """
     return model_gh.File.update_file(model_gh.Global,
                                      gh_file_path=gh_file_path,
                                      message=message,
@@ -96,6 +120,13 @@ def file_updater(gh_file_path, message, content, branch_name):
 
 
 def file_deleter(gh_file_path, message, branch_name):
+    """
+    file deleter function
+    :param gh_file_path:
+    :param message:
+    :param branch_name:
+    :return:
+    """
     return model_gh.File.delete_file(model_gh.Global,
                                      gh_file_path=gh_file_path,
                                      message=message,

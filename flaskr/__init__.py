@@ -20,7 +20,7 @@ def create_app():
     app.register_blueprint(CONTROLLER_GH_UI)
     app.register_blueprint(CONTROLLER_GH_API)
 
-    # init the github class
+    # init the global github class
     model_gh.Global = model_gh.Model(init_token=os.environ['github_token'],
                                      init_repo=settings.REPO)
 

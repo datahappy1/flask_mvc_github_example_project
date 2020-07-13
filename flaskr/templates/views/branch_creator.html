@@ -6,7 +6,7 @@
     <p>Let's create the branch based on the source branch {{ template_current_branch }} in the Github repository
         ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="{{url_for('controller_gh_ui.branch_creator')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url_for('controller_gh_ui.create_branch', branch_name=template_current_branch)}}" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <input type="hidden" name="branch_name_src" value="{{ template_current_branch }}">
             <textarea name="branch_name_tgt" maxlength="70" placeholder="branch name" class="form-control" rows="1"></textarea>

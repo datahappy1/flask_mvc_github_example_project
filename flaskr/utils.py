@@ -9,8 +9,12 @@ def file_uploader_helper(file) -> tuple:
     :param file:
     :return:
     """
+    temp_folder = os.path.join(os.getcwd(), 'temp')
+    if not os.path.isdir(temp_folder):
+        os.mkdir(temp_folder)
+
     file_name = secure_filename(file.filename)
-    temp_file_path = os.path.join(os.getcwd(), 'temp', file_name)
+    temp_file_path = os.path.join(temp_folder, file_name)
 
     file.save(temp_file_path)
     with open(temp_file_path, 'rb') as temp_file_handler:

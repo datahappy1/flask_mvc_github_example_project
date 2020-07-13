@@ -6,7 +6,7 @@
     <p>Let's delete the file through a commit to the branch {{ template_current_branch }}
         in the Github repository ( Github repo represents the model in the MVC pattern )</p>
 
-    <form action="{{url_for('controller_gh_ui.file_deleter', branch_name=template_current_branch, file_name=file_name)}}"
+    <form action="{{url_for('controller_gh_ui.delete_file', branch_name=template_current_branch, file_name=file_name)}}"
           method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <textarea name="commit_message" maxlength="70" placeholder="commit message" class="form-control" rows="1"></textarea>
