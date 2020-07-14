@@ -7,9 +7,9 @@ from github import Github, GithubException
 from flaskr import settings
 
 
-class Global:
+class GlobalGhModel:
     """"
-    global class for access to the Pygithub instance
+    global class for accessing the Pygithub instance
     """
     def __init__(self, gh_global):
         self.gh_global_object = gh_global
@@ -18,7 +18,7 @@ class Global:
         return self.gh_global_object
 
 
-class Model:  # pylint: disable=too-few-public-methods
+class GhBaseModel:  # pylint: disable=too-few-public-methods
     """
     project parent github class
     """
@@ -37,7 +37,7 @@ class Model:  # pylint: disable=too-few-public-methods
                 'content': self.github}
 
 
-class Branch(Model):
+class GhBranch(GhBaseModel):
     """
     Model subclass Branch
     """
@@ -89,7 +89,7 @@ class Branch(Model):
                     'error': github_exc.data}
 
 
-class File(Model):
+class GhFile(GhBaseModel):
     """
     Model subclass File
     """
@@ -169,7 +169,7 @@ class File(Model):
         :return:
         """
         try:
-            _commit = File.get_head_commit(self, branch_name)
+            _commit = GhFile.get_head_commit(self, branch_name)
             if _commit.get('status') == 200:
                 ref = _commit.get('content')
             # if cannot retrieve head commit sha, use branch sha
@@ -211,7 +211,7 @@ class File(Model):
         :param branch_name:
         :return:
         """
-        _sha = File.get_file_sha(self, gh_file_path, branch_name)
+        _sha = GhFile.get_file_sha(self, gh_file_path, branch_name)
         if _sha.get('status') == 200:
             sha = _sha.get('content')
             try:
@@ -232,7 +232,7 @@ class File(Model):
         :param branch_name:
         :return:
         """
-        _sha = File.get_file_sha(self, gh_file_path, branch_name)
+        _sha = GhFile.get_file_sha(self, gh_file_path, branch_name)
         if _sha.get('status') == 200:
             sha = _sha.get('content')
             try:

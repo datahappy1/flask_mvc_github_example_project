@@ -13,7 +13,7 @@ CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__,
                              template_folder='templates')
 
 
-@CONTROLLER_GH_UI.route('/views/gh_branches_manager/', methods=['GET'])
+@CONTROLLER_GH_UI.route('/gh_branches_manager/', methods=['GET'])
 def gh_branches_manager():
     """
     github branches manager function
@@ -39,7 +39,7 @@ def gh_branches_manager():
                            template_repo_name=settings.REPO)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/create/',
+@CONTROLLER_GH_UI.route('/gh_branches_manager/branch/<branch_name>/create/',
                         methods=['GET', 'POST'])
 def create_branch(branch_name):
     """
@@ -62,12 +62,12 @@ def create_branch(branch_name):
             branch_create_error = _branch_create.get('error')
             flash(f'Branch create exception {branch_create_error}', category="danger")
 
-        return redirect('/views/gh_branches_manager/')
+        return redirect('/gh_branches_manager/')
     else:
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_branches_manager/branch/<branch_name>/delete/',
+@CONTROLLER_GH_UI.route('/gh_branches_manager/branch/<branch_name>/delete/',
                         methods=['GET', 'POST'])
 def delete_branch(branch_name):
     """
@@ -89,12 +89,12 @@ def delete_branch(branch_name):
             flash('Branch delete exception {}'.format(branch_delete_error),
                   category="danger")
 
-        return redirect('/views/gh_branches_manager/')
+        return redirect('/gh_branches_manager/')
     else:
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>/', methods=['GET'])
+@CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>/', methods=['GET'])
 def gh_files_manager(branch_name):
     """
     github files manager function
@@ -132,7 +132,7 @@ def gh_files_manager(branch_name):
                            template_file_list=files_list_content)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>/file/create/',
+@CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>/file/create/',
                         methods=['GET', 'POST'])
 def upload_file(branch_name):
     """
@@ -156,7 +156,7 @@ def upload_file(branch_name):
             file_name = request.form['file_name']
             if file_name == '':
                 flash('No file uploaded, no file content found', category="danger")
-                return redirect('/views/gh_files_manager/branch/' + branch_name)
+                return redirect('/gh_files_manager/branch/' + branch_name)
 
         gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
 
@@ -175,12 +175,12 @@ def upload_file(branch_name):
             file_create_error = _file_create.get('error')
             flash(f'File create exception {file_create_error}', category="danger")
 
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
+        return redirect('/gh_files_manager/branch/' + branch_name)
     else:
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
+@CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
                         '/file/edit/<path:file_name>', methods=['GET', 'POST'])
 def edit_file(branch_name, file_name):
     """
@@ -202,11 +202,11 @@ def edit_file(branch_name, file_name):
                                                                      branch_name=branch_name) \
                     .get('content')
 
-                # if file is text-editable type but empty, so the form shows the file content textarea
+                # if file is text-editable type but empty, the form shows the file content textarea
                 if not file_contents:
                     file_contents = ''
             else:
-                # file exists but is not text-editable type, so the form shows the file upload
+                # file exists but is not text-editable type, the form shows the file upload
                 file_contents = None
 
         else:
@@ -218,6 +218,7 @@ def edit_file(branch_name, file_name):
                                template_current_branch=branch_name,
                                file_name=file_name,
                                file_contents=file_contents)
+
     elif request.method == "POST":
         message = request.form['commit_message']
         gh_file_path = file_name
@@ -230,7 +231,7 @@ def edit_file(branch_name, file_name):
                       category="info")
             else:
                 flash('No file uploaded', category="danger")
-                return redirect('/views/gh_files_manager/branch/' + branch_name)
+                return redirect('/gh_files_manager/branch/' + branch_name)
 
         # except FileNotFoundError in case file uploaded through textarea instead of input file
         # except BadRequestKeyError because the file_editor.html form objects are dynamically
@@ -252,12 +253,12 @@ def edit_file(branch_name, file_name):
             file_edit_error = _file_edit.get('error')
             flash(f'File edit exception {file_edit_error}', category="danger")
 
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
+        return redirect('/gh_files_manager/branch/' + branch_name)
     else:
         return abort(405)
 
 
-@CONTROLLER_GH_UI.route('/views/gh_files_manager/branch/<branch_name>'
+@CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
                         '/file/delete/<path:file_name>', methods=['GET', 'POST'])
 def delete_file(branch_name, file_name):
     """
@@ -280,6 +281,7 @@ def delete_file(branch_name, file_name):
         return render_template('views/file_deleter.html',
                                template_current_branch=branch_name,
                                file_name=file_name)
+
     elif request.method == "POST":
         message = request.form['commit_message']
         _file_delete = common_functions.file_deleter(
@@ -294,6 +296,6 @@ def delete_file(branch_name, file_name):
             file_delete_error = _file_delete.get('error')
             flash(f'File delete exception {file_delete_error}', category="danger")
 
-        return redirect('/views/gh_files_manager/branch/' + branch_name)
+        return redirect('/gh_files_manager/branch/' + branch_name)
     else:
         return abort(405)
