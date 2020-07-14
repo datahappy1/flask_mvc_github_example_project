@@ -18,7 +18,7 @@ class GlobalGhModel:
         return self.gh_global_object
 
 
-class GhBaseModel:  # pylint: disable=too-few-public-methods
+class GhBaseModel:
     """
     project parent github class
     """

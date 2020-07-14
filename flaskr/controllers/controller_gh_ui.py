@@ -50,7 +50,7 @@ def create_branch(branch_name):
     if request.method == "GET":
         return render_template('views/branch_creator.html',
                                template_current_branch=branch_name)
-    elif request.method == "POST":
+    if request.method == "POST":
         branch_name_src_ui = request.form['branch_name_src']
         branch_name_tgt_ui = request.form['branch_name_tgt']
         _branch_create = common_functions.branch_creator(branch_name_src_ui, branch_name_tgt_ui)
@@ -63,8 +63,8 @@ def create_branch(branch_name):
             flash(f'Branch create exception {branch_create_error}', category="danger")
 
         return redirect('/gh_branches_manager/')
-    else:
-        return abort(405)
+
+    return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/gh_branches_manager/branch/<branch_name>/delete/',
@@ -78,7 +78,7 @@ def delete_branch(branch_name):
     if request.method == "GET":
         return render_template('views/branch_deleter.html',
                                template_current_branch=branch_name)
-    elif request.method == "POST":
+    if request.method == "POST":
         _branch_delete = common_functions.branch_deleter(
             branch_name=branch_name)
         branch_delete_status = _branch_delete.get('status')
@@ -90,8 +90,8 @@ def delete_branch(branch_name):
                   category="danger")
 
         return redirect('/gh_branches_manager/')
-    else:
-        return abort(405)
+
+    return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>/', methods=['GET'])
@@ -143,7 +143,7 @@ def upload_file(branch_name):
     if request.method == "GET":
         return render_template('views/file_uploader.html',
                                template_current_branch=branch_name)
-    elif request.method == "POST":
+    if request.method == "POST":
         message = request.form['commit_message']
 
         try:
@@ -176,8 +176,8 @@ def upload_file(branch_name):
             flash(f'File create exception {file_create_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
-    else:
-        return abort(405)
+
+    return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
@@ -219,7 +219,7 @@ def edit_file(branch_name, file_name):
                                file_name=file_name,
                                file_contents=file_contents)
 
-    elif request.method == "POST":
+    if request.method == "POST":
         message = request.form['commit_message']
         gh_file_path = file_name
 
@@ -254,8 +254,8 @@ def edit_file(branch_name, file_name):
             flash(f'File edit exception {file_edit_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
-    else:
-        return abort(405)
+
+    return abort(405)
 
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
@@ -282,7 +282,7 @@ def delete_file(branch_name, file_name):
                                template_current_branch=branch_name,
                                file_name=file_name)
 
-    elif request.method == "POST":
+    if request.method == "POST":
         message = request.form['commit_message']
         _file_delete = common_functions.file_deleter(
             gh_file_path=file_name,
@@ -297,5 +297,5 @@ def delete_file(branch_name, file_name):
             flash(f'File delete exception {file_delete_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
-    else:
-        return abort(405)
+
+    abort(405)
