@@ -1,11 +1,11 @@
 # flask_mvc_github_example_project
 
-![](https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/rating.svg)
+![](https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/rating.svg)
 ## an example project for working with branches and files in your Github repo using Flask webapp / api
 ### 10000 ft. overview:
 ![alt text][diagram]
 
-[diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/diagram.png "diagram"
+[diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/diagram.png "diagram"
 
 ### purpose of this Flask project is to demonstrate:
 1) how to deliver the same features in both api endpoints and static html forms in one Flask project
