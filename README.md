@@ -19,15 +19,15 @@ in the MVC design pattern)
 ### few screenshots of the Flask web application UI:
 ![alt text][mainscreen]
 
-[mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/main_screen.png "main screen"
+[mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/main_screen.png "main screen"
 
 ![alt text][branchesmanager]
 
-[branchesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/branches_manager.png "branchesmanager"
+[branchesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/branches_manager.png "branchesmanager"
 
 ![alt text][filesmanager]
 
-[filesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/files_manager.png "filesmanager"
+[filesmanager]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/files_manager.png "filesmanager"
 
 
 
@@ -47,7 +47,7 @@ flask_secret_key = <your generated flask secret key>
 
 ![alt text][setup]
 
-[setup]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/flaskr/docs/setup.png "setup"
+[setup]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/setup.png "setup"
 
 
 *disclaimer: this example project codebase comes as is, in a production ready application, besides other things, 
