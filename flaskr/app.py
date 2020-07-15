@@ -47,9 +47,8 @@ def index():
     index route render template function
     :return:
     """
-    with APP.app_context():
-        return render_template('index.html',
-                               template_current_branch=settings.INITIAL_BRANCH_NAME)
+    return render_template('index.html',
+                           template_current_branch=settings.INITIAL_BRANCH_NAME)
 
 
 if __name__ == '__main__':

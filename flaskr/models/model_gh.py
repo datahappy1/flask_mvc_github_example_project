@@ -44,9 +44,9 @@ class GhBranch(GhBaseModel):
         :return:
         """
         try:
-            branches = self.repo.get_branches()
+            branches_response = self.repo.get_branches()
             branches_list = []
-            for branch in branches:
+            for branch in branches_response:
                 branches_list.append(branch.raw_data.get('name'))
             return {'status': 200,
                     'content': branches_list}
@@ -62,9 +62,9 @@ class GhBranch(GhBaseModel):
         :return:
         """
         try:
-            srcbranch = self.repo.get_branch(source_branch)
+            src_branch_response = self.repo.get_branch(source_branch)
             self.repo.create_git_ref(ref='refs/heads/' + target_branch,
-                                     sha=srcbranch.commit.sha)
+                                     sha=src_branch_response.commit.sha)
             return {'status': 201}
         except GithubException as github_exc:
             return {'status': github_exc.status,
@@ -77,8 +77,8 @@ class GhBranch(GhBaseModel):
         :return:
         """
         try:
-            branch_ref = self.repo.get_git_ref(f"heads/{branch_name}")
-            branch_ref.delete()
+            branch_ref_response = self.repo.get_git_ref(f"heads/{branch_name}")
+            branch_ref_response.delete()
             return {'status': 200}
         except GithubException as github_exc:
             return {'status': github_exc.status,
@@ -115,11 +115,11 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            _commit = self.repo.get_branch(branch_name)
-            commit = _commit.commit
-            commit = commit.raw_data.get('sha')
+            commit_response = self.repo.get_branch(branch_name)
+            commit = commit_response.commit
+            commit_head = commit.raw_data.get('sha')
             return {'status': 200,
-                    'content': commit}
+                    'content': commit_head}
         except GithubException as github_exc:
             return {'status': github_exc.status,
                     'error': github_exc.data}
@@ -132,11 +132,11 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            contents = self.repo.get_contents(gh_file_path, ref=branch_name)
-            url = contents.download_url
-            req = requests.get(url)
+            contents_response = self.repo.get_contents(gh_file_path, ref=branch_name)
+            url = contents_response.download_url
+            request_response = requests.get(url)
             return {'status': 200,
-                    'content': req.status_code}
+                    'content': request_response.status_code}
         except GithubException as github_exc:
             return {'status': github_exc.status,
                     'error': github_exc.data}
@@ -149,8 +149,8 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            resp = self.repo.get_contents(gh_file_path, ref=branch_name)
-            sha = resp.sha
+            sha_response = self.repo.get_contents(gh_file_path, ref=branch_name)
+            sha = sha_response.sha
             return {'status': 200,
                     'content': sha}
         except GithubException as github_exc:
@@ -165,17 +165,17 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            _commit = GhFile.get_head_commit(self, branch_name)
-            if _commit.get('status') == 200:
-                ref = _commit.get('content')
+            commit_response = GhFile.get_head_commit(self, branch_name)
+            if commit_response.get('status') == 200:
+                ref = commit_response.get('content')
             # if cannot retrieve head commit sha, use branch sha
             else:
                 ref = branch_name
 
-            contents = self.repo.get_contents(gh_file_path, ref=ref)
-            url = contents.download_url
-            req = requests.get(url)
-            raw_data = req.content.decode('UTF-8')
+            contents_response = self.repo.get_contents(gh_file_path, ref=ref)
+            url = contents_response.download_url
+            request_response = requests.get(url)
+            raw_data = request_response.content.decode('UTF-8')
             return {'status': 200,
                     'content': raw_data}
         except GithubException as github_exc:
@@ -207,9 +207,9 @@ class GhFile(GhBaseModel):
         :param branch_name:
         :return:
         """
-        _sha = GhFile.get_file_sha(self, gh_file_path, branch_name)
-        if _sha.get('status') == 200:
-            sha = _sha.get('content')
+        sha_response = GhFile.get_file_sha(self, gh_file_path, branch_name)
+        if sha_response.get('status') == 200:
+            sha = sha_response.get('content')
             try:
                 self.repo.update_file(gh_file_path, message, content, sha, branch_name)
                 return {'status': 200}
@@ -217,8 +217,8 @@ class GhFile(GhBaseModel):
                 return {'status': github_exc.status,
                         'error': github_exc.data}
         else:
-            return {'status': _sha.get('status'),
-                    'error': _sha.get('error')}
+            return {'status': sha_response.get('status'),
+                    'error': sha_response.get('error')}
 
     def delete_file(self, gh_file_path, message, branch_name) -> dict:
         """
@@ -228,9 +228,9 @@ class GhFile(GhBaseModel):
         :param branch_name:
         :return:
         """
-        _sha = GhFile.get_file_sha(self, gh_file_path, branch_name)
-        if _sha.get('status') == 200:
-            sha = _sha.get('content')
+        sha_response = GhFile.get_file_sha(self, gh_file_path, branch_name)
+        if sha_response.get('status') == 200:
+            sha = sha_response.get('content')
             try:
                 self.repo.delete_file(gh_file_path, message, sha,
                                       branch=branch_name)
@@ -239,5 +239,5 @@ class GhFile(GhBaseModel):
                 return {'status': github_exc.status,
                         'error': github_exc.data}
         else:
-            return {'status': _sha.get('status'),
-                    'error': _sha.get('error')}
+            return {'status': sha_response.get('status'),
+                    'error': sha_response.get('error')}
