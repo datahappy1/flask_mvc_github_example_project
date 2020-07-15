@@ -8,7 +8,7 @@ import pytest
 from flaskr.settings import API_BASE_ENDPOINT
 from flaskr.app import APP
 
-TEST_RUNNER_ID = str(uuid.uuid4())
+TEST_RUNNER_ID = uuid.uuid4()
 TEST_BRANCH_NAME = 'requests_test_{}'.format(TEST_RUNNER_ID)
 TEST_FILE_NAME = 'test_file_99d4c5aa-4a57-4e76-9962-e38ea5a54895.txt'
 
