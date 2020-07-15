@@ -9,8 +9,8 @@ from werkzeug.exceptions import BadRequestKeyError
 from flaskr import settings, utils
 from flaskr.controllers import common_functions
 
-CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__,
-                             template_folder='templates')
+CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__, template_folder='templates')
+GH_FILE_PATH_BASE = "flaskr/" + settings.REPO_FOLDER
 
 
 @CONTROLLER_GH_UI.route('/gh_branches_manager/', methods=['GET'])
@@ -19,17 +19,19 @@ def gh_branches_manager():
     github branches manager function
     :return:
     """
-    _session_id = common_functions.session_getter()
-    gh_session_status, gh_session_id = _session_id.get('status'), _session_id.get('content')
+    _session_id_response_ui = common_functions.session_getter()
+    gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
+                                       _session_id_response_ui.get('content')
     flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
-    _branch_list = common_functions.branch_lister()
-    branch_list_status = _branch_list.get('status')
+    _branch_list_response_ui = common_functions.branch_lister()
+    branch_list_status = _branch_list_response_ui.get('status')
+
     if branch_list_status == 200:
-        branch_list_content = _branch_list.get('content')
+        branch_list_content = _branch_list_response_ui.get('content')
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
-        branch_list_error = _branch_list.get('error')
+        branch_list_error = _branch_list_response_ui.get('error')
         flash(f'Branches load exception {branch_list_error}', category="danger")
         return redirect('/')
 
@@ -50,16 +52,19 @@ def create_branch(branch_name):
     if request.method == "GET":
         return render_template('views/branch_creator.html',
                                template_current_branch=branch_name)
+
     if request.method == "POST":
         branch_name_src_ui = request.form['branch_name_src']
         branch_name_tgt_ui = request.form['branch_name_tgt']
-        _branch_create = common_functions.branch_creator(branch_name_src_ui, branch_name_tgt_ui)
-        branch_create_status = _branch_create.get('status')
+        _branch_create_response_ui = common_functions.branch_creator(branch_name_src_ui,
+                                                                     branch_name_tgt_ui)
+        branch_create_status = _branch_create_response_ui.get('status')
+
         if branch_create_status == 201:
             flash(f'Branch {branch_name_tgt_ui} based on {branch_name_src_ui} was created!',
                   category="success")
         else:
-            branch_create_error = _branch_create.get('error')
+            branch_create_error = _branch_create_response_ui.get('error')
             flash(f'Branch create exception {branch_create_error}', category="danger")
 
         return redirect('/gh_branches_manager/')
@@ -78,14 +83,15 @@ def delete_branch(branch_name):
     if request.method == "GET":
         return render_template('views/branch_deleter.html',
                                template_current_branch=branch_name)
+
     if request.method == "POST":
-        _branch_delete = common_functions.branch_deleter(
-            branch_name=branch_name)
-        branch_delete_status = _branch_delete.get('status')
+        _branch_delete_response_ui = common_functions.branch_deleter(branch_name=branch_name)
+        branch_delete_status = _branch_delete_response_ui.get('status')
+
         if branch_delete_status == 200:
             flash(f'Branch {branch_name} was deleted!', category="success")
         else:
-            branch_delete_error = _branch_delete.get('error')
+            branch_delete_error = _branch_delete_response_ui.get('error')
             flash('Branch delete exception {}'.format(branch_delete_error),
                   category="danger")
 
@@ -101,27 +107,30 @@ def gh_files_manager(branch_name):
     :param branch_name:
     :return:
     """
-    _session_id = common_functions.session_getter()
-    gh_session_status, gh_session_id = _session_id.get('status'), _session_id.get('content')
+    _session_id_response_ui = common_functions.session_getter()
+    gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
+                                       _session_id_response_ui.get('content')
     flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
-    _branch_list = common_functions.branch_lister()
-    branch_list_status = _branch_list.get('status')
+    _branch_list_response_ui = common_functions.branch_lister()
+    branch_list_status = _branch_list_response_ui.get('status')
+
     if branch_list_status == 200:
-        branch_list_content = _branch_list.get('content')
+        branch_list_content = _branch_list_response_ui.get('content')
         flash(f'Branches load success {branch_list_status}', category="success")
     else:
-        branch_list_error = _branch_list.get('error')
+        branch_list_error = _branch_list_response_ui.get('error')
         flash(f'Branches load exception {branch_list_error}', category="danger")
         return redirect('/')
 
-    _files_list = common_functions.file_lister(branch_name)
-    files_list_status = _files_list.get('status')
+    _files_list_response_ui = common_functions.file_lister(branch_name)
+    files_list_status = _files_list_response_ui.get('status')
+
     if files_list_status == 200:
-        files_list_content = _files_list.get('content')
+        files_list_content = _files_list_response_ui.get('content')
         flash(f'Files load success {files_list_status}', category="success")
     else:
-        files_list_error = _files_list.get('error')
+        files_list_error = _files_list_response_ui.get('error')
         flash(f'Files load exception {files_list_error}', category="danger")
         return redirect('/')
 
@@ -143,6 +152,7 @@ def upload_file(branch_name):
     if request.method == "GET":
         return render_template('views/file_uploader.html',
                                template_current_branch=branch_name)
+
     if request.method == "POST":
         message = request.form['commit_message']
 
@@ -154,25 +164,26 @@ def upload_file(branch_name):
         except FileNotFoundError:
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
+
             if file_name == '':
                 flash('No file uploaded, no file content found', category="danger")
                 return redirect('/gh_files_manager/branch/' + branch_name)
 
-        gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+        gh_file_path = GH_FILE_PATH_BASE + file_name
 
-        _file_create = common_functions.file_creator(
+        _file_create_response_ui = common_functions.file_creator(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
             branch_name=branch_name)
 
-        file_create_status = _file_create.get('status')
+        file_create_status = _file_create_response_ui.get('status')
 
         if file_create_status == 201:
             flash(f'File {file_name} was committed to the repository branch {branch_name} '
                   f'with the message {message}!', category="success")
         else:
-            file_create_error = _file_create.get('error')
+            file_create_error = _file_create_response_ui.get('error')
             flash(f'File create exception {file_create_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
@@ -190,13 +201,14 @@ def edit_file(branch_name, file_name):
     :return:
     """
     if request.method == "GET":
-        _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
-                                                            branch_name=branch_name)
-        file_exists_status = _file_exists.get('status')
+        _file_exists_response_ui = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                                        branch_name=branch_name)
+        file_exists_status = _file_exists_response_ui.get('status')
         if file_exists_status == 200:
 
             # check if file is text-editable type to load up file contents for the form
             file_extension = os.path.splitext(str(file_name))[1]
+
             if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
                 file_contents = common_functions.file_content_getter(gh_file_path=file_name,
                                                                      branch_name=branch_name) \
@@ -210,7 +222,7 @@ def edit_file(branch_name, file_name):
                 file_contents = None
 
         else:
-            file_exists_error = _file_exists.get('error')
+            file_exists_error = _file_exists_response_ui.get('error')
             flash(f'File exists exception {file_exists_error}', category="danger")
             return abort(404)
 
@@ -225,6 +237,7 @@ def edit_file(branch_name, file_name):
 
         try:
             file = request.files['uploaded_file']
+
             if file:
                 file_name_upload, file_contents = utils.file_uploader_helper(file)
                 flash(f"File {file_name} is the target for contents from {file_name_upload}",
@@ -239,18 +252,19 @@ def edit_file(branch_name, file_name):
         except (FileNotFoundError, BadRequestKeyError):
             file_contents = request.form['file_contents']
 
-        _file_edit = common_functions.file_updater(
+        _file_edit_response_ui = common_functions.file_updater(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
             branch_name=branch_name)
-        file_edit_status = _file_edit.get('status')
+        file_edit_status = _file_edit_response_ui.get('status')
+
         if file_edit_status == 200:
             flash(f'File {file_name} update was committed to the repository '
                   f'branch {branch_name} with the message {message}!',
                   category="success")
         elif file_edit_status != 200:
-            file_edit_error = _file_edit.get('error')
+            file_edit_error = _file_edit_response_ui.get('error')
             flash(f'File edit exception {file_edit_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
@@ -268,34 +282,34 @@ def delete_file(branch_name, file_name):
     :return:
     """
     if request.method == "GET":
-        _file_exists = common_functions.file_exists_checker(gh_file_path=file_name,
-                                                            branch_name=branch_name)
-        file_exists_status = _file_exists.get('status')
-        if file_exists_status == 200:
-            pass
-        else:
-            file_exists_error = _file_exists.get('error')
-            flash(f'File exists exception {file_exists_error}', category="danger")
-            return abort(404)
+        _file_exists_response_ui = common_functions.file_exists_checker(gh_file_path=file_name,
+                                                                        branch_name=branch_name)
+        file_exists_status = _file_exists_response_ui.get('status')
 
-        return render_template('views/file_deleter.html',
-                               template_current_branch=branch_name,
-                               file_name=file_name)
+        if file_exists_status == 200:
+            return render_template('views/file_deleter.html',
+                                   template_current_branch=branch_name,
+                                   file_name=file_name)
+
+        file_exists_error = _file_exists_response_ui.get('error')
+        flash(f'File exists exception {file_exists_error}', category="danger")
+        return abort(404)
 
     if request.method == "POST":
         message = request.form['commit_message']
-        _file_delete = common_functions.file_deleter(
+        _file_delete_response_ui = common_functions.file_deleter(
             gh_file_path=file_name,
             message=message,
             branch_name=branch_name)
-        file_delete_status = _file_delete.get('status')
+        file_delete_status = _file_delete_response_ui.get('status')
+
         if file_delete_status == 200:
             flash(f'File {file_name} deletion was committed to the repository '
                   f'branch {branch_name} with the message {message}!', category="success")
         else:
-            file_delete_error = _file_delete.get('error')
+            file_delete_error = _file_delete_response_ui.get('error')
             flash(f'File delete exception {file_delete_error}', category="danger")
 
         return redirect('/gh_files_manager/branch/' + branch_name)
 
-    abort(405)
+    return abort(405)

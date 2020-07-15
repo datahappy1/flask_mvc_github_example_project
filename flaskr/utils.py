@@ -13,7 +13,10 @@ def file_uploader_helper(file) -> tuple:
     """
     temp_folder = os.path.join(os.getcwd(), 'temp')
     if not os.path.isdir(temp_folder):
-        os.mkdir(temp_folder)
+        try:
+            os.mkdir(temp_folder)
+        except OSError:
+            raise OSError(f'Cannot create temp folder {temp_folder}')
 
     file_name = secure_filename(file.filename)
     temp_file_path = os.path.join(temp_folder, file_name)

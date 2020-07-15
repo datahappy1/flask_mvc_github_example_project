@@ -7,17 +7,6 @@ from github import Github, GithubException
 from flaskr import settings
 
 
-class GlobalGhModel:
-    """"
-    global class for accessing the Pygithub instance
-    """
-    def __init__(self, gh_global):
-        self.gh_global_object = gh_global
-
-    def __repr__(self):
-        return self.gh_global_object
-
-
 class GhBaseModel:
     """
     project parent github class
@@ -28,13 +17,20 @@ class GhBaseModel:
         self.repo = self.github.get_repo(init_repo)
         self.repo_folder = settings.REPO_FOLDER
 
+    def __repr__(self):
+        return "{}, {}".format(self.github, id(self))
+
     def get_session_id(self) -> dict:
         """
         get session id function
         :return:
         """
-        return {'status': 200,
-                'content': self.github}
+        try:
+            return {'status': 200,
+                    'content': self.github}
+        except GithubException as github_exc:
+            return {'status': github_exc.status,
+                    'error': github_exc.data}
 
 
 class GhBranch(GhBaseModel):
@@ -101,8 +97,8 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            files = self.repo.get_dir_contents("/flaskr/" + self.repo_folder,
-                                               ref=branch_name)
+            files = self.repo.get_contents(self.repo_folder,
+                                           ref=branch_name)
             files_list = []
             for file in files:
                 files_list.append(file.raw_data.get('path'))

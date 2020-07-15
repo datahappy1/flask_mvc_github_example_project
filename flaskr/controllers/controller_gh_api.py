@@ -10,6 +10,7 @@ from flaskr import settings, utils
 from flaskr.controllers import common_functions
 
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
+GH_FILE_PATH_BASE = "flaskr/" + settings.REPO_FOLDER
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches', methods=['GET', 'POST'])
@@ -21,11 +22,11 @@ def api_collection_branches():
     response = None
 
     if request.method == "GET":
-        _branch_list = common_functions.branch_lister()
-        branch_list_status = _branch_list.get('status')
+        _branch_list_response_api = common_functions.branch_lister()
+        branch_list_status = _branch_list_response_api.get('status')
 
         if branch_list_status == 200:
-            branch_list_content = _branch_list.get('content')
+            branch_list_content = _branch_list_response_api.get('content')
             response = jsonify({
                 'repository': settings.REPO,
                 'branches': branch_list_content,
@@ -34,7 +35,7 @@ def api_collection_branches():
                 'mimetype': 'application/json'
             })
         else:
-            branch_list_error = _branch_list.get('error')
+            branch_list_error = _branch_list_response_api.get('error')
             response = jsonify({
                 'status': branch_list_status,
                 'error': branch_list_error,
@@ -43,21 +44,22 @@ def api_collection_branches():
         response.status_code = branch_list_status
 
     if request.method == 'POST':
-        branch_name_src = request.form['branch_name_src']
-        branch_name_tgt = request.form['branch_name_tgt']
-        _branch_create = common_functions.branch_creator(branch_name_src, branch_name_tgt)
-        branch_create_status = _branch_create.get('status')
+        branch_name_src_api = request.form['branch_name_src']
+        branch_name_tgt_api = request.form['branch_name_tgt']
+        _branch_create_response_api = common_functions.branch_creator(branch_name_src_api,
+                                                                      branch_name_tgt_api)
+        branch_create_status = _branch_create_response_api.get('status')
 
         if branch_create_status == 201:
             response = jsonify({
                 'repository': settings.REPO,
-                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name_tgt,
+                'location': settings.API_BASE_ENDPOINT + '/branches/' + branch_name_tgt_api,
                 'method': request.method,
                 'status': branch_create_status,
                 'mimetype': 'application/json'
             })
         else:
-            branch_create_error = _branch_create.get('error')
+            branch_create_error = _branch_create_response_api.get('error')
             response = jsonify({
                 'status': branch_create_status,
                 'error': branch_create_error,
@@ -78,8 +80,8 @@ def api_singleton_branch(branch_name):
     response = None
 
     if request.method == 'DELETE':
-        _branch_delete = common_functions.branch_deleter(branch_name)
-        branch_delete_status = _branch_delete.get('status')
+        _branch_delete_response_api = common_functions.branch_deleter(branch_name)
+        branch_delete_status = _branch_delete_response_api.get('status')
 
         if branch_delete_status == 200:
             response = jsonify({
@@ -89,7 +91,7 @@ def api_singleton_branch(branch_name):
                 'mimetype': 'application/json'
             })
         else:
-            branch_delete_error = _branch_delete.get('error')
+            branch_delete_error = _branch_delete_response_api.get('error')
             response = jsonify({
                 'status': branch_delete_status,
                 'error': branch_delete_error,
@@ -110,11 +112,11 @@ def api_collection_files(branch_name):
     response = None
 
     if request.method == "GET":
-        _files_list = common_functions.file_lister(branch_name)
-        files_list_status = _files_list.get('status')
+        _files_list_response_api = common_functions.file_lister(branch_name)
+        files_list_status = _files_list_response_api.get('status')
 
         if files_list_status == 200:
-            files_list_content = _files_list.get('content')
+            files_list_content = _files_list_response_api.get('content')
             response = jsonify({
                 'repository': settings.REPO,
                 'branch': branch_name,
@@ -124,7 +126,7 @@ def api_collection_files(branch_name):
                 'mimetype': 'application/json'
             })
         else:
-            files_list_error = _files_list.get('error')
+            files_list_error = _files_list_response_api.get('error')
             response = jsonify({
                 'status': files_list_status,
                 'error': files_list_error,
@@ -147,15 +149,15 @@ def api_collection_files(branch_name):
             file_contents = request.form['file_contents']
             file_name = request.form['file_name']
 
-        gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+        gh_file_path = GH_FILE_PATH_BASE + file_name
 
-        _file_create = common_functions.file_creator(
+        _file_create_response_api = common_functions.file_creator(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
             branch_name=branch_name)
 
-        file_create_status = _file_create.get('status')
+        file_create_status = _file_create_response_api.get('status')
 
         if file_create_status == 201:
             response = jsonify({
@@ -168,7 +170,7 @@ def api_collection_files(branch_name):
                 'mimetype': 'application/json'
             })
         else:
-            file_create_error = _file_create.get('error')
+            file_create_error = _file_create_response_api.get('error')
             response = jsonify({
                 'status': file_create_status,
                 'error': file_create_error,
@@ -191,7 +193,7 @@ def api_singleton_file(branch_name, file_name):
     response = None
     message = request.form['commit_message']
     file_name = secure_filename(file_name)
-    gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
+    gh_file_path = GH_FILE_PATH_BASE + file_name
 
     if request.method == 'PUT':
         try:
@@ -203,15 +205,13 @@ def api_singleton_file(branch_name, file_name):
             file = request.files['uploaded_file']
             file_name, file_contents = utils.file_uploader_helper(file)
 
-            gh_file_path = "flaskr/" + settings.REPO_FOLDER + file_name
-
-        _file_update = common_functions.file_updater(
+        _file_update_response_api = common_functions.file_updater(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
             branch_name=branch_name)
 
-        file_update_status = _file_update.get('status')
+        file_update_status = _file_update_response_api.get('status')
 
         if file_update_status == 200:
             response = jsonify({
@@ -224,7 +224,7 @@ def api_singleton_file(branch_name, file_name):
                 'mimetype': 'application/json'
             })
         else:
-            file_update_error = _file_update.get('error')
+            file_update_error = _file_update_response_api.get('error')
             response = jsonify({
                 'status': file_update_status,
                 'error': file_update_error,
@@ -233,12 +233,12 @@ def api_singleton_file(branch_name, file_name):
         response.status_code = file_update_status
 
     if request.method == 'DELETE':
-        _file_delete = common_functions.file_deleter(
+        _file_delete_response_api = common_functions.file_deleter(
             gh_file_path=gh_file_path,
             message=message,
             branch_name=branch_name)
 
-        file_delete_status = _file_delete.get('status')
+        file_delete_status = _file_delete_response_api.get('status')
 
         if file_delete_status == 200:
             response = jsonify({
@@ -249,7 +249,7 @@ def api_singleton_file(branch_name, file_name):
                 'mimetype': 'application/json'
             })
         else:
-            file_update_error = _file_delete.get('error')
+            file_update_error = _file_delete_response_api.get('error')
             response = jsonify({
                 'status': file_delete_status,
                 'error': file_update_error,
