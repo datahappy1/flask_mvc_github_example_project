@@ -97,10 +97,10 @@ class GhFile(GhBaseModel):
         :return:
         """
         try:
-            files = self.repo.get_contents(self.repo_folder,
-                                           ref=branch_name)
+            files_response = self.repo.get_contents(self.repo_folder,
+                                                    ref=branch_name)
             files_list = []
-            for file in files:
+            for file in files_response:
                 files_list.append(file.raw_data.get('path'))
             return {'status': 200,
                     'content': files_list}
