@@ -50,6 +50,6 @@ flask_secret_key = <your generated flask secret key>
 [setup]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/setup.png "setup"
 
 
-*disclaimer: this example project codebase comes as is, in a production ready application, besides other things, 
+> disclaimer: this example project codebase comes as is, in a production ready application, besides other things, 
 you should use the OAuth protocol for the Github login, this library can
 get you started: https://github-flask.readthedocs.io/en/latest/

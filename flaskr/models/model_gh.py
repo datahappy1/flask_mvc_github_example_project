@@ -4,6 +4,7 @@ model github module
 import requests
 
 from github import Github, GithubException
+
 from flaskr import settings
 
 
