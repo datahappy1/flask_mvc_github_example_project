@@ -14,7 +14,7 @@ GH_FILE_PATH_BASE = "flaskr/" + settings.REPO_FOLDER
 
 
 @CONTROLLER_GH_UI.route('/gh_branches_manager/', methods=['GET'])
-def gh_branches_manager():
+def ui_collection_branches_route():
     """
     github branches manager function
     :return:
@@ -45,7 +45,7 @@ def gh_branches_manager():
 
 @CONTROLLER_GH_UI.route('/gh_branches_manager/branch/<branch_name>/create/',
                         methods=['GET', 'POST'])
-def create_branch(branch_name):
+def ui_singleton_branch_create_route(branch_name):
     """
     create branch function
     :param branch_name:
@@ -78,7 +78,7 @@ def create_branch(branch_name):
 
 @CONTROLLER_GH_UI.route('/gh_branches_manager/branch/<branch_name>/delete/',
                         methods=['GET', 'POST'])
-def delete_branch(branch_name):
+def ui_singleton_branch_delete_route(branch_name):
     """
     delete branch function
     :param branch_name:
@@ -107,7 +107,7 @@ def delete_branch(branch_name):
 
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>/', methods=['GET'])
-def gh_files_manager(branch_name):
+def ui_collection_files_route(branch_name):
     """
     github files manager function
     :param branch_name:
@@ -151,7 +151,7 @@ def gh_files_manager(branch_name):
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>/file/create/',
                         methods=['GET', 'POST'])
-def upload_file(branch_name):
+def ui_singleton_file_create_route(branch_name):
     """
     upload file function
     :param branch_name:
@@ -203,7 +203,7 @@ def upload_file(branch_name):
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
                         '/file/edit/<path:file_name>', methods=['GET', 'POST'])
-def edit_file(branch_name, file_name):
+def ui_singleton_file_edit_route(branch_name, file_name):
     """
     edit file function
     :param branch_name:
@@ -286,7 +286,7 @@ def edit_file(branch_name, file_name):
 
 @CONTROLLER_GH_UI.route('/gh_files_manager/branch/<branch_name>'
                         '/file/delete/<path:file_name>', methods=['GET', 'POST'])
-def delete_file(branch_name, file_name):
+def ui_singleton_file_delete_route(branch_name, file_name):
     """
     delete file function
     :param branch_name:

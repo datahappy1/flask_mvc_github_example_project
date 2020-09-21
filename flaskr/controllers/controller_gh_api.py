@@ -14,7 +14,7 @@ GH_FILE_PATH_BASE = "flaskr/" + settings.REPO_FOLDER
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches', methods=['GET', 'POST'])
-def api_collection_branches():
+def api_collection_branches_route():
     """
     api collection branches endpoint function
     :return:
@@ -72,7 +72,7 @@ def api_collection_branches():
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>', methods=['DELETE'])
-def api_singleton_branch(branch_name):
+def api_singleton_branch_route(branch_name):
     """
     api singleton branch endpoint function
     :param branch_name:
@@ -105,7 +105,7 @@ def api_singleton_branch(branch_name):
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files', methods=['GET', 'POST'])
-def api_collection_files(branch_name):
+def api_collection_files_route(branch_name):
     """
     api collection files endpoint function
     :param branch_name:
@@ -186,7 +186,7 @@ def api_collection_files(branch_name):
 
 @CONTROLLER_GH_API.route('/api/version1/branches/<branch_name>/files/<file_name>',
                          methods=['PUT', 'DELETE'])
-def api_singleton_file(branch_name, file_name):
+def api_singleton_file_route(branch_name, file_name):
     """
     api singleton file endpoint function
     :param branch_name:
