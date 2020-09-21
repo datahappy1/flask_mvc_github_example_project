@@ -7,7 +7,7 @@
       <div class="card-body">
         <h5 class="card-title">Github branches manager</h5>
         <p class="card-text">Here you can manage the Github branches in the repo.</p>
-        <a href="{{url_for('controller_gh_ui.gh_branches_manager')}}"
+        <a href="{{url_for('controller_gh_ui.ui_collection_branches_route')}}"
            class="btn btn-primary">Github branches manager</a>
       </div>
     </div>
@@ -17,7 +17,7 @@
       <div class="card-body">
         <h5 class="card-title">Github files manager</h5>
         <p class="card-text">Here you can manage the files in the Github branches in the repo.</p>
-        <a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=template_current_branch)}}"
+        <a href="{{url_for('controller_gh_ui.ui_collection_files_route', branch_name=template_current_branch)}}"
            class="btn btn-primary">Github files manager</a>
       </div>
     </div>

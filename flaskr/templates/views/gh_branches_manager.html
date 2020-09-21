@@ -17,15 +17,15 @@
         </thead>
         {% for branch in template_branch_list %}
         <tr>
-            <td><a href="{{url_for('controller_gh_ui.gh_files_manager', branch_name=branch)}}">
+            <td><a href="{{url_for('controller_gh_ui.ui_collection_files_route', branch_name=branch)}}">
                 {{ branch }}</a></td>
             <td>
-                <a href="{{ url_for('controller_gh_ui.create_branch', branch_name=branch) }}">
+                <a href="{{ url_for('controller_gh_ui.ui_singleton_branch_create_route', branch_name=branch) }}">
                     copy to a new branch
                 </a>
             </td>
             <td>
-                <a href="{{ url_for('controller_gh_ui.delete_branch', branch_name=branch) }}">
+                <a href="{{ url_for('controller_gh_ui.ui_singleton_branch_delete_route', branch_name=branch) }}">
                     delete branch
                 </a>
             </td>

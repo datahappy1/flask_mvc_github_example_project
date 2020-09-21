@@ -10,7 +10,7 @@ from flaskr import settings, utils
 from flaskr.models.model import Model
 
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
-GH_FILE_PATH_BASE = "flaskr/" + settings.REPO_FOLDER
+GH_FILE_PATH_BASE = settings.REPO_FOLDER
 
 
 @CONTROLLER_GH_API.route('/api/version1/branches', methods=['GET', 'POST'])

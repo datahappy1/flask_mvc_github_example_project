@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>flask_mvc_github_example_project</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
@@ -18,26 +17,18 @@
 <div class="container-fluid mt-3">
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
+        {% if messages %}
 
             {% for category,message in messages %}
                 <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
             {% endfor %}
 
-    {% endif %}
+        {% endif %}
     {% endwith %}
 
     {% block content %}
     {% endblock %}
 </div>
-
-<script>
-    window.setTimeout(function() {
-    $(".alert").fadeTo(500, 0).slideUp(500, function(){
-        $(this).remove();
-    });
-}, 2000);
-</script>
 
 </body>
 </html>
