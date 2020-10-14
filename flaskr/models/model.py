@@ -15,21 +15,21 @@ class Model:
     """
 
     def __init__(self):
-        self.model_gh = current_app.config["model_github"]
+        self.model = current_app.config["model_github"]
 
     def session_getter(self) -> dict:
         """
         session getter method
         :return:
         """
-        return GhBaseModel.get_session_id(self.model_gh)
+        return GhBaseModel.get_session_id(self.model)
 
     def branch_lister(self) -> dict:
         """
         branch lister method
         :return:
         """
-        return GhBranch.list_all_branches(self.model_gh)
+        return GhBranch.list_all_branches(self.model)
 
     def branch_creator(self, source_branch_name, target_branch_name) -> dict:
         """
@@ -38,7 +38,7 @@ class Model:
         :param target_branch_name:
         :return:
         """
-        return GhBranch.create_branch(self.model_gh,
+        return GhBranch.create_branch(self.model,
                                       source_branch=source_branch_name,
                                       target_branch=target_branch_name)
 
@@ -48,7 +48,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhBranch.delete_branch(self.model_gh,
+        return GhBranch.delete_branch(self.model,
                                       branch_name=branch_name)
 
     def file_lister(self, branch_name) -> dict:
@@ -57,7 +57,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        files_list_response = GhFile.list_all_files(self.model_gh,
+        files_list_response = GhFile.list_all_files(self.model,
                                                     branch_name)
 
         if files_list_response.get('status') == 200:
@@ -79,7 +79,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhFile.get_file_status(self.model_gh,
+        return GhFile.get_file_status(self.model,
                                       gh_file_path, branch_name)
 
     def file_content_getter(self, gh_file_path, branch_name) -> dict:
@@ -89,7 +89,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhFile.get_file_contents(self.model_gh,
+        return GhFile.get_file_contents(self.model,
                                         gh_file_path, branch_name)
 
     def file_creator(self, gh_file_path, message, content, branch_name) -> dict:
@@ -101,7 +101,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhFile.create_file(self.model_gh,
+        return GhFile.create_file(self.model,
                                   gh_file_path=gh_file_path,
                                   message=message,
                                   content=content,
@@ -116,7 +116,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhFile.update_file(self.model_gh,
+        return GhFile.update_file(self.model,
                                   gh_file_path=gh_file_path,
                                   message=message,
                                   content=content,
@@ -130,7 +130,7 @@ class Model:
         :param branch_name:
         :return:
         """
-        return GhFile.delete_file(self.model_gh,
+        return GhFile.delete_file(self.model,
                                   gh_file_path=gh_file_path,
                                   message=message,
                                   branch_name=branch_name)
