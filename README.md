@@ -1,14 +1,16 @@
 # flask_mvc_github_example_project
 
 ![](https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/rating.svg)
+
 Example project demonstrating CRUD paradigm on top of the branches and files in a Github repository, built with Flask.
 This project implements the same CRUD pattern using a Rest API and using a web application.
-### 10000 ft. overview:
+
+- ### 10000 ft. overview:
 ![alt text][diagram]
 
 [diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/diagram.png "diagram"
 
-### purpose of this Flask project is to demonstrate:
+- ### purpose of this Flask project is to demonstrate:
 1) how to deliver the same features in both API endpoints and static html forms in one Flask project
 2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
 3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
@@ -17,7 +19,7 @@ in the MVC design pattern)
 5) ability of such a web application to gracefully fail on Github integration exceptions
 6) how easy it is to integrate a Flask web application with Bootstrap used for styling
 
-### few screenshots of the Flask web application UI:
+- ### few screenshots of the Flask web application UI:
 ![alt text][mainscreen]
 
 [mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/main_screen.png "main screen"
@@ -32,7 +34,7 @@ in the MVC design pattern)
 
 
 
-### how to setup your environment:
+- ### how to setup your environment:
 1) git clone this repo
 2) setup a virtual environment for this project
 3) create a Github personal access token: login to Github and go to settings - developer settings - Personal access tokens - Generate a new token
