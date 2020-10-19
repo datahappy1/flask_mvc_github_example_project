@@ -1,14 +1,15 @@
 # flask_mvc_github_example_project
 
 ![](https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/rating.svg)
-## an example project for working with branches and files in your Github repo using Flask webapp / api
+Example project demonstrating CRUD paradigm on top of the branches and files in a Github repository, built with Flask.
+This project implements the same CRUD pattern using a Rest API and using a web application.
 ### 10000 ft. overview:
 ![alt text][diagram]
 
 [diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/diagram.png "diagram"
 
 ### purpose of this Flask project is to demonstrate:
-1) how to deliver the same features in both api endpoints and static html forms in one Flask project
+1) how to deliver the same features in both API endpoints and static html forms in one Flask project
 2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
 3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
 in the MVC design pattern)
