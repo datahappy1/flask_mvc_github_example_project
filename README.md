@@ -5,17 +5,17 @@
 Example project demonstrating the CRUD paradigm on top of the branches and files in a Github repository, built with Flask.
 This project implements the same CRUD pattern using a Rest API and using a web application.
 
-- [Project Overview](#Project Overview)
-- [Key features](#Key features)
-- [Screenshots from the web application](#Screenshots from the web application)
-- [How to install and setup locally](#How to install and setup locally)
+- [Project Overview](#project-overview)
+- [Key features](#key-features)
+- [Screenshots from the web application](#screenshots-from-the-web-application)
+- [How to install and setup locally](#how-to-install-and-setup-locally)
 
-### Project Overview:
+## Project Overview:
 ![alt text][diagram]
 
 [diagram]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/diagram.png "diagram"
 
-### Key features:
+## Key features:
 1) how to deliver the same features in both API endpoints and static html forms in one Flask project
 2) how Flask can be used with the MVC design pattern with the controller imported as Flask blueprints
 3) how Flask can deal with Github integration using the Github API v3 (used as the model "persistence" layer
@@ -24,7 +24,7 @@ in the MVC design pattern)
 5) ability of such a web application to gracefully fail on Github integration exceptions
 6) how easy it is to integrate a Flask web application with Bootstrap used for styling
 
-### Screenshots from the web application:
+## Screenshots from the web application:
 ![alt text][mainscreen]
 
 [mainscreen]: https://github.com/datahappy1/flask_mvc_github_example_project/blob/master/docs/main_screen.png "main screen"
@@ -39,7 +39,7 @@ in the MVC design pattern)
 
 
 
-### How to install and setup locally:
+## How to install and setup locally:
 1) `git clone` this repo
 2) setup a virtual environment for this project
 3) create a Github personal access token: login to Github and go to settings --> developer settings --> Personal access tokens --> Generate a new token
