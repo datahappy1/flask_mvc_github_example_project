@@ -3,11 +3,10 @@ controller github ui module
 """
 import os
 
-from flask import Blueprint, request, flash, redirect, render_template, abort
+from flask import Blueprint, request, flash, redirect, render_template, abort, current_app
 from werkzeug.exceptions import BadRequestKeyError
 
 from flaskr import settings, utils
-from flaskr.models.model import Model
 
 CONTROLLER_GH_UI = Blueprint('controller_gh_ui', __name__, template_folder='templates')
 GH_FILE_PATH_BASE = settings.REPO_FOLDER
@@ -19,14 +18,14 @@ def ui_collection_branches_route():
     github branches manager function
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
-    _session_id_response_ui = model.session_getter()
+    _session_id_response_ui = model.get_session_id()
     gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
                                        _session_id_response_ui.get('content')
     flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
-    _branch_list_response_ui = model.branch_lister()
+    _branch_list_response_ui = model.list_all_branches()
     branch_list_status = _branch_list_response_ui.get('status')
 
     if branch_list_status == 200:
@@ -51,7 +50,7 @@ def ui_singleton_branch_create_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
         return render_template('views/branch_creator.html',
@@ -60,8 +59,8 @@ def ui_singleton_branch_create_route(branch_name):
     if request.method == "POST":
         branch_name_src_ui = request.form['branch_name_src']
         branch_name_tgt_ui = request.form['branch_name_tgt']
-        _branch_create_response_ui = model.branch_creator(branch_name_src_ui,
-                                                          branch_name_tgt_ui)
+        _branch_create_response_ui = model.create_branch(branch_name_src_ui,
+                                                         branch_name_tgt_ui)
         branch_create_status = _branch_create_response_ui.get('status')
 
         if branch_create_status == 201:
@@ -84,14 +83,14 @@ def ui_singleton_branch_delete_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
         return render_template('views/branch_deleter.html',
                                template_current_branch=branch_name)
 
     if request.method == "POST":
-        _branch_delete_response_ui = model.branch_deleter(branch_name=branch_name)
+        _branch_delete_response_ui = model.delete_branch(branch_name=branch_name)
         branch_delete_status = _branch_delete_response_ui.get('status')
 
         if branch_delete_status == 200:
@@ -113,14 +112,14 @@ def ui_collection_files_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
-    _session_id_response_ui = model.session_getter()
+    _session_id_response_ui = model.get_session_id()
     gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
                                        _session_id_response_ui.get('content')
     flash(f'PyGithub connect success {gh_session_status}, {gh_session_id}', category="success")
 
-    _branch_list_response_ui = model.branch_lister()
+    _branch_list_response_ui = model.list_all_branches()
     branch_list_status = _branch_list_response_ui.get('status')
 
     if branch_list_status == 200:
@@ -131,7 +130,7 @@ def ui_collection_files_route(branch_name):
         flash(f'Branches load exception {branch_list_error}', category="danger")
         return redirect('/')
 
-    _files_list_response_ui = model.file_lister(branch_name)
+    _files_list_response_ui = model.list_all_files(branch_name)
     files_list_status = _files_list_response_ui.get('status')
 
     if files_list_status == 200:
@@ -157,7 +156,7 @@ def ui_singleton_file_create_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
         return render_template('views/file_uploader.html',
@@ -181,7 +180,7 @@ def ui_singleton_file_create_route(branch_name):
 
         gh_file_path = GH_FILE_PATH_BASE + file_name
 
-        _file_create_response_ui = model.file_creator(
+        _file_create_response_ui = model.create_file(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
@@ -210,11 +209,11 @@ def ui_singleton_file_edit_route(branch_name, file_name):
     :param file_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
-        _file_exists_response_ui = model.file_exists_checker(gh_file_path=file_name,
-                                                             branch_name=branch_name)
+        _file_exists_response_ui = model.get_file_status(gh_file_path=file_name,
+                                                         branch_name=branch_name)
         file_exists_status = _file_exists_response_ui.get('status')
         if file_exists_status == 200:
 
@@ -222,8 +221,8 @@ def ui_singleton_file_edit_route(branch_name, file_name):
             file_extension = os.path.splitext(str(file_name))[1]
 
             if file_extension in settings.EDITABLE_FILE_EXTENSION_LIST:
-                file_contents = model.file_content_getter(gh_file_path=file_name,
-                                                          branch_name=branch_name) \
+                file_contents = model.get_file_contents(gh_file_path=file_name,
+                                                        branch_name=branch_name) \
                     .get('content')
 
                 # if file is text-editable type but empty, the form shows the file content textarea
@@ -264,7 +263,7 @@ def ui_singleton_file_edit_route(branch_name, file_name):
         except (FileNotFoundError, BadRequestKeyError):
             file_contents = request.form['file_contents']
 
-        _file_edit_response_ui = model.file_updater(
+        _file_edit_response_ui = model.update_file(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
@@ -293,11 +292,11 @@ def ui_singleton_file_delete_route(branch_name, file_name):
     :param file_name:
     :return:
     """
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
-        _file_exists_response_ui = model.file_exists_checker(gh_file_path=file_name,
-                                                             branch_name=branch_name)
+        _file_exists_response_ui = model.get_file_status(gh_file_path=file_name,
+                                                         branch_name=branch_name)
         file_exists_status = _file_exists_response_ui.get('status')
 
         if file_exists_status == 200:
@@ -311,7 +310,7 @@ def ui_singleton_file_delete_route(branch_name, file_name):
 
     if request.method == "POST":
         message = request.form['commit_message']
-        _file_delete_response_ui = model.file_deleter(
+        _file_delete_response_ui = model.delete_file(
             gh_file_path=file_name,
             message=message,
             branch_name=branch_name)

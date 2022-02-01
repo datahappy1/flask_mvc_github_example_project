@@ -3,62 +3,61 @@ model module
 """
 import os
 
-from flask import current_app
-
 from flaskr import settings
-from flaskr.models.model_gh import GhBaseModel, GhBranch, GhFile
-
 
 class Model:
     """
-    Model base class
+    Model abstract factory
     """
 
-    def __init__(self):
-        self.model = current_app.config["model_github"]
+    def __init__(self, concrete_model):
+        self.model = concrete_model
 
-    def session_getter(self) -> dict:
+    def get_session_id(self) -> dict:
         """
-        session getter method
+        get_session_id method
         :return:
         """
-        return GhBaseModel.get_session_id(self.model)
+        return self.model.get_session_id()
 
-    def branch_lister(self) -> dict:
+    def list_all_branches(self) -> dict:
         """
-        branch lister method
+        list_all_branches method
         :return:
         """
-        return GhBranch.list_all_branches(self.model)
+        return self.model.list_all_branches()
 
-    def branch_creator(self, source_branch_name, target_branch_name) -> dict:
+    def create_branch(self, source_branch_name, target_branch_name) -> dict:
         """
-        branch creator method
+        create_branch method
         :param source_branch_name:
         :param target_branch_name:
         :return:
         """
-        return GhBranch.create_branch(self.model,
-                                      source_branch=source_branch_name,
-                                      target_branch=target_branch_name)
+        return self.model.create_branch(
+            source_branch=source_branch_name,
+            target_branch=target_branch_name
+        )
 
-    def branch_deleter(self, branch_name) -> dict:
+    def delete_branch(self, branch_name) -> dict:
         """
-        branch deleter method
+        delete_branch method
         :param branch_name:
         :return:
         """
-        return GhBranch.delete_branch(self.model,
-                                      branch_name=branch_name)
+        return self.model.delete_branch(
+            branch_name=branch_name
+        )
 
-    def file_lister(self, branch_name) -> dict:
+    def list_all_files(self, branch_name) -> dict:
         """
-        file lister method
+        list_all_files method
         :param branch_name:
         :return:
         """
-        files_list_response = GhFile.list_all_files(self.model,
-                                                    branch_name)
+        files_list_response = self.model.list_all_files(
+            branch_name
+        )
 
         if files_list_response.get('status') == 200:
             _files_list = []
@@ -72,65 +71,70 @@ class Model:
 
         return files_list_response
 
-    def file_exists_checker(self, gh_file_path, branch_name) -> dict:
+    def get_file_status(self, gh_file_path, branch_name) -> dict:
         """
-        file exists checker method
+        get_file_status method
         :param gh_file_path:
         :param branch_name:
         :return:
         """
-        return GhFile.get_file_status(self.model,
-                                      gh_file_path, branch_name)
+        return self.model.get_file_status(
+            gh_file_path, branch_name
+        )
 
-    def file_content_getter(self, gh_file_path, branch_name) -> dict:
+    def get_file_contents(self, gh_file_path, branch_name) -> dict:
         """
-        file content getter method
+        get_file_contents method
         :param gh_file_path:
         :param branch_name:
         :return:
         """
-        return GhFile.get_file_contents(self.model,
-                                        gh_file_path, branch_name)
+        return self.model.get_file_contents(
+            gh_file_path, branch_name
+        )
 
-    def file_creator(self, gh_file_path, message, content, branch_name) -> dict:
+    def create_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
-        file creator method
+        create_file method
         :param gh_file_path:
         :param message:
         :param content:
         :param branch_name:
         :return:
         """
-        return GhFile.create_file(self.model,
-                                  gh_file_path=gh_file_path,
-                                  message=message,
-                                  content=content,
-                                  branch_name=branch_name)
+        return self.model.create_file(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=content,
+            branch_name=branch_name
+        )
 
-    def file_updater(self, gh_file_path, message, content, branch_name) -> dict:
+    def update_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
-        file updater method
+        update_file method
         :param gh_file_path:
         :param message:
         :param content:
         :param branch_name:
         :return:
         """
-        return GhFile.update_file(self.model,
-                                  gh_file_path=gh_file_path,
-                                  message=message,
-                                  content=content,
-                                  branch_name=branch_name)
+        return self.model.update_file(
+            gh_file_path=gh_file_path,
+            message=message,
+            content=content,
+            branch_name=branch_name
+        )
 
-    def file_deleter(self, gh_file_path, message, branch_name) -> dict:
+    def delete_file(self, gh_file_path, message, branch_name) -> dict:
         """
-        file deleter method
+        delete_file method
         :param gh_file_path:
         :param message:
         :param branch_name:
         :return:
         """
-        return GhFile.delete_file(self.model,
-                                  gh_file_path=gh_file_path,
-                                  message=message,
-                                  branch_name=branch_name)
+        return self.model.delete_file(
+            gh_file_path=gh_file_path,
+            message=message,
+            branch_name=branch_name
+        )

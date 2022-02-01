@@ -1,5 +1,5 @@
 flask==1.1.2
 werkzeug==1.0.1
-PyGithub==1.51
+PyGithub==1.55
 requests==2.24.0
 pytest

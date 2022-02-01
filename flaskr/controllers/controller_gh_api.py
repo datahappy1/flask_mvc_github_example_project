@@ -4,10 +4,9 @@ controller github api module
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 
 from flaskr import settings, utils
-from flaskr.models.model import Model
 
 CONTROLLER_GH_API = Blueprint('controller_gh_api', __name__)
 GH_FILE_PATH_BASE = settings.REPO_FOLDER
@@ -20,10 +19,10 @@ def api_collection_branches_route():
     :return:
     """
     response = None
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
-        _branch_list_response_api = model.branch_lister()
+        _branch_list_response_api = model.list_all_branches()
         branch_list_status = _branch_list_response_api.get('status')
 
         if branch_list_status == 200:
@@ -47,8 +46,8 @@ def api_collection_branches_route():
     if request.method == 'POST':
         branch_name_src_api = request.form['branch_name_src']
         branch_name_tgt_api = request.form['branch_name_tgt']
-        _branch_create_response_api = model.branch_creator(branch_name_src_api,
-                                                           branch_name_tgt_api)
+        _branch_create_response_api = model.create_branch(branch_name_src_api,
+                                                          branch_name_tgt_api)
         branch_create_status = _branch_create_response_api.get('status')
 
         if branch_create_status == 201:
@@ -79,10 +78,10 @@ def api_singleton_branch_route(branch_name):
     :return:
     """
     response = None
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == 'DELETE':
-        _branch_delete_response_api = model.branch_deleter(branch_name)
+        _branch_delete_response_api = model.delete_branch(branch_name)
         branch_delete_status = _branch_delete_response_api.get('status')
 
         if branch_delete_status == 200:
@@ -112,10 +111,10 @@ def api_collection_files_route(branch_name):
     :return:
     """
     response = None
-    model = Model()
+    model = current_app.config["model_github"]
 
     if request.method == "GET":
-        _files_list_response_api = model.file_lister(branch_name)
+        _files_list_response_api = model.list_all_files(branch_name)
         files_list_status = _files_list_response_api.get('status')
 
         if files_list_status == 200:
@@ -154,7 +153,7 @@ def api_collection_files_route(branch_name):
 
         gh_file_path = GH_FILE_PATH_BASE + file_name
 
-        _file_create_response_api = model.file_creator(
+        _file_create_response_api = model.create_file(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
@@ -194,7 +193,7 @@ def api_singleton_file_route(branch_name, file_name):
     :return:
     """
     response = None
-    model = Model()
+    model = current_app.config["model_github"]
 
     message = request.form['commit_message']
     file_name = secure_filename(file_name)
@@ -210,7 +209,7 @@ def api_singleton_file_route(branch_name, file_name):
             file = request.files['uploaded_file']
             file_name, file_contents = utils.file_uploader_helper(file)
 
-        _file_update_response_api = model.file_updater(
+        _file_update_response_api = model.update_file(
             gh_file_path=gh_file_path,
             message=message,
             content=file_contents,
@@ -238,7 +237,7 @@ def api_singleton_file_route(branch_name, file_name):
         response.status_code = file_update_status
 
     if request.method == 'DELETE':
-        _file_delete_response_api = model.file_deleter(
+        _file_delete_response_api = model.delete_file(
             gh_file_path=gh_file_path,
             message=message,
             branch_name=branch_name)
