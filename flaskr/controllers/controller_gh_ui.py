@@ -18,7 +18,7 @@ def ui_collection_branches_route():
     github branches manager function
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     _session_id_response_ui = model.get_session_id()
     gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
@@ -50,7 +50,7 @@ def ui_singleton_branch_create_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         return render_template('views/branch_creator.html',
@@ -83,7 +83,7 @@ def ui_singleton_branch_delete_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         return render_template('views/branch_deleter.html',
@@ -112,7 +112,7 @@ def ui_collection_files_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     _session_id_response_ui = model.get_session_id()
     gh_session_status, gh_session_id = _session_id_response_ui.get('status'), \
@@ -156,7 +156,7 @@ def ui_singleton_file_create_route(branch_name):
     :param branch_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         return render_template('views/file_uploader.html',
@@ -209,7 +209,7 @@ def ui_singleton_file_edit_route(branch_name, file_name):
     :param file_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         _file_exists_response_ui = model.get_file_status(gh_file_path=file_name,
@@ -292,7 +292,7 @@ def ui_singleton_file_delete_route(branch_name, file_name):
     :param file_name:
     :return:
     """
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         _file_exists_response_ui = model.get_file_status(gh_file_path=file_name,

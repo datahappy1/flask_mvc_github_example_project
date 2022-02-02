@@ -19,7 +19,7 @@ def api_collection_branches_route():
     :return:
     """
     response = None
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         _branch_list_response_api = model.list_all_branches()
@@ -78,7 +78,7 @@ def api_singleton_branch_route(branch_name):
     :return:
     """
     response = None
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == 'DELETE':
         _branch_delete_response_api = model.delete_branch(branch_name)
@@ -111,7 +111,7 @@ def api_collection_files_route(branch_name):
     :return:
     """
     response = None
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     if request.method == "GET":
         _files_list_response_api = model.list_all_files(branch_name)
@@ -193,7 +193,7 @@ def api_singleton_file_route(branch_name, file_name):
     :return:
     """
     response = None
-    model = current_app.config["model_github"]
+    model = current_app.config["model"]
 
     message = request.form['commit_message']
     file_name = secure_filename(file_name)

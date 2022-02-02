@@ -7,7 +7,7 @@ from flaskr import settings
 
 class Model:
     """
-    Model abstract factory
+    Model base class
     """
 
     def __init__(self, concrete_model):

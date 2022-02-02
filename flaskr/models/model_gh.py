@@ -1,50 +1,36 @@
 """
 model github module
 """
-from dataclasses import dataclass
 import requests
 
 from github import Github, GithubException
 from flaskr import settings
 
 
-@dataclass()
-class SuccessResponse():
+def make_success_response(status, content):
     """
-    Success response class
+    make success response function
+    :param status:
+    :param content:
+    :return:
     """
-    status: int
-    content: any
-
-    def make_response(self):
-        """
-        make success response method
-        :return:
-        """
-        return dict(status=self.status, content=self.content)
+    return dict(status=status, content=content)
 
 
-@dataclass()
-class ErrorResponse():
+def make_error_response(status, error):
     """
-    Error response class
+    make error response function
+    :param status:
+    :param error:
+    :return:
     """
-    status: int
-    error: dict
-
-    def make_response(self):
-        """
-        make error response method
-        :return:
-        """
-        return dict(status=self.status, error=str(self.error))
+    return dict(status=status, error=str(error))
 
 
 class GhBaseModel:
     """
     Github model class
     """
-
     def __init__(self, init_token, init_repo):
         self.github = Github(init_token)
         self.repo = self.github.get_repo(init_repo)
@@ -64,9 +50,9 @@ class GhBaseModel:
             commit_response = self.repo.get_branch(branch_name)
             commit = commit_response.commit
             commit_head = commit.raw_data.get('sha')
-            return SuccessResponse(200, commit_head).make_response()
+            return make_success_response(200, commit_head)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def _get_file_sha(self, gh_file_path, branch_name) -> dict:
         """
@@ -78,9 +64,9 @@ class GhBaseModel:
         try:
             sha_response = self.repo.get_contents(gh_file_path, ref=branch_name)
             sha = sha_response.sha
-            return SuccessResponse(200, sha).make_response()
+            return make_success_response(200, sha)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def get_session_id(self) -> dict:
         """
@@ -88,9 +74,9 @@ class GhBaseModel:
         :return:
         """
         try:
-            return SuccessResponse(200, self.github).make_response()
+            return make_success_response(200, self.github)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def list_all_branches(self) -> dict:
         """
@@ -102,9 +88,9 @@ class GhBaseModel:
             branches_list = []
             for branch in branches_response:
                 branches_list.append(branch.raw_data.get('name'))
-            return SuccessResponse(200, branches_list).make_response()
+            return make_success_response(200, branches_list)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def create_branch(self, source_branch, target_branch) -> dict:
         """
@@ -117,9 +103,9 @@ class GhBaseModel:
             src_branch_response = self.repo.get_branch(source_branch)
             self.repo.create_git_ref(ref='refs/heads/' + target_branch,
                                      sha=src_branch_response.commit.sha)
-            return SuccessResponse(201, None).make_response()
+            return make_success_response(201, None)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def delete_branch(self, branch_name) -> dict:
         """
@@ -130,9 +116,9 @@ class GhBaseModel:
         try:
             branch_ref_response = self.repo.get_git_ref(f"heads/{branch_name}")
             branch_ref_response.delete()
-            return SuccessResponse(200, None).make_response()
+            return make_success_response(200, None)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def list_all_files(self, branch_name) -> dict:
         """
@@ -146,9 +132,9 @@ class GhBaseModel:
             files_list = []
             for file in files_response:
                 files_list.append(file.raw_data.get('path'))
-            return SuccessResponse(200, files_list).make_response()
+            return make_success_response(200, files_list)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def get_file_status(self, gh_file_path, branch_name) -> dict:
         """
@@ -161,9 +147,9 @@ class GhBaseModel:
             contents_response = self.repo.get_contents(gh_file_path, ref=branch_name)
             url = contents_response.download_url
             request_response = requests.get(url)
-            return SuccessResponse(200, request_response.status_code).make_response()
+            return make_success_response(200, request_response.status_code)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def get_file_contents(self, gh_file_path, branch_name) -> dict:
         """
@@ -184,9 +170,9 @@ class GhBaseModel:
             url = contents_response.download_url
             request_response = requests.get(url)
             raw_data = request_response.content.decode('UTF-8')
-            return SuccessResponse(200, raw_data).make_response()
+            return make_success_response(200, raw_data)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def create_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
@@ -199,9 +185,9 @@ class GhBaseModel:
         """
         try:
             self.repo.create_file(gh_file_path, message, content, branch_name)
-            return SuccessResponse(201, None).make_response()
+            return make_success_response(201, None)
         except GithubException as github_exc:
-            return ErrorResponse(github_exc.status, github_exc.data).make_response()
+            return make_error_response(github_exc.status, github_exc.data)
 
     def update_file(self, gh_file_path, message, content, branch_name) -> dict:
         """
@@ -217,14 +203,14 @@ class GhBaseModel:
             sha = sha_response.get('content')
             try:
                 self.repo.update_file(gh_file_path, message, content, sha, branch_name)
-                return SuccessResponse(200, None).make_response()
+                return make_success_response(200, None)
             except GithubException as github_exc:
-                return ErrorResponse(github_exc.status, github_exc.data).make_response()
+                return make_error_response(github_exc.status, github_exc.data)
         else:
-            return ErrorResponse(
+            return make_error_response(
                 sha_response.get('status'),
                 sha_response.get('error')
-            ).make_response()
+            )
 
     def delete_file(self, gh_file_path, message, branch_name) -> dict:
         """
@@ -240,11 +226,11 @@ class GhBaseModel:
             try:
                 self.repo.delete_file(gh_file_path, message, sha,
                                       branch=branch_name)
-                return SuccessResponse(200, None).make_response()
+                return make_success_response(200, None)
             except GithubException as github_exc:
-                return ErrorResponse(github_exc.status, github_exc.data).make_response()
+                return make_error_response(github_exc.status, github_exc.data)
         else:
-            return ErrorResponse(
+            return make_error_response(
                 sha_response.get('status'),
                 sha_response.get('error')
-            ).make_response()
+            )

@@ -21,8 +21,8 @@ def create_app():
     current_app.register_blueprint(CONTROLLER_GH_UI)
     current_app.register_blueprint(CONTROLLER_GH_API)
 
-    current_app.config['model_github'] = Model(GhBaseModel(init_token=os.environ['github_token'],
-                                                           init_repo=settings.REPO))
+    current_app.config['model'] = Model(GhBaseModel(init_token=os.environ['github_token'],
+                                                    init_repo=settings.REPO))
     return current_app
 
 
